@@ -1,0 +1,58 @@
+name:              java2scala
+version:           1.0
+Build-Type:        Simple
+cabal-version:     >= 1.8
+author:            Andrea Moruno
+
+executable java2scala
+  main-is:         Main.hs
+  hs-source-dirs:  src
+  build-depends:   base,
+                   directory,
+                   uu-parsinglib,
+                   uulib,
+                   java2scala,
+                   filepath,
+                   Cabal >= 1.8,
+                   pipes,
+                   bytestring,
+                   pipes-safe,
+                   unix,
+                   system-filepath
+
+executable test
+  main-is:       Main.hs
+  hs-source-dirs: test
+  build-depends:   base,
+                   directory,
+                   uu-parsinglib,
+                   uulib,
+                   java2scala,
+                   filepath,
+                   Cabal >= 1.8,
+                   pipes,
+                   bytestring,
+                   pipes-safe,
+                   unix,
+                   system-filepath
+
+library
+  build-depends:
+                   base,
+                   directory,
+                   uu-parsinglib,
+                   uulib,
+                   filepath,
+                   Cabal >= 1.8,
+                   pipes,
+                   bytestring,
+                   pipes-safe,
+                   unix,
+                   system-filepath
+  exposed-modules: J2s.Scanner J2s.Parser J2s.Integration
+        J2s.Scanner.Token J2s.Scanner.Show J2s.Scanner.Lexical J2s.Scanner.Generic
+        J2s.Scanner.Position J2s.Integration.ScannerParser J2s.Ast.Sintax J2s.Ast.Semantic
+
+  ghc-options:  -fno-warn-missing-signatures
+  -- extensions: per-instance pragmas OVERLAPPING/OVERLAPPABLE/OVERLAPS instance {-# OVERLAPPABLE #-} Show a => Show [a] where …
+  hs-source-dirs: src test
