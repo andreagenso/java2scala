@@ -130,7 +130,7 @@ tokenToByteString ls = foldl (\x (Token ormj str pos) ->
 --handler path = do
 --    canRead <- liftIO $ fmap readable $ getPermissions path
 --    isDir   <- liftIO $ doesDirectoryExist path
---    isValidExtension <- liftIO $ evaluate ((snd (splitExtension path) == ".java" || snd (splitExtension path) == ".mora") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
+--    isValidExtension <- liftIO $ evaluate ((snd (splitExtension path) == ".java") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
 --    when (not isDir && canRead && isValidExtension) $
 --        (readFileS 10240 path >-> liftIO . applyScanner) path
 
@@ -138,7 +138,7 @@ tokenToByteString ls = foldl (\x (Token ormj str pos) ->
 --handlerParser path = do
 --    canRead <- liftIO $ fmap readable $ getPermissions path
 --    isDir   <- liftIO $ doesDirectoryExist path
---    isValidExtension <- liftIO $ evaluate ((snd (splitExtension path) == ".java" || snd (splitExtension path) == ".mora") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
+--    isValidExtension <- liftIO $ evaluate ((snd (splitExtension path) == ".java" ) && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
 --    when (not isDir && canRead && isValidExtension) $
 --        (readFileS 10240 path >-> liftIO . applyParser) path
 
@@ -172,7 +172,7 @@ getRecursiveContents topdir = do
 --          isDirectory <- doesDirectoryExist path
 --          if isDirectory
 --                then recursiveContentsParser  path
---                else if ((snd (splitExtension path) == ".java" || snd (splitExtension path) == ".mora") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
+--                else if ((snd (splitExtension path) == ".java") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
 --                        then
 --                            do
 --                                reading <- readFile path

@@ -18,7 +18,8 @@ executable java2scala
                    bytestring,
                    pipes-safe,
                    unix,
-                   system-filepath
+                   system-filepath,
+                   uuagc
 
 executable test
   main-is:       Main.hs
@@ -34,7 +35,8 @@ executable test
                    bytestring,
                    pipes-safe,
                    unix,
-                   system-filepath
+                   system-filepath,
+                   uuagc
 
 library
   build-depends:
@@ -48,7 +50,8 @@ library
                    bytestring,
                    pipes-safe,
                    unix,
-                   system-filepath
+                   system-filepath,
+                   uuagc
   exposed-modules: J2s.Scanner J2s.Parser J2s.Integration
         J2s.Scanner.Token J2s.Scanner.Show J2s.Scanner.Lexical J2s.Scanner.Generic
         J2s.Scanner.Position J2s.Integration.ScannerParser J2s.Ast.Sintax J2s.Ast.Semantic

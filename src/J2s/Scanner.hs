@@ -9,7 +9,7 @@ import J2s.Scanner.Generic
 import UU.Scanner.Position
 import J2s.Scanner.Position
 
-{- Scanner Mora Project, OrmJ Language  -}
+{- Scanner J2S Project  -}
 -- Init the scan 
 scanner :: File -> IO()
 scanner file = loadLexicalStructure file

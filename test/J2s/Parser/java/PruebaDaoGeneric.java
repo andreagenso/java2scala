@@ -17,7 +17,6 @@ public class PruebaDaoGeneric {
 		List<Alumno> list = daoTest.getList();
 
 		if (list.size() == 0) {
-			// Generamos un juego de datos de prueba.mora
 			Alumno alumno = new Alumno();
 			alumno.setApellido("Perez");
 			alumno.setNombre("Pedro");

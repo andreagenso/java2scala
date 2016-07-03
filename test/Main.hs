@@ -212,7 +212,7 @@ test "tsiset"  = tsiset
 test _ = print ("Command not found!!")
 
 
--- main -- allFirstLines "/home/andrea/workspaceclipse_haskell/Mora-Ormj"
+-- main -- allFirstLines "/home/andrea/workspaceclipse_haskell/java2scala"
 
 -- main = runSafeIO $ runProxy $ runEitherK $
---      contentsRecursive "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test" />/ handler
+--      contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test" />/ handler

@@ -10,127 +10,128 @@ import Content
 import Pipes
 
 
-testSingleParser = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/java/CharArrayPropertyEditorTests.java"
+testSingleParser = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/java/CharArrayPropertyEditorTests.java"
 
 {-
 testParser  = runSafeIO $ runProxy $ runEitherK $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test" />/ handlerParser
+                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test" />/ handlerParser
 
 testParserJavaTest  = runSafeIO $ runProxy $ runEitherK $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/java/openjdk-6-src-b27/jdk/test/java/lang/StrictMath/" />/ handlerParser
+                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/java/lang/StrictMath/" />/ handlerParser
 
 testParserJavaTest2  = runSafeIO $ runProxy $ runEitherK $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/java/openjdk-6-src-b27/langtools/test/" />/ handlerParser
+                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/" />/ handlerParser
 
 testParserEncodingDir = runSafeIO $ runProxy $ runEitherK $
-                                      contentsRecursive "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/java/openjdk-6-src-b27/langtools/test/com/sun/javadoc/testEncoding/" />/ handlerParser
+                                      contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/com/sun/javadoc/testEncoding/" />/ handlerParser
 -}
 
 {-
 testParser  = runExceptT $ runEffect $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test" />/ handlerParser
+                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test" />/ handlerParser
 
 testParserJavaTest  = runExceptT $ runEffect $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/java/openjdk-6-src-b27/jdk/test/java/lang/StrictMath/" />/ handlerParser
+                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/java/lang/StrictMath/" />/ handlerParser
 
 testParserJavaTest2  = runExceptT $ runEffect $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/java/openjdk-6-src-b27/langtools/test/" />/ handlerParser
+                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/" />/ handlerParser
 
 testParserEncodingDir = runExceptT $ runEffect $
-                                      contentsRecursive "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/java/openjdk-6-src-b27/langtools/test/com/sun/javadoc/testEncoding/" />/ handlerParser
+                                      contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/com/sun/javadoc/testEncoding/" />/ handlerParser
 -}
 
 
 
 -- testAllTypeParser = do
---                        res <- recursiveContentsParser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser"
+--                        res <- recursiveContentsParser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser"
 --                       let tokens = res
 --                       putStr (show tokens)
 
 -- testParser = do
---                res <- recursiveContentsParser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test"
+--                res <- recursiveContentsParser "/home/andrea/workspaceclipse_haskell/java2scala/test"
 --                let tokens = res
 --                putStr (show tokens)
 
-tsp0 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/0compilationUnit.mora"
-tsp1 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/1compilationUnitSimple.mora"
-tsp2 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/2packageDeclarationMarkerAnnotation.mora"
-tsp2_1 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/2packageDeclarationNormalAnnotation1.mora"
-tsp2_2 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/2packageDeclarationNormalAnnotation2.mora"
-tsp2_3 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/2packageDeclarationNormalAnnotation3.mora"
-tsp2_4 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/2packageDeclarationSimple.mora"
-tsp2_5 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/2packageDeclarationSingleElementAnnotation1.mora"
-tsp7 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/7elementValuePairs.mora"
-tsp8 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/8elementValuePair.mora"
-tsp9 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/9elementValue.mora"
-tsp10 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/10conditionalExpression.mora"
-tsp11 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/11conditionalOrExpression.mora"
-tsp17 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/17relationalExpression.mora"
-tsp18 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/18shiftExpression.mora"
-tsp19 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/19additiveExpression.mora"
-tsp21 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/21unaryExpression.mora"
-tsp24 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/24unaryExpressionNotPlusMinus.mora"
-tsp25 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/25postfixExpression.mora"
-tsp26 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/26primary.mora"
-tsp27 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/27primaryNoNewArray.mora"
-tsp28 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/28literal.mora"
-tsp29 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/29type.mora"
-tsp30 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/30primitiveType.mora"
-tsp34 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/34referenceType.mora"
-tsp35 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/35classOrInterfaceType.mora"
-tsp38 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/38typeArguments.mora"
-tsp40 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/40actualTypeArgument.mora"
-tsp47 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/47expression.mora"
-tsp49 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/49assignment.mora"
-tsp56 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/56classInstanceCreationExpression.mora"
-tsp58 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/58methodInvocation.mora"
-tsp62 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/62arrayCreationExpression.mora"
-tsp69 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/69postIncrementExpression.mora"
-tsp70 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/70postDecrementExpression.mora"
-tsp71 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/71castExpression.mora"
-tsp72 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/72elementValueArrayInitializer.mora"
-tsp76 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/76packageName.mora"
-tsp77 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/77importDeclarations.mora"
-tsp84 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/84typeDeclarations.mora"
-tsp85 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/85typeDeclaration0.mora"
-tsp85_1 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/85typeDeclaration1.mora"
-tsp85_2 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/85typeDeclaration2.mora"
-tsp86_1 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/86classDeclaration1.mora"
-tsp87 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/87normalClassDeclaration.mora"
-tsp92 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/92typeParameter.mora"
-tsp96 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/96super.mora"
-tsp97 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/97interfaces.mora"
-tsp99 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/99classBody.mora"
-tsp102 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/102classMemberDeclaration.mora"
-tsp110 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/110methodDeclaration.mora"
-tsp127 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/127block.mora"
-tsp132 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/132statement.mora"
-tsp132_1 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/132statement1.mora"
-tsp133 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/133statementWithoutTrailingSubstatement.mora"
-tsp154 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/154switchStatement.mora"
-tsp162 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/162doStatement.mora"
-tsp166 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/166ifThenElseStatement.mora"
-tsp167 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/167statementNoShortIf.mora"
-tsp179 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/179interfaceDeclaration.mora"
-tsp193 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/193annotationTypeDeclaration.mora"
-tsp198 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/198enumDeclaration.mora"
-tsp203 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/203instanceInitializer.mora"
-tsp204 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/204staticInitializer.mora"
-tsp205 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/205constructorDeclaration.mora"
-tspClase = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/Clase.mora"
-tspclase1 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/clase1.mora"
-tspclase2 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/clase2.mora"
-tspClass = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/Class.mora"
-tspEV = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/elemenValueVsElementValuePairs.mora"
-tspImport = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/Import.mora"
-tspPI = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/PackageImportTest.mora"
-tspPC = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/PruebaConditionalExpression.mora"
-tspPP = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/PruebaParser.mora"
+-- Todo check sintax
+tsp0 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/0compilationUnit.java"
+tsp1 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/1compilationUnitSimple.java"
+tsp2 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/2packageDeclarationMarkerAnnotation.java"
+tsp2_1 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/2packageDeclarationNormalAnnotation1.java"
+tsp2_2 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/2packageDeclarationNormalAnnotation2.java"
+tsp2_3 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/2packageDeclarationNormalAnnotation3.java"
+tsp2_4 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/2packageDeclarationSimple.java"
+tsp2_5 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/2packageDeclarationSingleElementAnnotation1.java"
+tsp7 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/7elementValuePairs.java"
+tsp8 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/8elementValuePair.java"
+tsp9 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/9elementValue.java"
+tsp10 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/10conditionalExpression.java"
+tsp11 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/11conditionalOrExpression.java"
+tsp17 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/17relationalExpression.java"
+tsp18 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/18shiftExpression.java"
+tsp19 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/19additiveExpression.java"
+tsp21 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/21unaryExpression.java"
+tsp24 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/24unaryExpressionNotPlusMinus.java"
+tsp25 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/25postfixExpression.java"
+tsp26 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/26primary.java"
+tsp27 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/27primaryNoNewArray.java"
+tsp28 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/28literal.java"
+tsp29 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/29type.java"
+tsp30 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/30primitiveType.java"
+tsp34 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/34referenceType.java"
+tsp35 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/35classOrInterfaceType.java"
+tsp38 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/38typeArguments.java"
+tsp40 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/40actualTypeArgument.java"
+tsp47 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/47expression.java"
+tsp49 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/49assignment.java"
+tsp56 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/56classInstanceCreationExpression.java"
+tsp58 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/58methodInvocation.java"
+tsp62 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/62arrayCreationExpression.java"
+tsp69 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/69postIncrementExpression.java"
+tsp70 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/70postDecrementExpression.java"
+tsp71 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/71castExpression.java"
+tsp72 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/72elementValueArrayInitializer.java"
+tsp76 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/76packageName.java"
+tsp77 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/77importDeclarations.java"
+tsp84 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/84typeDeclarations.java"
+tsp85 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/85typeDeclaration0.java"
+tsp85_1 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/85typeDeclaration1.java"
+tsp85_2 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/85typeDeclaration2.java"
+tsp86_1 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/86classDeclaration1.java"
+tsp87 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/87normalClassDeclaration.java"
+tsp92 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/92typeParameter.java"
+tsp96 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/96super.java"
+tsp97 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/97interfaces.java"
+tsp99 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/99classBody.java"
+tsp102 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/102classMemberDeclaration.java"
+tsp110 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/110methodDeclaration.java"
+tsp127 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/127block.java"
+tsp132 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/132statement.java"
+tsp132_1 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/132statement1.java"
+tsp133 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/133statementWithoutTrailingSubstatement.java"
+tsp154 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/154switchStatement.java"
+tsp162 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/162doStatement.java"
+tsp166 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/166ifThenElseStatement.java"
+tsp167 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/167statementNoShortIf.java"
+tsp179 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/179interfaceDeclaration.java"
+tsp193 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/193annotationTypeDeclaration.java"
+tsp198 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/198enumDeclaration.java"
+tsp203 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/203instanceInitializer.java"
+tsp204 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/204staticInitializer.java"
+tsp205 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/205constructorDeclaration.java"
+tspClase = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/Clase.java"
+tspclase1 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/clase1.java"
+tspclase2 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/clase2.java"
+tspClass = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/Class.java"
+tspEV = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/elemenValueVsElementValuePairs.java"
+tspImport = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/Import.java"
+tspPI = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/PackageImportTest.java"
+tspPC = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/PruebaConditionalExpression.java"
+tspPP = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/PruebaParser.java"
 
-tspj1 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/java/AbstractApplicationContextTests.java"
-tspj2 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/java/AbstractAttributes.java"
-tspj3 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/java/AbstractBeanFactoryTests.java"
-tspj4 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/java/AbstractControlFlowTests.java"
-tspj5 = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/java/AbstractListableBeanFactoryTests.java"
+tspj1 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/java/AbstractApplicationContextTests.java"
+tspj2 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/java/AbstractAttributes.java"
+tspj3 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/java/AbstractBeanFactoryTests.java"
+tspj4 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/java/AbstractControlFlowTests.java"
+tspj5 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/java/AbstractListableBeanFactoryTests.java"
 
-tspj = parser "/home/andrea/workspaceclipse_haskell/Mora-Ormj/test/Mora/Ormj/Parser/java/CharArrayPropertyEditorTests.java"
+tspj = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/java/CharArrayPropertyEditorTests.java"
