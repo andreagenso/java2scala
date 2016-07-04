@@ -1,7 +1,7 @@
 module J2s.Ast.Sintax where
 
 -- 1
-data Ormj = Ormj  PackageDeclaration   ImportDeclarations  TypeDeclarations
+data J2s = J2s  PackageDeclaration   ImportDeclarations  TypeDeclarations
                   deriving Show
 
 

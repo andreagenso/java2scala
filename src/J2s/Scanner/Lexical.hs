@@ -31,11 +31,11 @@ constantBool = ["true","false"]
 ---- operatorSingle = [">","<","!","~","?",":","+","-","*","/","&","|","^","%"] -- se ha quitado =
         
 ---- operatorDoble :: [Operator]
--- operatorDoble = ["==","<=",">=","!=","+=","-=","*=","/=","&=","|=","^=","%=","&&","||","++","--","<<", "HS@ORMJShift>>ShiftORMJ@"]
+-- operatorDoble = ["==","<=",">=","!=","+=","-=","*=","/=","&=","|=","^=","%=","&&","||","++","--","<<", "HS@J2SShift>>ShiftJ2S@"]
 ---- operatorDoble = ["==","<=",">=","!=","+=","-=","*=","/=","&=","|=","^=","%=","&&","||","++","--","<<",">>"]
 
 ---- operatorTri :: [Operator]
----- operatorTri = ["<<=",">>=",">>>=", "HS@ORMJShift>>>ShiftORMJ@"]
+---- operatorTri = ["<<=",">>=",">>>=", "HS@J2SShift>>>ShiftJ2S@"]
 -- operatorTri = ["<<=",">>=",">>>=",">>>"]
 
 ---- operatorQuard :: [Operator]

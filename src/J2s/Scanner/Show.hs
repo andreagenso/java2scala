@@ -4,10 +4,10 @@ import J2s.Scanner.Token
 
 -- Result Structure
 instance Show Token where 
-        show (Token ormj str pos) = show ormj ++ " " ++ show str ++ "\t" ++ show pos ++ "\n"
+        show (Token j2s str pos) = show j2s ++ " " ++ show str ++ "\t" ++ show pos ++ "\n"
 
 -- Name of Result Structure
-instance Show OrmjSc where
+instance Show J2sSc where
         show Identifier                          = "Identifier        : "
         show KeyWord                             = "KeyWord           : "
         show SpecialSimbol                   = "Special Simbol    : " 

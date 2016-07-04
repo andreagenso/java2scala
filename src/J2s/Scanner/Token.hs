@@ -6,10 +6,10 @@ import UU.Scanner.Position
 -- import Text.ParserCombinators.UU.BasicInstances
             
 {- Data types -}
-data Token = Token OrmjSc SimCode Pos
+data Token = Token J2sSc SimCode Pos
 
 {- Tokens -}
-data OrmjSc = Identifier
+data J2sSc = Identifier
            | KeyWord
            | SpecialSimbol
            | BooleanLiteral

@@ -3,6 +3,7 @@ version:           1.0
 Build-Type:        Simple
 cabal-version:     >= 1.8
 author:            Andrea Moruno
+extra-source-files: src/J2s/Ag/Sintax.ag
 
 executable java2scala
   main-is:         Main.hs
@@ -19,7 +20,8 @@ executable java2scala
                    pipes-safe,
                    unix,
                    system-filepath,
-                   uuagc
+                   uuagc,
+                   uuagc-cabal
 
 executable test
   main-is:       Main.hs
@@ -36,7 +38,26 @@ executable test
                    pipes-safe,
                    unix,
                    system-filepath,
-                   uuagc
+                   uuagc,
+                   uuagc-cabal
+
+executable ag
+  main-is:       Sintax.hs
+  hs-source-dirs: src/J2s/Ag
+  build-depends:   base,
+                   directory,
+                   uu-parsinglib,
+                   uulib,
+                   java2scala,
+                   filepath,
+                   Cabal >= 1.8,
+                   pipes,
+                   bytestring,
+                   pipes-safe,
+                   unix,
+                   system-filepath,
+                   uuagc,
+                   uuagc-cabal
 
 library
   build-depends:
@@ -51,7 +72,8 @@ library
                    pipes-safe,
                    unix,
                    system-filepath,
-                   uuagc
+                   uuagc,
+                   uuagc-cabal
   exposed-modules: J2s.Scanner J2s.Parser J2s.Integration
         J2s.Scanner.Token J2s.Scanner.Show J2s.Scanner.Lexical J2s.Scanner.Generic
         J2s.Scanner.Position J2s.Integration.ScannerParser J2s.Ast.Sintax J2s.Ast.Semantic

@@ -15,27 +15,27 @@ import UU.Parsing
 -- file debe llevar el path del archivo actual
 -- file = ""
 
-instance Eq OrmjSc => Eq Token where
-  (Token ormj1 cad1 pos1) == (Token ormj2 cad2 pos2) = ormj1 == ormj2 && (  ormj1 == Identifier || 
-                                                                ormj1 == BooleanLiteral || ormj1 == CharacterLiteral ||
-                                                                ormj1 == StringLiteral  || ormj1 == (DecimalIntegerLiteral )
-                                                                || ormj1 == (HexIntegerLiteral )
-                                                                || ormj1 == (OctalIntegerLiteral )
-                                                                || ormj1 == (DecimalFloatingPointLiteral) 
-                                                                || ormj1 == (HexadecimalFloatingPointLiteral) 
---                                                              || ormj1 == NullLiteral  
+instance Eq J2sSc => Eq Token where
+  (Token j2s1 cad1 pos1) == (Token j2s2 cad2 pos2) = j2s1 == j2s2 && (  j2s1 == Identifier ||
+                                                                j2s1 == BooleanLiteral || j2s1 == CharacterLiteral ||
+                                                                j2s1 == StringLiteral  || j2s1 == (DecimalIntegerLiteral )
+                                                                || j2s1 == (HexIntegerLiteral )
+                                                                || j2s1 == (OctalIntegerLiteral )
+                                                                || j2s1 == (DecimalFloatingPointLiteral)
+                                                                || j2s1 == (HexadecimalFloatingPointLiteral)
+--                                                              || j2s1 == NullLiteral
                                 || cad1 == cad2 )
 
 instance Ord Token where
-  (Token ormj1 cad1 pos1) <= (Token ormj2 cad2 pos2) = ormj1 < ormj2 || (ormj1 == ormj2 && cad1 <= cad2)
+  (Token j2s1 cad1 pos1) <= (Token j2s2 cad2 pos2) = j2s1 < j2s2 || (j2s1 == j2s2 && cad1 <= cad2)
  
 instance Symbol Token
 
 -- Los parsers atomicos
 obtenerVal (Token _ cad pos) = cad
 
-tSym ::  OrmjSc -> SimCode -> Parser Token SimCode
-tSym ormj str   = obtenerVal <$> pSym (Token ormj str (initPos ""))
+tSym ::  J2sSc -> SimCode -> Parser Token SimCode
+tSym j2s str   = obtenerVal <$> pSym (Token j2s str (initPos ""))
 
 pIdentifier                      = tSym Identifier ""
 pKeyWord       kw                = tSym KeyWord kw
@@ -86,8 +86,8 @@ pNullLiteral      "null"   = tSym NullLiteral "null"
 -- sem_IntLiteral_OctalIntegerLiteral   = OctalIntegerLiteral
 -- pFloatingLiteral             = tSym (FloatingLiteral) ""
 
--- pOperator'' ">" ">" ">" = tSym Operator "HS@ORMJShift>>>ShiftORMJ@"
--- pOperator'  ">" ">"     = tSym Operator "HS@ORMJShift>>ShiftORMJ@"
+-- pOperator'' ">" ">" ">" = tSym Operator "HS@J2SShift>>>ShiftJ2S@"
+-- pOperator'  ">" ">"     = tSym Operator "HS@J2SShift>>ShiftJ2s@"
 
 sem_Bool x | x == "true" = True
                    | x == "false" = False

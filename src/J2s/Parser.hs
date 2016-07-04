@@ -9,7 +9,7 @@ import J2s.Integration.ScannerParser
 
 import UU.Scanner.Position
 -- 1
-pOrmj =  sem_Ormj_Ormj <$> pPackageDeclaration <*> pImportDeclarations <*> pTypeDeclarations
+pJ2s =  sem_J2s_J2s <$> pPackageDeclaration <*> pImportDeclarations <*> pTypeDeclarations
 -- -----------------------------------------------------------------------------------
 -- Parser of PackageDeclaration - pAnnotations
 -- ----------------------------------------------------------------------------------------
@@ -657,5 +657,5 @@ pCatchClause = sem_CatchClause_CatchClause <$ pKeyWord "catch" <* pSpecialSimbol
 parser nombre = do 
                    entrada   <- readFile nombre
                    let sel   = classify entrada (initPos nombre)
-                   resultado <- parseIO pOrmj sel
+                   resultado <- parseIO pJ2s sel
                    putStrLn( show resultado)

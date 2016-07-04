@@ -3,8 +3,8 @@ module J2s.Ast.Semantic where
 import J2s.Ast.Sintax
 
 -- tomar en cuenta comentarios
-sem_Ormj_Ormj = Ormj
--- sem_Ormj_NilOrmj = NilOrmj -- no se considera el caso Nil
+sem_J2s_J2s = J2s
+-- sem_J2s_NilJ2s = NilJ2s -- no se considera el caso Nil
                   
 -- definicion completa
 sem_PackageDeclaration_PackageDeclaration = PackageDeclaration
