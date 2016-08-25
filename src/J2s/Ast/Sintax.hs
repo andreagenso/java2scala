@@ -2,8 +2,7 @@ module J2s.Ast.Sintax where
 
 -- 1
 data J2s = J2s  PackageDeclaration   ImportDeclarations  TypeDeclarations
-                  deriving Show
-
+          deriving Show
 
 -- 2-  definicion completa
 data PackageDeclaration = PackageDeclaration Annotations PackageName

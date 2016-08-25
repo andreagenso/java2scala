@@ -8,32 +8,29 @@ import UU.Scanner.Position
 import Control.Exception(evaluate)
 import Control.Monad(forM, liftM)
 
-
-
---import Control.Proxy
---import Control.Proxy.Safe hiding (readFileS)
-import Pipes
 import System.FilePath ((</>), takeFileName)
 import Content
-
+import Control.Proxy
+import Control.Proxy.Safe
+import Control.Monad ( forM, forM_, liftM )
+import Debug.Trace ( trace )
+import System.Environment ( getArgs )
+import System.IO.Unsafe ( unsafeInterleaveIO )
 
 
 testSingleScanner = scanner "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/src/share/classes/com/sun/demo/jvmti/hprof/Tracker.java"
 
-{-
 testScanner  = runSafeIO $ runProxy $ runEitherK $
                     contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test" />/ handler
 
 testJavaTest  = runSafeIO $ runProxy $ runEitherK $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/java/lang/StrictMath/" />/ handler
-
-testJavaTest2  = runSafeIO $ runProxy $ runEitherK $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/" />/ handler
+                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test" />/ handler
 
 testEncodingDir = runSafeIO $ runProxy $ runEitherK $
                                       contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/com/sun/javadoc/testEncoding/" />/ handler
--}
 
+
+test001 = scanner "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/javax/xml/crypto/dsig/GenerationTests.java"
 -- OK resolved testFloat = scanner "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/java/lang/StrictMath/Expm1Tests.java"
 -- testear codificacion
 testEncode = scanner "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/com/sun/javadoc/testEncoding/EncodeTest.java"

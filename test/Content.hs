@@ -12,36 +12,40 @@ import UU.Scanner.Position
 import UU.Parsing
 
 import Control.Monad (when, unless)
---import Control.Proxy
-import Pipes
-import Pipes.Core(respond, request)
-import Pipes.Safe
-import Pipes.Tutorial
---import Control.Proxy.Safe hiding (readFileS)
+import Control.Proxy
+import Control.Proxy.Safe hiding (readFileS)
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as B8
 import System.Directory (readable, getPermissions, doesDirectoryExist)
 import System.FilePath ((</>), takeFileName)
-import System.Posix.Directory (DirStream, openDirStream, closeDirStream, readDirStream)
+import System.Posix (openDirStream, readDirStream, closeDirStream)
 import System.IO (openFile, hClose, IOMode(ReadMode), hIsEOF)
 
-import qualified Filesystem.Path.CurrentOS as F
 import J2s.Scanner.Token
 import Text.Show
 
 
+import UU.Parsing
+
+import J2s.Ast.Sintax
+import J2s.Scanner
+import J2s.Ast.Semantic
+import J2s.Integration.ScannerParser
+
+import UU.Scanner.Position
+
+
 -- --------------------------------------------------------------------------------------------------------------------
 -- Pipe
---contents
---       :: MonadSafe m => FilePath ->() -> Proxy (Exception p) FilePath SafeT ()
---     :: (MonadSafe p)
---     => FilePath -> () -> Producer (Exception p) FilePath SafeT ()
+contents
+     :: (CheckP p)
+     => FilePath -> () -> Producer (ExceptionP p) FilePath SafeIO ()
 contents path () = do
-     canRead <- liftIO $ fmap readable $ getPermissions path
-     when canRead $ bracket ( liftIO $ openDirStream path) (liftIO . closeDirStream) $ \dirp -> do
+     canRead <- tryIO $ fmap readable $ getPermissions path
+     when canRead $ bracket id (openDirStream path) closeDirStream $ \dirp -> do
          let loop = do
-                 file <- liftIO $ readDirStream dirp
+                 file <- tryIO $ readDirStream dirp
                  case file of
                      [] -> return ()
                      _  -> do
@@ -49,33 +53,48 @@ contents path () = do
                          loop
          loop
 
---contentsRecursive
---     :: (MonadSafe p)
---     => FilePath -> () -> Producer (Exception p) FilePath SafeT ()
---contentsRecursive path () = loop path
---   where
---     loop path = do
---         contents path () </> \newPath -> do
---             respond newPath
---             isDir <- liftIO $ doesDirectoryExist newPath
---             let isChild = not $ takeFileName newPath `elem` [".", ".."]
---             when (isDir && isChild) $ loop newPath
+contentsRecursive
+     :: (CheckP p)
+     => FilePath -> () -> Producer (ExceptionP p) FilePath SafeIO ()
+contentsRecursive path () = loop path
+   where
+     loop path = do
+         contents path () //> \newPath -> do
+             respond newPath
+             isDir <- tryIO $ doesDirectoryExist newPath
+             let isChild = not $ takeFileName newPath `elem` [".", ".."]
+             when (isDir && isChild) $ loop newPath
 
---readFileS
---    ::  MonadSafe p
---    => Int -> FilePath -> () -> Producer (Exception p) B.ByteString SafeT ()
---readFileS chunkSize path () =
---    bracket id (openFile path ReadMode) hClose $ \handle -> do
---        let loop = do
---                eof <- liftIO $ hIsEOF handle
---                unless eof $ do
---                    bs <- liftIO $ B.hGetSome handle chunkSize
---                    respond bs
---                    loop
---        loop
+readFileS
+    :: (CheckP p)
+    => Int -> FilePath -> () -> Producer (ExceptionP p) B.ByteString SafeIO ()
+readFileS chunkSize path () =
+    bracket id (openFile path ReadMode) hClose $ \handle -> do
+        let loop = do
+                eof <- tryIO $ hIsEOF handle
+                unless eof $ do
+                    bs <- tryIO $ B.hGetSome handle chunkSize
+                    respond bs
+                    loop
+        loop
 
--- firstLine :: (Proxy p) => () -> Consumer p B.ByteString IO ()
-firstLine () = loop
+
+readFileSP
+    :: (CheckP p)
+    => Int -> FilePath -> () -> Producer (ExceptionP p) B.ByteString SafeIO ()
+readFileSP chunkSize path () =
+    bracket id (openFile path ReadMode) hClose $ \handle -> do
+        let loop = do
+                eof <- tryIO $ hIsEOF handle
+                unless eof $ do
+                    bs <- tryIO $ B.hGetSome handle chunkSize
+                    respond bs
+                    loop
+        loop
+
+
+firstLine :: (Proxy p) => () -> Consumer p B.ByteString IO ()
+firstLine () = runIdentityP loop
   where
     loop = do
         bs <- request ()
@@ -84,67 +103,60 @@ firstLine () = loop
         if (B.null suffix) then loop else lift $ B8.putStr (B8.pack "\n")
 
 
---allContent :: (Proxy p) => () -> Consumer p B.ByteString IO ()
---allContent :: (Proxy p, Show a) => () -> Consumer p B.ByteString IO () r
-allContent () = loop
+allContent :: (Proxy p) => () -> Consumer p B.ByteString IO ()
+allContent () = runIdentityP loop
   where
     loop = do
         bs <- request ()
         lift $ B8.putStr bs
 
 
---applyScanner :: (Proxy p) => String ->  Consumer p B.ByteString IO ()
-applyScanner path = loop
+applyScanner :: (Proxy p) => String ->  Consumer p B.ByteString IO ()
+applyScanner path = runIdentityP loop
   where
     loop = do
         bs <- request ()
-        let sc = tokenToByteString (classify (B8.unpack bs) (initPos path))
+        let sc = tokenToByteString (classify (initPos path)(B8.unpack bs))
         lift $ putStrLn ("Opening file --------------------------------------------------------------- " ++ path)
         lift $ putStrLn ("LO QUE SE LEE ES *********************************************  " ++ (B8.unpack bs))
         lift $ B8.putStrLn sc
         lift $ putStrLn ("Closing file  ---------------------------------------------------------------  " ++ path)
 
+applyParser :: Proxy p => String -> Consumer p B.ByteString IO ()
+applyParser path = runIdentityP loop
+  where
+    loop = do
+        bs <- request ()
+        lift $ putStrLn ("Opening file --------------------------------------------------------------- " ++ path)
+        lift $ putStrLn ("LO QUE SE LEE ES *********************************************  " ++ (B8.unpack bs))
+        let sc = classify  (initPos path) (B8.unpack bs)
+        lift $ B8.putStrLn =<< tokensParserToByteString sc
+        lift $ putStrLn ("Closing file  ---------------------------------------------------------------  " ++ path)
 
---applyParser :: (Proxy p) => String -> Consumer p B.ByteString IO ()
---applyParser path = runEffect loop
---  where
---    loop = do
---        bs <- request ()
---        let sc = (classify (B8.unpack bs) (initPos path))
---        let res = parseIO pOrmj sc
---        lift $  B8.putStrLn (B8.pack (show res))
+tokensParserToByteString :: [Token] -> IO B.ByteString
+tokensParserToByteString tokens = fmap (B8.pack . show) $ parseIO pJ2s tokens
 
-
--- ((B8.pack (show ormj)) B8.append (B8.pack " ") B8.append (B8.pack str) B8.append (B8.pack "\t") B8.append (B8.pack pos) B8.append (B8.pack "\n")))
 tokenToByteString :: [Token] -> B.ByteString
 tokenToByteString ls = foldl (\x (Token ormj str pos) ->
                         B8.append x ( B8.pack ((show ormj) ++ "\t" ++ str ++ "\t" ++ (show pos) ++ "\n")  )) B8.empty ls
 
--- ormjToByteString :: IO Ormj -> B.ByteString
--- ormjToByteString ls =  B8.pack (show ls)
--- ormjToByteStrng ls = foldl (\x (Ormj ormj str pos) ->
---                       B8.append x ( B8.pack ((show ormj) ++ "\t" ++ str ++ "\t" ++ (show pos) ++ "\n")  )) B8.empty (ls :: [])
+handler :: (CheckP p) => FilePath -> Session (ExceptionP p) SafeIO ()
+handler path = do
+    canRead <- tryIO $ fmap readable $ getPermissions path
+    isDir   <- tryIO $ doesDirectoryExist path
+    isValidExtension <- tryIO $ evaluate ((snd (splitExtension path) == ".java" || snd (splitExtension path) == ".mora") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
+    when (not isDir && canRead && isValidExtension) $
+        (readFileS 10240 path >-> try . applyScanner) path
 
-
---handler :: (MonadSafe p) => FilePath -> Session (Exception p) SafeT ()
---handler path = do
---    canRead <- liftIO $ fmap readable $ getPermissions path
---    isDir   <- liftIO $ doesDirectoryExist path
---    isValidExtension <- liftIO $ evaluate ((snd (splitExtension path) == ".java") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
---    when (not isDir && canRead && isValidExtension) $
---        (readFileS 10240 path >-> liftIO . applyScanner) path
-
---handlerParser :: (MonadSafe p) => FilePath -> Session (Exception p) SafeT ()
---handlerParser path = do
---    canRead <- liftIO $ fmap readable $ getPermissions path
---    isDir   <- liftIO $ doesDirectoryExist path
---    isValidExtension <- liftIO $ evaluate ((snd (splitExtension path) == ".java" ) && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
---    when (not isDir && canRead && isValidExtension) $
---        (readFileS 10240 path >-> liftIO . applyParser) path
-
+handlerParser :: (CheckP p) => FilePath -> Session (ExceptionP p) SafeIO ()
+handlerParser path = do
+    canRead <- tryIO $ fmap readable $ getPermissions path
+    isDir   <- tryIO $ doesDirectoryExist path
+    isValidExtension <- tryIO $ evaluate ((snd (splitExtension path) == ".java" || snd (splitExtension path) == ".mora") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
+    when (not isDir && canRead && isValidExtension) $
+        (readFileSP 10240 path >-> try . applyParser) path
 
 ------------------------------------------------------------------------------------------------------------------------
-
 
 
 getRecursiveContents :: FilePath -> IO[FilePath]
@@ -156,7 +168,7 @@ getRecursiveContents topdir = do
           isDirectory <- doesDirectoryExist path
           if isDirectory
                 then getRecursiveContents path
-                else if ((snd (splitExtension path) == ".java") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java")  && (snd (splitFileName path) /= "Unmappable.java"))
+                else if ((snd (splitExtension path) == ".java" || snd (splitExtension path) == ".mora") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java")  && (snd (splitFileName path) /= "Unmappable.java"))
                         then return [path]
                         else return []
         return (concat paths)
@@ -164,23 +176,23 @@ getRecursiveContents topdir = do
 
 
 -- recursiveContentsScanner :: FilePath -> IO[FilePath]
---recursiveContentsParser topdir = do
---        names <- getDirectoryContents topdir
---        let properNames = filter (`notElem` [".","..", "Scanner"]) names
---        paths <- forM properNames $ \name -> do
---          let path = topdir </> name
---          isDirectory <- doesDirectoryExist path
---          if isDirectory
---                then recursiveContentsParser  path
---                else if ((snd (splitExtension path) == ".java") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
---                        then
---                            do
---                                reading <- readFile path
---                                let sel = classify reading (initPos path)
---                                res <- parseIO pOrmj sel
---                                return [show res]
---                        else    return []
---        return (concat paths)
+recursiveContentsParser topdir = do
+        names <- getDirectoryContents topdir
+        let properNames = filter (`notElem` [".","..", "Scanner"]) names
+        paths <- forM properNames $ \name -> do
+          let path = topdir </> name
+          isDirectory <- doesDirectoryExist path
+          if isDirectory
+                then recursiveContentsParser  path
+                else if ((snd (splitExtension path) == ".java" || snd (splitExtension path) == ".mora") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
+                        then
+                            do
+                                reading <- readFile path
+                                let sel = classify (initPos path) reading
+                                res <- parseIO pJ2s sel
+                                return [show res]
+                        else    return []
+        return (concat paths)
 
 
 recursiveContentsScanner topdir = do
@@ -191,7 +203,7 @@ recursiveContentsScanner topdir = do
           isDirectory <- doesDirectoryExist path
           if isDirectory
                 then recursiveContentsScanner path
-                else if ((snd (splitExtension path) == ".java") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
+                else if ((snd (splitExtension path) == ".java" || snd (splitExtension path) == ".mora") && (snd (splitFileName path) /= "EncodeTest.java") && (snd (splitFileName path) /= "T6302184.java") && (snd (splitFileName path) /= "Unmappable.java"))
                         then return [path]
                         else return []
         return (concat paths)

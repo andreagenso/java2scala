@@ -17,14 +17,14 @@ scanner file = loadLexicalStructure file
 loadLexicalStructure  ::File -> IO()
 loadLexicalStructure file = do 
                             reading <- readFile file
-                            let tokens = classify reading (initPos file)
+                            let tokens = classify (initPos file) reading
                             putStr(show tokens)
 
 -- scannerStr :: String -> String
 -- scannerStr file = show (classify file (initPos file))
 
 scannerStr :: String -> Tokens
-scannerStr file = classify file (initPos file)
+scannerStr file = classify (initPos file) file
 
                             
 {- Init the classify of tokens
@@ -32,8 +32,8 @@ f == '\n'   -> review and update the  Row
 id Space f  -> review and update the Column
 otherwise   -> is a token
 -}
-classify :: File -> Pos -> Tokens
-classify code pos = takeComments (classify1 (verifyUnicode code) pos )
+classify :: Pos -> File -> Tokens
+classify pos code = takeComments (classify1 (verifyUnicode code) pos )
 
 takeComments :: Tokens -> Tokens
 takeComments []                             = [] 
@@ -49,8 +49,8 @@ verifyUnicode code@(i:input)  | isAscii i = i:(verifyUnicode input)
 
 classify1 :: File -> Pos -> Tokens
 classify1 [] pos            = []
-classify1 code@(f:file) pos | f == '\n'           = classify file ( advl 1 pos)
-                            | isSpace f           = classify file ( advc 1 pos)
+classify1 code@(f:file) pos | f == '\n'           = classify ( advl 1 pos) file
+                            | isSpace f           = classify ( advc 1 pos) file
                                             | otherwise           = tokClassify (span (not.isSpace) code) pos
                                             
 {- Init the classify token by token -}
@@ -60,7 +60,7 @@ tokClassify (scod,code) pos  | isBlockComment   scod                = (Token Blo
                                                  | isId scod                            = fIniWithId (scod,code) pos
                                                  | isDigitPoint scod                    = fIniWithZero (scod,code) pos
                                                          | isCharacterLiteral scod              = (Token CharacterLiteral (takeCharacterLit scod) pos)                       : (classify1 ((scod \\ (takeCharacterLit scod            )) ++ code) (advc (length (takeCharacterLit scod           )) pos ))                                      
-                                                         | isStringLiteral scod code            = (Token StringLiteral    (fst(takeStringLiteral scod code))   pos )         : (classify  ( snd(takeStringLiteral scod code)                    ) (advc (length (fst(takeStringLiteral scod code  ))) pos ))
+                                                         | isStringLiteral scod code            = (Token StringLiteral    (fst(takeStringLiteral scod code))   pos )         : (classify  (advc (length (fst(takeStringLiteral scod code  ))) pos ) ( snd(takeStringLiteral scod code)                    ))
                                                          | isOperator       scod operatorList   = (Token Operator (takeToken scod operatorList) pos)                         : (classify1 ((scod \\ (takeToken scod operatorList)) ++ code) (advc (length (takeToken scod operatorList)) pos ))
                                                          | isMajor       scod majorList         = (Token TokMayor (takeToken scod majorList) pos)                            : (classify1 ((scod \\ (takeToken scod majorList)) ++ code) (advc (length (takeToken scod majorList)) pos ))
                                                          | isSpecialSimbol  scod specialSimbol  = (Token SpecialSimbol  (takeToken scod specialSimbol) pos)                                 : (classify1 ((scod \\ (takeToken scod specialSimbol )) ++ code) (advc (length (takeToken scod specialSimbol)) pos ))

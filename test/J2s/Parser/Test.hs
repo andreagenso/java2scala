@@ -1,56 +1,37 @@
+{-# LANGUAGE FlexibleContexts #-}
 module J2s.Parser.Test where
 
 import Content
+import J2s.Ast.Sintax
 import J2s.Parser
+import Control.Monad ( forM, forM_, liftM )
+import Debug.Trace ( trace )
+import System.Environment ( getArgs )
+import System.IO.Unsafe ( unsafeInterleaveIO )
 
--- import Control.Proxy
--- import Control.Proxy.Safe hiding (readFileS)
-import System.FilePath ((</>), takeFileName)
-import Content
-import Pipes
+import Control.Proxy
+import Control.Proxy.Safe
+import UU.Parsing
 
+test001Parser = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/javax/xml/crypto/dsig/GenerationTests.java"
 
 testSingleParser = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/java/CharArrayPropertyEditorTests.java"
 
-{-
+testParser :: IO()
 testParser  = runSafeIO $ runProxy $ runEitherK $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test" />/ handlerParser
+                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/" />/ handlerParser
 
+testParserJavaTest :: IO()
 testParserJavaTest  = runSafeIO $ runProxy $ runEitherK $
                     contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/java/lang/StrictMath/" />/ handlerParser
 
+testParserJavaTest2 :: IO()
 testParserJavaTest2  = runSafeIO $ runProxy $ runEitherK $
                     contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/" />/ handlerParser
 
+testParserEncodingDir :: IO()
 testParserEncodingDir = runSafeIO $ runProxy $ runEitherK $
                                       contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/com/sun/javadoc/testEncoding/" />/ handlerParser
--}
-
-{-
-testParser  = runExceptT $ runEffect $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test" />/ handlerParser
-
-testParserJavaTest  = runExceptT $ runEffect $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/java/lang/StrictMath/" />/ handlerParser
-
-testParserJavaTest2  = runExceptT $ runEffect $
-                    contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/" />/ handlerParser
-
-testParserEncodingDir = runExceptT $ runEffect $
-                                      contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/com/sun/javadoc/testEncoding/" />/ handlerParser
--}
-
-
-
--- testAllTypeParser = do
---                        res <- recursiveContentsParser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser"
---                       let tokens = res
---                       putStr (show tokens)
-
--- testParser = do
---                res <- recursiveContentsParser "/home/andrea/workspaceclipse_haskell/java2scala/test"
---                let tokens = res
---                putStr (show tokens)
 
 -- Todo check sintax
 tsp0 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/0compilationUnit.java"

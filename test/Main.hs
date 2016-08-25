@@ -2,51 +2,32 @@ module Main where
 
 import J2s.Scanner.Test
 import J2s.Parser.Test
+import J2s.Ast.Sintax
 
 import J2s.Scanner.Position
 import J2s.Scanner
 import UU.Scanner.Position
-import System.FilePath ((</>), splitExtension)
 import Control.Exception.Base (evaluate)
-
 import J2s.Scanner.Token
-
 import Control.Monad (when, unless)
-
---import Control.Proxy
--- import Control.Proxy.Safe hiding (readFileS)
--- import qualified Data.ByteString as B
--- import qualified Data.ByteString.Char8 as B8
--- import System.Directory (readable, getPermissions, doesDirectoryExist)
-import System.FilePath ((</>), takeFileName)
--- import System.Posix (openDirStream, readDirStream, closeDirStream)
--- import System.IO (openFile, hClose, IOMode(ReadMode), hIsEOF)
 import Content
 
-main :: IO ()
+import Control.Monad ( forM, forM_, liftM )
+import Debug.Trace ( trace )
+import System.Directory ( doesDirectoryExist, getDirectoryContents )
+import System.Environment ( getArgs )
+import System.FilePath ( (</>) )
+import System.IO.Unsafe ( unsafeInterleaveIO )
+import UU.Parsing
+
+main :: IO()
 main = do f <- getLine
           let command = test f
           command
 
-{-
-test "testscanner"  = testScanner
-
-test "testjavatest"  = testJavaTest
-test "testjavatest2"  = testJavaTest2
-test "testencodingdir" = testEncodingDir
--}
-
-test "testencode" = testEncode
-test "testfloat" = testFloat
-test "testfloat2" = testFloat2
-test "tssswitchboard" = tssswitchboard
-
-test "scannerwitherror" = testScannerWithError
-test "singlescanner" = testSingleScanner
-
-
+test :: String -> IO()
 test "singleparser" = testSingleParser
--- test "testparser" = testParser
+test "testparser" = testParser
 
 test "tsp0" = tsp0
 test "tsp1" = tsp1
@@ -131,6 +112,20 @@ test "tspj5" = tspj5
 test "tspj" = tspj
 
 -- scanner
+test "t001" = test001
+test "tp001" = test001Parser
+
+test "testscanner"  = testScanner
+test "testjavatest"  = testJavaTest
+test "testencodingdir" = testEncodingDir
+test "scannerwitherror" = testScannerWithError
+test "singlescanner" = testSingleScanner
+
+test "testencode" = testEncode
+test "testfloat" = testFloat
+test "testfloat2" = testFloat2
+test "tssswitchboard" = tssswitchboard
+
 test "tss0" = tss0
 test "tss1" = tss1
 test "tss2" = tss2
@@ -210,9 +205,3 @@ test "tssj" = tssj
 test "tsiset"  = tsiset
 
 test _ = print ("Command not found!!")
-
-
--- main -- allFirstLines "/home/andrea/workspaceclipse_haskell/java2scala"
-
--- main = runSafeIO $ runProxy $ runEitherK $
---      contentsRecursive "/home/andrea/workspaceclipse_haskell/java2scala/test" />/ handler

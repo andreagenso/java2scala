@@ -8,13 +8,13 @@ instance Show Token where
 
 -- Name of Result Structure
 instance Show J2sSc where
-        show Identifier                          = "Identifier        : "
-        show KeyWord                             = "KeyWord           : "
+        show Identifier                      = "Identifier        : "
+        show KeyWord                         = "KeyWord           : "
         show SpecialSimbol                   = "Special Simbol    : " 
         show BooleanLiteral                  = "Boolean Literal   : "
         show CharacterLiteral                = "Character Literal : " 
-        show StringLiteral                           = "String Literal    : "   
-        show Operator                            = "Operator          : "
+        show StringLiteral                   = "String Literal    : "
+        show Operator                        = "Operator          : "
         show LineComment                     = "Line Comment      : "
         show BlockComment                    = "Block Comment     : "
         show DecimalIntegerLiteral           = "Integer Literal Decimal: "
@@ -23,18 +23,5 @@ instance Show J2sSc where
         show DecimalFloatingPointLiteral     = "Floating Literal Decimal     : "
         show HexadecimalFloatingPointLiteral = "Floating Literal Hexadecimal: "
         show NullLiteral                     = "Null Literal      : "
-        show TokMayor                                            = "TOK MAYOR         : "
-        show Error                                       = "Error             : "
-        
---      show (IntegerLiteral il)  = "Integer Literal " ++ show il
---      show (FloatingLiteral fl) = "Floating Literal " ++ show fl
-{-
-instance Show IntLiteral where
-        show DecimalIntegerLiteral = "Decimal :" 
-        show HexIntegerLiteral     = "Hex     :"
-        show OctalIntegerLiteral   = "Octal   :"
-        
-instance Show FloatLiteral where
-        show DecimalFloatingPointLiteral     = "Decimal  :"
-        show HexadecimalFloatingPointLiteral = "Hexadecimal  :"
--}      
+        show TokMayor                        = "TOK MAYOR         : "
+        show Error                           = "Error             : "

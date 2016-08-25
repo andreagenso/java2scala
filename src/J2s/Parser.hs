@@ -656,6 +656,6 @@ pCatchClause = sem_CatchClause_CatchClause <$ pKeyWord "catch" <* pSpecialSimbol
 -- ---------------------------------------------------------------------------------------------
 parser nombre = do 
                    entrada   <- readFile nombre
-                   let sel   = classify entrada (initPos nombre)
+                   let sel   = classify (initPos nombre) entrada
                    resultado <- parseIO pJ2s sel
                    putStrLn( show resultado)
