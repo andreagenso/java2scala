@@ -91,20 +91,20 @@ public class GenerationTests {
     private static KeyStore ks;
     private final static String DIR = System.getProperty("test.src", ".");
     private final static String DATA_DIR =
-        DIR + System.getProperty("file.separator") + "data";
+            DIR + System.getProperty("file.separator") + "data";
     private final static String KEYSTORE =
-        DATA_DIR + System.getProperty("file.separator") + "certs" +
-        System.getProperty("file.separator") + "test.jks";
+            DATA_DIR + System.getProperty("file.separator") + "certs" +
+                    System.getProperty("file.separator") + "test.jks";
     private final static String CRL =
-        DATA_DIR + System.getProperty("file.separator") + "certs" +
-        System.getProperty("file.separator") + "crl";
+            DATA_DIR + System.getProperty("file.separator") + "certs" +
+                    System.getProperty("file.separator") + "crl";
     private final static String ENVELOPE =
-        DATA_DIR + System.getProperty("file.separator") + "envelope.xml";
+            DATA_DIR + System.getProperty("file.separator") + "envelope.xml";
     private static URIDereferencer httpUd = null;
     private final static String STYLESHEET =
-        "http://www.w3.org/TR/xml-stylesheet";
+            "http://www.w3.org/TR/xml-stylesheet";
     private final static String STYLESHEET_B64 =
-        "http://www.w3.org/Signature/2002/04/xml-stylesheet.b64";
+            "http://www.w3.org/Signature/2002/04/xml-stylesheet.b64";
 
     public static void main(String args[]) throws Exception {
         setup();
@@ -147,12 +147,10 @@ public class GenerationTests {
         ks.load(fis, "changeit".toCharArray());
         signingKey = ks.getKey("user", "changeit".toCharArray());
         signingCert = ks.getCertificate("user");
-        validatingKey = signingCert.getPublicKey();
+        //validatingKey = signingCert.getPublicKey();
 
         // create common objects
 
     }
-
-
 
 }
