@@ -1,2 +1,8 @@
-file : "src/J2s/Ag/Sintax.ag"
-options: data, catas, semfuns, signatures, pretty, rename, module "Sintax", wrappers
+file : "src/AG/Sintax.ag"
+options :
+    data,
+    catas,
+    semfuns,
+    wrappers,
+    signatures,
+    haskellsyntax
