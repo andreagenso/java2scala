@@ -17,3 +17,920 @@ attr Tree
 sem Tree
   | Node  lhs.sum  =  @left.sum + @right.sum
   | Tip   lhs.sum  =  @value
+
+
+
+{-- 1 -}
+data J2s
+        | J2s packageDeclaration :: PackageDeclaration
+              importDeclarations :: ImportDeclarations
+              typeDeclarations:: TypeDeclarations
+
+deriving J2s : Show
+
+{-- 2 -}
+data PackageDeclaration
+    | PackageDeclaration annotations :: Annotations packageName :: PackageName
+    | NilPackageDeclaration
+
+deriving PackageDeclaration : Show
+
+data Annotation
+    | Annotation typeName :: TypeName
+                 typeAnnotation :: TypeAnnotation
+
+deriving Annotation : Show
+
+type Annotations = [Annotation]
+
+data TypeAnnotation
+    | MarkerAnnotation
+    | NormalAnnotation  elementValuePairs :: ElementValuePairs
+    | SingleElementAnnotation  elementValue :: ElementValue
+
+deriving TypeAnnotation : Show
+
+data TypeName
+    | TypeName identifier :: Identifier typeName :: TypeName
+    | NilTypeName
+
+deriving TypeName : Show
+
+type ElementValuePairs = [ElementValuePair]
+
+data ElementValuePair
+    | ElementValuePair identifier :: Identifier
+                       elementValue :: ElementValue
+
+deriving ElementValuePair : Show
+
+data ElementValue
+    | ElementValueConditional conditionalExpression :: ConditionalExpression
+    | ElementValueAnnotation annotation :: Annotation
+    | ElementValueEVArrayInitializer elementValueArrayInitializer :: ElementValueArrayInitializer
+
+deriving ElementValue : Show
+
+data ConditionalExpression
+    | ConditionalExpr conditionalOrExpression :: ConditionalOrExpression
+    | ConditionalExprComb conditionalOrExpression :: ConditionalOrExpression
+                          expression :: Expression
+                          conditionalExpression :: ConditionalExpression
+
+deriving ConditionalExpression : Show
+-- ToDo complete expressions
+data ConditionalOrExpression
+    | ConditionalOrExpressionUnaryExpression unaryExpression :: UnaryExpression
+    | ConditionalOrExpressionIntanceOf unaryExpression :: UnaryExpression
+                                       type_ :: Type
+
+deriving ConditionalOrExpression : Show
+
+data UnaryExpression
+    | UnaryExpressionPreIncrementExpression unaryExpression :: UnaryExpression
+    | UnaryExpressionPreDecrementExpression unaryExpression :: UnaryExpression
+    | UnExpMas unaryExpression :: UnaryExpression
+    | UnExpMenos unaryExpression :: UnaryExpression
+    | PostExpPrimaryPostfixZ primary :: Primary
+                             zpostfixExpression :: ZPostfixExpression
+    | PostfixExpressionPrimary primary :: Primary
+    | Pestan unaryExpression :: UnaryExpression
+    | Admiracion unaryExpression :: UnaryExpression
+
+deriving UnaryExpression : Show
+
+type ZPostfixExpression = [ZPostfixExp]
+
+data ZPostfixExp
+    | PostIncrement
+    | PostDecrement
+
+deriving ZPostfixExp : Show
+
+data Primary
+    | PrimNoNewArray primaryNoNewArray :: PrimaryNoNewArray
+    | PrimNoNewArrayZ primaryNoNewArray :: PrimaryNoNewArray
+                      zprimary :: ZPrimary
+
+deriving Primary : Show
+
+type ZPrimary = [PrimaryNNAArrayFieldAccessOrMethodInvocation]
+
+data PrimaryNNAArrayFieldAccessOrMethodInvocation
+    | PrimaryNoNewArrayFieldAccess identifier :: Identifier
+    | PrimarynoNewArrayMethodInvocation nonWildTypeArguments :: NonWildTypeArguments
+                                        identifier :: Identifier
+                                        argumentList :: ArgumentList
+    | PrimaryConstructor  nonWildTypeArguments :: NonWildTypeArguments
+
+deriving PrimaryNNAArrayFieldAccessOrMethodInvocation : Show
+
+{-- 27 -}
+data PrimaryNoNewArray
+    | PrimaryNoNewArray primarynna :: PrimaryNNA
+                        zPrimaryNoNewArray :: ZPrimaryNoNewArray
+
+deriving PrimaryNoNewArray : Show
+
+data PrimaryNNA
+    | PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral string :: String
+    | PrimNNALiteral_IntegerLiteral_HexIntegerLiteral   string :: String
+    | PrimNNALiteral_IntegerLiteral_OctalIntegerLiteral string :: String
+    | PrimNNALiteral_FloatingPointLiteral_DecimalFloatingPointLiteral string :: String
+    | PrimNNALiteral_FloatingPointLiteral_HexadecimalFloatingPointLiteral string :: String
+    | PrimNNALiteral_BooleanLiteral bool :: Bool
+    | PrimNNALiteral_CharacterLiteral string :: String
+    | PrimNNALiteral_StringLiteral string :: String
+    | PrimNNALiteral_NullLiteral
+    | PrimNNATypeClassPrimitiveType primitiveType :: PrimitiveType
+                                    typeZ :: TypeZ
+    | PrimNNATypeClassReferenceTypeClassIOT identifier :: Identifier
+                                            typeArguments :: TypeArguments
+                                            primNNAClassOrInterfaceType :: PrimNNAClassOrInterfaceType
+    | PrimNNATypeClassReferenceTypeTypeVariable identifier :: Identifier
+                                                typeZ :: TypeZ
+    | PrimNNAVoid
+    | PrimNNAThis
+    | PrimNNAClassName typeName :: TypeName {- Antes Identifier -}
+    | PrimNNAParExp expression :: Expression
+    | UnNotPlusCastExpression expression :: Expression
+                              unaryExpression :: UnaryExpression {- ANTES Type        UnaryExpression  -- CONTROLAR COND CONTEXTO -}
+    | PrimNNAClassInstanceCreationExpression typeArguments :: TypeArguments
+                                             classOrInterfaceType :: ClassOrInterfaceType
+                                             argumentList :: ArgumentList  {- Antes ->                           | PrimNNAClassIns ClassInstanceCreationExpression -}
+    | ArrayCreationExpressionPrimitiveType primitiveType :: PrimitiveType
+                                           dimExprs :: DimExprs                      {- Dims -- ARRAYCreationExpression Aplicar Cond Contexto -}
+    | ArrayCreationExpressionClassOrInterf classOrInterfaceType :: ClassOrInterfaceType
+                                           dimExprs :: DimExprs               {-- Dims -- ARRAYCreationExpression Aplicar Cond Contexto -}
+    | ArrayCreationExpressionArrInitialPrim primitiveType :: PrimitiveType
+                                            dims :: Dims
+                                            arrayInitilizer :: ArrayInitializer          {-- ARRAYCreationExpression Aplicar Cond Contexto -}
+    | ArrayCreationExpressionArrInitialClass classOrInterfaceType :: ClassOrInterfaceType
+                                             dims :: Dims
+                                             arrayInitializer :: ArrayInitializer  {-- ARRAYCreationExpression Aplicar Cond Contexto -}
+    | PrimNNAFieldAccessPrim primary :: Primary
+                             identifier :: Identifier
+    | PrimNNAFieldAccessSuper identifier :: Identifier
+    | PrimNNAFieldAccessClassName typeName :: TypeName
+                                  identifier :: Identifier  {-- Antes Identifier -}
+    | PrimNNAMethodInvocationMN typeName :: TypeName
+                                argumentList :: ArgumentList  {-- Antes MethodName -}
+    | PrimNNAMethodInvocationSuper nonWildTypeArguments :: NonWildTypeArguments
+                                   identifier :: Identifier
+                                   argumentList :: ArgumentList
+    | PrimNNAMethodInvocationClassN typeName :: TypeName
+                                    nonWildTypeArguments :: NonWildTypeArguments
+                                    identifier :: Identifier
+                                    argumentList :: ArgumentList  {- TypeNAme ANtes Identifier CONTROLAR EN COND CONTEXTO -}
+    | PrimNNAMethodInvocationTypeN  typeName :: TypeName
+                                    nonWildTypeArguments :: NonWildTypeArguments
+                                    identifier :: Identifier
+                                    argumentList :: ArgumentList
+    | PrimNNAArrayAccessExprName typeName :: TypeName
+                                 expression :: Expression  {-- Antes ExpressionName -}
+    | PostfixExpressionExpressionName typeName :: TypeName  {-- AQUI IMPLEMENTAR COND CONTEXTO --}
+
+deriving PrimaryNNA : Show
+
+data PrimNNAClassOrInterfaceType
+    | PrimNNAClassOrInterfaceType  identifier :: Identifier
+                                   typeArguments :: TypeArguments
+                                   primNNAClassOrInterfaceType :: PrimNNAClassOrInterfaceType
+    | NilPrimNNAClassOrInterfaceType
+    | TypeZPrimNNAClassOrInterfaceType typeZ :: TypeZ
+
+deriving PrimNNAClassOrInterfaceType : Show
+
+type ZPrimaryNoNewArray = [ZPrimaryOrExpression]
+
+data ZPrimaryOrExpression
+    | ZPOEExpressionDeArrayAccess expression :: Expression
+    | ZPOEZPrimary zPrimary :: ZPrimary
+
+deriving ZPrimaryOrExpression : Show
+
+-- 29
+data Type
+    | TypePrimitiveType primitiveOrReferenceType :: PrimitiveOrRefereceType
+                        typeZ :: TypeZ
+deriving Type : Show
+
+data PrimitiveOrRefereceType
+    | TypePrimitiveNumericType_TypeIntegral_Byte
+    | TypePrimitiveNumericType_TypeIntegral_Short
+    | TypePrimitiveNumericType_TypeIntegral_Int
+    | TypePrimitiveNumericType_TypeIntegral_Long
+    | TypePrimitiveNumericType_TypeIntegral_Char
+    | TypePrimitiveNumericType_TypeFloating_Float
+    | TypePrimitiveNumericType_TypeFloating_Double
+    | TypePrimitivePrimitivetypeBoolean
+    | TypeReferece referenceType :: ReferenceType
+
+deriving PrimitiveOrRefereceType : Show
+
+type TypeZ = [ArrayType]  {-- en referenceType, el ArrayType que era recursivo -}
+
+data ArrayType
+    | ArrayType
+deriving ArrayType : Show
+
+data PrimitiveType
+    | NumericType_TypeIntegral_Byte
+    | NumericType_TypeIntegral_Short
+    | NumericType_TypeIntegral_Int
+    | NumericType_TypeIntegral_Long
+    | NumericType_TypeIntegral_Char
+    | NumericType_TypeFloating_Float
+    | NumericType_TypeFloating_Double
+    | PrimitivetypeBoolean
+
+deriving PrimitiveType : Show
+
+-- 34 -
+data ReferenceType
+    | ReferenceTypeClassOrInterfaceType identifier :: Identifier
+                                        typeArguments :: TypeArguments
+                                        zClassOrInterfaceType :: ZClassOrInterfaceType
+
+deriving ReferenceType : Show
+
+-- 35 -
+data ClassOrInterfaceType
+    | ClassOrInterfaceType identifier :: Identifier
+                           typeArguments :: TypeArguments
+                           zClassOrInterfaceType :: ZClassOrInterfaceType
+
+deriving ClassOrInterfaceType : Show
+
+type ZClassOrInterfaceType = [ZCOITTypeDeclSpecifier]
+
+data ZCOITTypeDeclSpecifier
+    | ZCOITTypeDeclSpecifier identifier :: Identifier
+                             typeArguments :: TypeArguments
+deriving ZCOITTypeDeclSpecifier : Show
+
+data TypeArguments
+    | TypeArgumentsC1 actualTypeArgumentList :: ActualTypeArgumentList
+    | TypeArgumentsC2 actualTypeArgumentList :: ActualTypeArgumentList
+    | TypeArgumentsC3 actualTypeArgumentList :: ActualTypeArgumentList
+    | TypeArgumentsC0 actualTypeArgumentList :: ActualTypeArgumentList
+    | NilTypeArguments
+
+deriving TypeArguments : Show
+
+type ActualTypeArgumentList = [ActualTypeArgument]
+
+data ActualTypeArgument
+    | ActualTypeArgumentWildCard wildcardBound :: WildcardBounds
+    | ActualTypeReferenceType type_ :: Type
+
+deriving ActualTypeArgument : Show
+
+data WildcardBounds
+    | WilcardBoundsExtendsReferenceType type_ :: Type
+    | WilcardBoundsSuperReferenceType type_ :: Type
+    | NilwildcardBounds
+
+deriving WildcardBounds : Show
+
+-- 47
+data Expression
+    | ExpressionConditionalExpr     conditionalOrExpression :: ConditionalOrExpression
+    | ExpressionConditionalExprComb conditionalOrExpression1 :: ConditionalOrExpression
+                                    expression :: Expression
+                                    conditionalExpression2 :: ConditionalExpression
+    | ExpressionAssignment          conditionalOrExpression :: ConditionalOrExpression
+                                    assignmentOperator :: AssignmentOperator
+                                    expression :: Expression
+
+deriving Expression : Show
+
+data AssignmentOperator
+    | AssignmentOp {- = -}
+    | AssignmentPlus {- *= -}
+    | AssignmentDiv {- /= -}
+    | AssignmentMod {- %= -}
+    | AssignmentAdd {- += -}
+    | AssignmentMin {- -= -}
+    | AssignmentMinShifShift  {- <<= -}
+    | AssignmentMayShitfShift {- >>= -}
+    | AssignmentMayShiftShiftShift {- >>>= -}
+    | AssignmentAndSingle {- &= -}
+    | AssignmentCincun {- ^= -}
+    | AssignmentOrSingle {- |= -}
+
+deriving AssignmentOperator : Show
+
+type Identifiers = [Identifier]
+
+data FieldAccess
+    | FieldAccessPrim primary :: Primary
+                      identifier :: Identifier
+    | FieldAccessSuper identifier :: Identifier
+    | FieldAccessClassName identifier :: Identifier identifier2 :: Identifier
+
+deriving FieldAccess : Show
+
+data ArrayAccess
+    | ArrayAccessExpName  identifiers :: Identifiers
+                          expression :: Expression {- Antes ExpressionName -}
+    | ArrayAccessPrimNNA primaryNoNewArray :: PrimaryNoNewArray
+                         expression :: Expression
+
+deriving ArrayAccess : Show
+
+type ArgumentList = [Expression]
+
+data NonWildTypeArguments
+    | NonWildTypeArgumentsC1 referenceTypList :: ReferenceTypeList
+    | NonWildTypeArgumentsC2 referenceTypList :: ReferenceTypeList
+    | NonWildTypeArgumentsC3 referenceTypList :: ReferenceTypeList
+    | NonWildTypeArgumentsC0 referenceTypList :: ReferenceTypeList
+    | NilNonWildTypeArguments
+
+deriving NonWildTypeArguments : Show
+
+type ReferenceTypeList = [Type ]
+
+data DimExprs
+    | DimExprs expression :: Expression
+               dimExprs :: DimExprs
+    | NilDimExprsDims dims :: Dims
+    | NilDimExprs
+
+deriving DimExprs : Show
+-- ToDo check how to convert to AG
+--type Dims = [ () ]
+type Dims = [Unit]
+data Unit
+    | Unit
+
+deriving Unit : Show
+
+data ArrayInitializer
+    | ArrayInitializer variableInitializers :: VariableInitializers
+    | NilArrayInitializers
+
+deriving ArrayInitializer : Show
+
+type VariableInitializers = [VariableInitializer]
+
+data VariableInitializer
+    | VariableInitializerExp expression :: Expression
+    | VariableInitializerArr attayInitializer :: ArrayInitializer
+
+deriving VariableInitializer : Show
+
+data ElementValueArrayInitializer
+    | ElementValueArrayInitializer elementValue :: ElementValues
+    | NilElementValueArrayinitializer
+
+deriving ElementValueArrayInitializer : Show
+
+type ElementValues = [ElementValue]
+
+type PackageName = [Identifier]
+
+type Identifier  = (String)
+-- *****************************************
+-- FIN Los siguientes dataTypes representan la estructutra de Conditional expresion
+-- *****************************************
+
+-- -------------------------------------------------------------------------
+-- Definicion de ImportDeclarations
+-- -------------------------------------------------------------------------
+data ImportDeclarations
+    | ImportDeclarations importDeclaration :: ImportDeclaration
+                         importDeclarations :: ImportDeclarations
+    | NilImportDeclarations
+
+deriving ImportDeclarations : Show
+
+data ImportDeclaration
+    | SingleTypeImportDeclaration typeName :: TypeName
+    | TypeImportOnDemandDeclaration packageOrTypeName :: PackageOrTypeName
+    | SingleStaticImportDeclaration typeName :: TypeName
+    | StaticImportOnDemandDeclaration typeName :: TypeName
+
+deriving ImportDeclaration : Show
+
+data PackageOrTypeName
+    | NilPackageOrTypeName
+    | PackageOrTypeName identifier :: Identifier
+                        packageOrTypeName :: PackageOrTypeName
+
+deriving PackageOrTypeName : Show
+
+{- -------------------------------------------------------------------------
+-- FIN Definicion de ImportDeclarations
+-- -------------------------------------------------------------------------
+-- -------------------------------------------------------------------------
+-- INICIO Definicion de TypeDeclarations
+-- ------------------------------------------------------------------------- -}
+type TypeDeclarations = [TypeDeclaration]
+
+data TypeDeclaration
+    | TypeDeclarationClassDeclarationNormalCD modifiers :: Modifiers
+                                              identifier :: Identifier
+                                              typeParameters :: TypeParameters
+                                              super :: Super
+                                              interfaces :: Interfaces
+                                              classBodyDeclarations :: ClassBodyDeclarations
+    | TypeDeclarationClassDeclarationEnumD modifiers :: Modifiers
+                                           identifier :: Identifier
+                                           interfaces :: Interfaces
+                                           enumBody ::EnumBody
+    | TypeDeclarationInterfaceDeclarationNormalInterfaceD modifiers :: Modifiers
+                                                          identifier :: Identifier
+                                                          typeParameters :: TypeParameters
+                                                          extendsInterfaces :: ExtendsInterfaces
+                                                          listInterfaceMemberDeclarations :: ListInterfaceMemberDeclaration
+    | TypeDeclarationInterfaceDeclarationAnnotationTypeD modifiers :: Modifiers
+                                                         identifier :: Identifier
+                                                         listAnnotationTypeElementDeclaration :: ListAnnotationTypeElementDeclaration
+    | TypeDeclarationSemiColon
+
+deriving TypeDeclaration : Show
+
+type ListInterfaceMemberDeclaration = [InterfaceMemberDeclaration]
+
+type ListAnnotationTypeElementDeclaration = [AnnotationTypeElementDeclaration]
+
+data Modifiers
+    | Modifiers modifier :: Modifier
+                modifiers :: Modifiers
+    | NilModifiers
+
+deriving Modifiers : Show
+
+data Modifier
+    | ModifierAnnotation annotation :: Annotation
+    | ModifierPublic
+    | ModifierProtected
+    | ModifierPrivate
+    | ModifierAbstract
+    | ModifiersStatic
+    | ModifierFinal
+    | ModifierStrictfp
+    | FieldModifierTransient
+    | FieldModifierVolatile
+    | MethodModifierSynchronized
+    | MethodModifierNative
+
+deriving Modifier : Show
+
+data TypeParameters
+    | TypeParametersC1 typeParameterList :: TypeParameterList
+    | TypeParametersC2 typeParameterList :: TypeParameterList
+    | TypeParametersC3 typeParameterList :: TypeParameterList
+    | TypeParametersC0 typeParameterList :: TypeParameterList
+    | NilTypeParameters
+
+deriving TypeParameters : Show
+
+type TypeParameterList = [TypeParameter]
+
+data TypeParameter
+    | TypeParameterBound  identifier :: Identifier
+                          typeBound :: TypeBound
+    | TypeParameter       identifier :: Identifier
+
+deriving TypeParameter : Show
+
+data TypeBound
+    | TypeBound classOrInterfaceType :: ClassOrInterfaceType
+                typeBound :: TypeBound
+    | NilAdditionalBoundList
+
+deriving TypeBound : Show
+
+data Super
+    | Super classOrInterfaceType :: ClassOrInterfaceType
+    | NilSuper
+
+deriving Super : Show
+
+data Interfaces
+    | Interfaces interfaceTypeList :: InterfaceTypeList
+    | NilInterfaces
+
+deriving Interfaces : Show
+
+type InterfaceTypeList = [ClassOrInterfaceType]
+
+type ClassBodyDeclarations = [ClassBodyDeclaration]
+
+data ClassBodyDeclaration
+    | ClassBodyDeclClassMemberDeclFieldDeclaration                     modifiers :: Modifiers
+                                                                       type_ :: Type
+                                                                       variableDeclarators :: VariableDeclarators
+    | ClassBodyDeclClassMemberDeclMethodDeclaration                    modifiers :: Modifiers
+                                                                       typeParameters :: TypeParameters
+                                                                       resultType :: ResultType
+                                                                       methosDeclarator :: MethodDeclarator
+                                                                       throws :: Throws
+                                                                       methodBody :: MethodBody
+    | ClassBodyDeclClassMemberDeclClassDeclarationNormalCD             modifiers :: Modifiers
+                                                                       identifier :: Identifier
+                                                                       typeParameters :: TypeParameters
+                                                                       super :: Super
+                                                                       interfaces :: Interfaces
+                                                                       classBodyDeclarations :: ClassBodyDeclarations
+    | ClassBodyDeclClassMemberDeclClassDeclarationEnumD                modifiers :: Modifiers
+                                                                       identifier :: Identifier
+                                                                       interfaces :: Interfaces
+                                                                       enumBody :: EnumBody
+    | ClassBodyDeclClassMemberDeclInterfaceDeclarationNormalInterfaceD modifiers :: Modifiers
+                                                                       identifier :: Identifier
+                                                                       typeParameters :: TypeParameters
+                                                                       extendsInterfaces :: ExtendsInterfaces
+                                                                       listInterfaceMemberDeclaration :: ListInterfaceMemberDeclaration
+    | ClassBodyDeclClassMemberDeclInterfaceDeclarationAnnotationTypeD  modifiers :: Modifiers
+                                                                       identifier :: Identifier
+                                                                       listAnnotationTypeElementDeclaration :: ListAnnotationTypeElementDeclaration
+    | ClassBodyDeclClassMemberDeclSemiColon
+    | ClassBodyInstanceInitializer blockStatements :: BlockStatements {- Block -- InstanceInitializer -}
+    | ClassBodyStaticInitializer blockStatements :: BlockStatements {- StaticInitializer -}
+    | ClassBodyConstructorDeclaration modifiers :: Modifiers
+                                      typeParameters :: TypeParameters
+                                      identifier :: Identifier
+                                      formalParameterList :: FormalParameterList
+                                      throws :: Throws
+                                      constructorBody :: ConstructorBody
+    | ClassBodyConstructorDeclarationNoFormalParList modifiers :: Modifiers
+                                                     typeParameters :: TypeParameters
+                                                     identifiers :: Identifier
+                                                     throws :: Throws
+                                                     constructorBody :: ConstructorBody
+
+deriving ClassBodyDeclaration : Show
+
+type VariableDeclarators =  [VariableDeclarator]
+
+data VariableDeclarator
+    | VariableDeclaratorId variableDeclaratorId :: VariableDeclaratorId
+    | VariableDeclaratorIdAsig variableDeclaratorId :: VariableDeclaratorId
+                               variableInitializer :: VariableInitializer
+
+deriving VariableDeclarator : Show
+
+data VariableDeclaratorId
+    | VarDeclaratorId identifier :: Identifier
+    | VarDeclaratorIdVDZ identifier :: Identifier
+                         variableDeclaratorIdZ :: VariableDeclatatorIdZ
+
+deriving VariableDeclaratorId : Show
+
+data VariableDeclatatorIdZ
+    | VarDeclaratorIdCorchete
+    | VarDeclaratorIdZ variableDeclaratorIdZ :: VariableDeclatatorIdZ
+
+deriving VariableDeclatatorIdZ : Show
+
+data ResultType
+    | ResultTypeType type_ :: Type
+    | ResultTypeVoid
+
+deriving ResultType : Show
+
+data MethodDeclarator
+    | MethodDeclaratorFormalPL identifier :: Identifier
+                               formalParameterList :: FormalParameterList
+    | MethodDeclaratorSingle identifier :: Identifier
+
+deriving MethodDeclarator : Show
+
+data FormalParameterList
+    | FormalParameterListFormal variableModifiers :: VariableModifiers
+                                type_ :: Type
+                                variableDeclaratorId :: VariableDeclaratorId
+                                formalParameterList :: FormalParameterList
+    | FormalParameterListLast
+                                variableModifiers :: VariableModifiers
+                                type_  :: Type
+                                variableDeclaratorId :: VariableDeclaratorId
+    | FormalParameterListNil
+
+deriving FormalParameterList : Show
+
+data VariableModifiers
+    | VariableModifiers variableModifier :: VariableModifier
+                        variableModifiers :: VariableModifiers
+    | NilVariableModifiers
+
+deriving VariableModifiers : Show
+
+data VariableModifier
+    | VariableModifierFinal
+    | VariableModifierAnnotation annotation :: Annotation
+
+deriving VariableModifier : Show
+
+data Throws
+    | Throws exceptionTypeList :: ExceptionTypeList
+    | NilThrows
+
+
+deriving Throws : Show
+
+type ExceptionTypeList = [ExceptionType]
+
+data ExceptionType
+    | ExceptionTypeClassType classOrInterfaceType :: ClassOrInterfaceType
+    | ExceptionTypeTypeVariable identifier :: Identifier
+
+deriving ExceptionType : Show
+
+data MethodBody
+    | MethodBodyBlock blokStatements :: BlockStatements
+    | MethodBodySemiColon
+
+deriving MethodBody : Show
+
+type BlockStatements = [BlockStatement]
+
+data BlockStatement
+    | BlockStatementLocalVariableDeclarationStatement      modifiers :: Modifiers
+                                                           type_ :: Type
+                                                           variableDeclarators :: VariableDeclarators
+    | BlockStatementClassDeclarationNormalClassDeclaration modifiers :: Modifiers
+                                                           identifier :: Identifier
+                                                           typeParameters :: TypeParameters
+                                                           super :: Super
+                                                           interfaces :: Interfaces
+                                                           classBodyDeclarations :: ClassBodyDeclarations
+    | BlockStatementClassDeclarationEnumDeclaration        modifiers :: Modifiers
+                                                           identifier :: Identifier
+                                                           interfaces :: Interfaces
+                                                           enumBody :: EnumBody
+    | BlockStatementStatement statement :: Statement
+
+deriving BlockStatement : Show
+
+data Statement
+    | StatementLabeled identifier :: Identifier
+                       statement :: Statement  {- LabeledStatement -}
+    | StatementIf expression :: Expression
+                  statement :: Statement {- IfThenStatement -}
+    | StatementIfElse expression :: Expression
+                      statement1 :: Statement
+                      statement2 :: Statement {- IfThenElseStatement -}
+    | StatementWhile expression :: Expression
+                     statement :: Statement   {- WhileStatement -}
+    | StatementFor  forStatement :: ForStatement
+    | SWTSBlock blockStatement :: BlockStatements
+    | SWTSEmptyStatement
+    | SWTSExpressionStatement expression :: Expression
+    | SWTSAssertStatementCond  expression :: Expression
+    | SWTSAssertStatementCondEx  expression :: Expression
+                                 conditionalExpression :: ConditionalExpression
+    | SWTSSwitchStatement expression :: Expression
+                          switchBlock :: SwitchBlock
+    | SWTSDoStatement statement :: Statement
+                      expression :: Expression
+    | SWTSBreakStatement
+    | SWTSBreakStatementId identifier :: Identifier
+    | SWTSNilContinueStatement
+    | SWTSContinueStatement identifier :: Identifier
+    | SWTSReturnStatement expression :: Expression
+    | SWTSNilReturnStatement
+    | SWTSynchronizedStatement expression :: Expression
+                               blockStatements :: BlockStatements
+    | SWTTrhowStatement expression :: Expression
+    | SWTTryStatement blockStatements :: BlockStatements
+                      catches :: Catches
+    | SWTTryStatementFinally blockStatements1 :: BlockStatements
+                             catches :: Catches
+                             blockStatements2 :: BlockStatements {-- el ultimo Block es FinallyBlock -}
+
+
+deriving Statement : Show
+
+data SwitchBlock
+    | SwitchBlockAll switchBlockStatementGrooups :: SwitchBlockStatementGroups
+                     switchLabels :: SwitchLabels
+    | SwitchBlockLabels switchLabels :: SwitchLabels
+    | SwitchBlockGroups switchBlockStatementGroups :: SwitchBlockStatementGroups
+    | NilSwitchBlock
+
+deriving SwitchBlock : Show
+
+type SwitchBlockStatementGroups = [SwitchBlockStatementGroup]
+
+data SwitchBlockStatementGroup
+    | SwitchBlockStatementGroup switchLabels :: SwitchLabels
+                                blockStatements :: BlockStatements
+deriving SwitchBlockStatementGroup : Show
+
+type SwitchLabels = [SwitchLabel]
+
+data SwitchLabel
+    | SwitchLabelConstant expression :: Expression
+    | SwitchLabelEnum identifiers :: Identifier
+    | SwitchLabelDefault
+
+deriving SwitchLabel : Show
+
+data ForInit
+    | ForInitStaExp statementExpressionList :: StatementExpressionList
+    | ForInitLocalVar variableModifiers :: VariableModifiers
+                      type_ :: Type
+                      variableDeclarators :: VariableDeclarators {- LocalVariableDeclaration -}
+    | NilForInit
+
+deriving ForInit : Show
+
+data StatementExpressionList
+    | StatementExpressionList expression :: Expression
+                              statementExpressionList :: StatementExpressionList
+    | NilStatementExpressionList
+
+deriving StatementExpressionList : Show
+
+data ForUpdate
+    | ForUpdate statemebtExpressionList :: StatementExpressionList
+    | NilForUpdate
+deriving ForUpdate : Show
+
+data ForStatement
+    | ForStatementBasicForStatementAll           forInit :: ForInit
+                                                 expression :: Expression
+                                                 forUpdate :: ForUpdate
+                                                 statement :: Statement
+    | ForStatementBasicForStatementNoExp         forInit :: ForInit
+                                                 forUpdate :: ForUpdate
+                                                 statement :: Statement
+    | ForStatementEnhancedForStatement           variableModifiers :: VariableModifiers
+                                                 type_ :: Type
+                                                 identifier :: Identifier
+                                                 expression :: Expression
+                                                 statement :: Statement
+    | ForStatementEnhancedForStatementNoVarModif type_ :: Type
+                                                 identifier :: Identifier
+                                                 expression :: Expression
+                                                 statement :: Statement
+deriving ForStatement : Show
+
+data ExtendsInterfaces
+    | ExtendsInterfaceType classOrInterfacesType :: ClassOrInterfaceType
+                           extendsInterfaces :: ExtendsInterfaces
+    | NilExtendsInterfaces
+
+deriving ExtendsInterfaces : Show
+
+data InterfaceMemberDeclaration
+    | InterfaceMemberDeclarationConstant modifiers :: Modifiers
+                                         type_ :: Type
+                                         variableDeclarators :: VariableDeclarators
+    | InterfaceMemberDeclarationAbstract modifiers :: Modifiers
+                                         typeParameters :: TypeParameters
+                                         resultType :: ResultType
+                                         methodDeclarator :: MethodDeclarator
+                                         throws :: Throws
+    | InterfaceMemberDeclTypeDeclarationClassDeclarationNormalCD modifiers :: Modifiers
+                                                                 identifier :: Identifier
+                                                                 typeParameters :: TypeParameters
+                                                                 super :: Super
+                                                                 interfaces :: Interfaces
+                                                                 classBodyDeclarations :: ClassBodyDeclarations
+    | InterfaceMemberDeclTypeDeclarationClassDeclarationEnumD    modifiers :: Modifiers
+                                                                 identifier :: Identifier
+                                                                 interfaces :: Interfaces
+                                                                 enumBody :: EnumBody
+    | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD modifiers :: Modifiers
+                                                                             identifier :: Identifier
+                                                                             typeParameters :: TypeParameters
+                                                                             extendsInterfaces :: ExtendsInterfaces
+                                                                             listInterfaceMemberDeclaration :: ListInterfaceMemberDeclaration
+    | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD  modifiers :: Modifiers
+                                                                             identifier :: Identifier
+                                                                             listAnnotationTypeElementDeclaration :: ListAnnotationTypeElementDeclaration
+    | InterfaceMemberDeclTypeDeclarationSemiColon
+
+deriving InterfaceMemberDeclaration : Show
+
+data AnnotationTypeElementDeclaration
+    | AnnTypeElemDeclAbstract                                            modifiers :: Modifiers
+                                                                         type_ :: Type
+                                                                         identifier :: Identifier
+                                                                         defaultValue :: DefaultValue
+    | AnnTypeElemDeclConstant                                            modifiers :: Modifiers
+                                                                         type_ :: Type
+                                                                         variableDeclarators :: VariableDeclarators
+    | AnnTypeElemDeclTypeDeclarationClassDeclarationNormalCD             modifiers :: Modifiers
+                                                                         identifier :: Identifier
+                                                                         typeParameters :: TypeParameters
+                                                                         super :: Super
+                                                                         interfaces :: Interfaces
+                                                                         classBodyDeclarations :: ClassBodyDeclarations
+    | AnnTypeElemDeclTypeDeclarationClassDeclarationEnumD                modifiers :: Modifiers
+                                                                         identifier :: Identifier
+                                                                         interfaces :: Interfaces
+                                                                         enumBody :: EnumBody
+    | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD modifiers :: Modifiers
+                                                                         identifier :: Identifier
+                                                                         typeParameters :: TypeParameters
+                                                                         extendsInterfaces :: ExtendsInterfaces
+                                                                         listInterfaceMemberDeclaration :: ListInterfaceMemberDeclaration
+    | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD  modifiers :: Modifiers
+                                                                         identifier :: Identifier
+                                                                         listAnnotationsTypeElementDeclaration :: ListAnnotationTypeElementDeclaration
+    | AnnTypeElemDeclTypeDeclarationSemiColon
+
+deriving AnnotationTypeElementDeclaration : Show
+
+data DefaultValue
+    | DefaultValue elementValue :: ElementValue
+    | NilDefaultValue
+
+deriving DefaultValue : Show
+
+data EnumBody
+    | EnumBody enumConstants :: EnumConstants
+               enumBodyDeclarations :: EnumBodyDeclarations
+
+deriving EnumBody : Show
+
+data EnumConstants
+    | EnumConstants enumConstant :: EnumConstant enumConstants :: EnumConstants
+    | NilEnumConstants
+
+deriving EnumConstants : Show
+
+data EnumConstant
+    | EnumConstantAll annotations :: Annotations
+                      identifier :: Identifier
+                      argumentList :: ArgumentList
+                      classBodyDeclarations :: ClassBodyDeclarations  {- Arguments por ArgumentList y () -}
+    | EnumConstantArgL annotations :: Annotations
+                       identifier :: Identifier
+                       argumentList :: ArgumentList
+    | EnumConstantClasB annotations :: Annotations
+                        identifier :: Identifier
+                        classBodyDeclaratiosn :: ClassBodyDeclarations
+    | EnumConstantNothing annotations :: Annotations
+                          identifier :: Identifier
+
+deriving EnumConstant : Show
+
+data EnumBodyDeclarations
+    | EnumBodyDeclarations classBodyDeclarations :: ClassBodyDeclarations
+    | NilEnumBodyDeclarations
+
+deriving EnumBodyDeclarations : Show
+
+data StaticInitializer
+    | StaticInitializer blockStatements :: BlockStatements
+
+deriving StaticInitializer : Show
+
+data ConstructorBody
+    | ConstructorBody explicitConstructorInvocation :: ExplicitConstructorInvocation
+                                       blockStatements :: BlockStatements
+
+deriving ConstructorBody : Show
+
+data ExplicitConstructorInvocation
+    | ExplConsInvThis nonWildTypeArguments :: NonWildTypeArguments
+                      argumentList :: ArgumentList
+    | ExplConsInvSuper nonWildTypeArguments :: NonWildTypeArguments
+                       argumentList :: ArgumentList
+    | ExplConsInvPrimary primary :: Primary
+                         argumentList :: ArgumentList {- NonWildTypeArguments ArgumentList -}
+    | NilExplixitConsInv
+
+deriving ExplicitConstructorInvocation : Show
+
+{-- -------------------------------------------------------------------------
+-- FIN Definicion de TypeDeclarations
+-- ------------------------------------------------------------------------- -}
+type Catches = [CatchClause]
+
+data CatchClause
+    | CatchClause variableModifiers :: VariableModifiers
+                  type_ :: Type
+                  variableDeclaratorId :: VariableDeclaratorId
+                  blockStatements :: BlockStatements
+
+deriving CatchClause : Show
+
+
+
+--attr J2s PackageDeclaration
+--    syn j2s :: String
+
+--attr PackageDeclaration PackageName Identifier
+--    syn j2s_packageDeclaration :: self
+
+--sem Identifier
+--    | Tuple lhs.j2s_packageDeclaration = @string
+
+--sem PackageName
+--    | Cons lhs.j2s_packageDeclaration = @hd.j2s_packageDeclarations U @tail.j2s_packageDeclaration
+--    | Nil lhs.j2s_packageDeclaration = []
+
+--sem PackageDeclaration
+--    | PackageDeclaration lhs.j2s_packageDeclaration = PackageDeclaration @packageName.j2s_packageDeclaration
+--                         lhs.j2s = "NOMBRE DEL PACKAGE"
+--    | NilPackageDeclaration lhs.j2s_packageDeclaration =NilPackageDeclaration @lhs.j2s_packageDeclaration
+--                            lhs.j2s = "VACIO"

@@ -10,8 +10,6 @@ maintainer:        tatiana.moruno@gmail.com
 extra-source-files: uuagc_options
 extra-source-files: src-ag/Sintax.ag
 
-
-
 flag bootstrap_external
    description: Use an external uuagc executable for bootstrapping
    default: True
@@ -55,24 +53,6 @@ executable test
                    uuagc,
                    uuagc-cabal
 
---executable ag
---  main-is:       Main.hs
---  hs-source-dirs: src/J2s/Ag
---  build-depends:   base,
---                   directory,
---                   uu-parsinglib,
---                   uulib,
---                   java2scala,
---                   filepath,
---                   Cabal >= 1.8,
---                  pipes-old >=3.2.0 && <3.4,
---                   pipes-safe-old == 1.2.0,
---                   bytestring,
---                   unix,
---                   system-filepath,
---                   uuagc,
---                   uuagc-cabal
-
 library
   build-depends:
                    base,
@@ -95,8 +75,5 @@ library
         J2s.Scanner.Token J2s.Scanner.Show J2s.Scanner.Lexical J2s.Scanner.Generic
         J2s.Scanner.Position J2s.Integration.ScannerParser J2s.Ast.Sintax J2s.Ast.Semantic
   extensions: TypeSynonymInstances, MultiParamTypeClasses
-  -- other-modules: Sintax
 
   ghc-options:  -fno-warn-missing-signatures
-  -- extensions: per-instance pragmas OVERLAPPING/OVERLAPPABLE/OVERLAPS instance {-# OVERLAPPABLE #-} Show a => Show [a] where …
-

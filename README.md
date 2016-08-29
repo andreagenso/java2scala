@@ -10,6 +10,7 @@ cabal build
 
 cabal install --enable-profiling --ghc-options="-DEXTERNAL_UUAGC -fprof-auto -rtsopts"
 
+./test +RTS -p
 
 -- UUAGC
 cabal clean
@@ -17,4 +18,3 @@ cabal configure --ghc-options="-DEXTERNAL_UUAGC"
 cabal build --ghc-options="-DEXTERNAL_UUAGC"
 cabal install --ghc-options="-DEXTERNAL_UUAGC"
 
-./test +RTS -p
