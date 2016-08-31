@@ -116,3 +116,5 @@ tspj4 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/
 tspj5 = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/java/AbstractListableBeanFactoryTests.java"
 
 tspj = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/java/CharArrayPropertyEditorTests.java"
+
+tmp = parser "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/TmpImport.java"

@@ -2,9 +2,9 @@ module J2s.Parser where
 
 import UU.Parsing
 
-import J2s.Ast.Sintax
+import J2s.Ast.Sintax  as AGS
 import J2s.Scanner
-import J2s.Ast.Semantic
+import J2s.Ast.Semantic as AGSem
 import J2s.Integration.ScannerParser
 
 import UU.Scanner.Position

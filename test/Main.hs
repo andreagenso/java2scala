@@ -29,6 +29,8 @@ test :: String -> IO()
 test "singleparser" = testSingleParser
 test "testparser" = testParser
 
+test "tmp" = tmp
+
 test "tsp0" = tsp0
 test "tsp1" = tsp1
 test "tsp2" = tsp2

@@ -78,13 +78,38 @@ data ConditionalExpression
                           conditionalExpression :: ConditionalExpression
 
 deriving ConditionalExpression : Show
--- ToDo complete expressions
-data ConditionalOrExpression
-    | ConditionalOrExpressionUnaryExpression unaryExpression :: UnaryExpression
-    | ConditionalOrExpressionIntanceOf unaryExpression :: UnaryExpression
-                                       type_ :: Type
 
+data ConditionalOrExpression
+  | Operation operation :: Operation
+              conditionalOrExpression1 :: ConditionalOrExpression
+              conditionalOrExpression2 :: ConditionalOrExpression
+  | ConditionalOrExpressionUnaryExpression unaryExpression :: UnaryExpression
+  | ConditionalOrExpressionIntanceOf unaryExpression :: UnaryExpression
+                                     type_ :: Type
 deriving ConditionalOrExpression : Show
+
+data Operation
+    | Or -- :||:
+    | And -- :&&:
+    | BitwiseOr  -- :|:
+    | BitwisrXor -- :^:
+    | BitwiseAnd -- :&:
+    | EqualTo -- :==:
+    | NotEqualTo -- :!=:
+    | LessThan -- :<:
+    | GreaterThan -- :>:
+    | LessEqualOrEqualTo -- :<=:
+    | GreaterThanOrEqualTo -- :>=:
+    | LeftShift -- :<<:
+    | RightShift -- :>>:
+    | ZeroFillRightShift -- :>>>:
+    | Add -- :+:
+    | Sub -- :-:
+    | Mult -- :*:
+    | Div -- :/:
+    | Mod -- :%:
+
+deriving Operation : Show
 
 data UnaryExpression
     | UnaryExpressionPreIncrementExpression unaryExpression :: UnaryExpression
@@ -359,13 +384,8 @@ data DimExprs
     | NilDimExprs
 
 deriving DimExprs : Show
--- ToDo check how to convert to AG
---type Dims = [ () ]
-type Dims = [Unit]
-data Unit
-    | Unit
 
-deriving Unit : Show
+type Dims = [{()}]
 
 data ArrayInitializer
     | ArrayInitializer variableInitializers :: VariableInitializers
@@ -391,7 +411,8 @@ type ElementValues = [ElementValue]
 
 type PackageName = [Identifier]
 
-type Identifier  = (String)
+type Identifier  = [Char]
+
 -- *****************************************
 -- FIN Los siguientes dataTypes representan la estructutra de Conditional expresion
 -- *****************************************
@@ -916,21 +937,39 @@ deriving CatchClause : Show
 
 
 
---attr J2s PackageDeclaration
---    syn j2s :: String
+--  ImportDeclaration ImportDeclarations J2s
+attr TypeName PackageOrTypeName Identifier
+    syn importDeclarationList :: {[String]}
 
---attr PackageDeclaration PackageName Identifier
---    syn j2s_packageDeclaration :: self
+attr ImportDeclaration ImportDeclarations J2s
+    syn importDeclaration :: String
 
---sem Identifier
---    | Tuple lhs.j2s_packageDeclaration = @string
+sem Identifier
+    | Nil lhs.importDeclarationList = []
+    | Cons lhs.importDeclarationList = @tl
 
---sem PackageName
---    | Cons lhs.j2s_packageDeclaration = @hd.j2s_packageDeclarations U @tail.j2s_packageDeclaration
---    | Nil lhs.j2s_packageDeclaration = []
+sem TypeName
+    | TypeName lhs.importDeclarationList = @identifier.importDeclarationList ++ @typeName.importDeclarationList
+    | NilTypeName lhs.importDeclarationList = []
 
---sem PackageDeclaration
---    | PackageDeclaration lhs.j2s_packageDeclaration = PackageDeclaration @packageName.j2s_packageDeclaration
---                         lhs.j2s = "NOMBRE DEL PACKAGE"
---    | NilPackageDeclaration lhs.j2s_packageDeclaration =NilPackageDeclaration @lhs.j2s_packageDeclaration
---                            lhs.j2s = "VACIO"
+sem PackageOrTypeName
+    | NilPackageOrTypeName  lhs.importDeclarationList = []
+    | PackageOrTypeName lhs.importDeclarationList = @identifier.importDeclarationList ++ @packageOrTypeName.importDeclarationList
+
+sem ImportDeclaration
+    | SingleTypeImportDeclaration lhs.importDeclaration =
+        "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList
+    | TypeImportOnDemandDeclaration lhs.importDeclaration =
+        "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @packageOrTypeName.importDeclarationList
+    | SingleStaticImportDeclaration lhs.importDeclaration =
+        "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList
+    | StaticImportOnDemandDeclaration lhs.importDeclaration =
+        "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList
+
+sem ImportDeclarations
+    | ImportDeclarations lhs.importDeclaration =
+        @importDeclaration.importDeclaration ++ ";" ++ "\n" ++ @importDeclarations.importDeclaration
+    | NilImportDeclarations  lhs.importDeclaration = ""
+
+sem J2s
+    | J2s lhs.importDeclaration = @importDeclarations.importDeclaration
