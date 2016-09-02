@@ -5,10 +5,10 @@ import J2s.Scanner
 import J2s.Integration.ScannerParser
 import UU.Scanner.Position
 
-import J2s.Ast.Sintax  as AGS
-import J2s.Ast.Semantic as AGS
---import qualified AG.Sintax as AGS
---import qualified AG.ImportDeclarationSem as AGS
+--import J2s.Ast.Sintax  as AGS
+--import J2s.Ast.Semantic as AGS
+import qualified AG.Sintax as AGS
+import qualified AG.ImportDeclarationSem as AGS
 -- 1
 pJ2s =  AGS.sem_J2s_J2s <$> pPackageDeclaration <*> pImportDeclarations <*> pTypeDeclarations
 -- -----------------------------------------------------------------------------------
@@ -547,12 +547,12 @@ pZAssertStatement = (\ ce e -> AGS.sem_Statement_SWTSAssertStatementCondEx e ce)
 pZContinueStatement = (\i -> AGS.sem_Statement_SWTSContinueStatement i ) <$> pIdentifier <* pSpecialSimbol ";"
                                   <|> AGS.sem_Statement_SWTSNilContinueStatement <$ pSpecialSimbol ";"
                                   
-pZTryStatement =  (\l b -> AGS.sem_Statement_SWTTryStatement b l) <$> pCatchClauses1
-              <|> (\l f b -> AGS.sem_Statement_SWTTryStatementFinally b l f) <$> pCatchClauses <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
+pZTryStatement =  (\l b -> AGS.sem_Statement_SWTTryStatement b l) <$> pCatchClause
+              <|> (\l f b -> AGS.sem_Statement_SWTTryStatementFinally b l f) <$> pCatchClause <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
                                                                                                      
 -- ToDO Check in grammar
-pCatchClauses1 = pList1 pCatchClause
-pCatchClauses = pList pCatchClause
+--pCatchClauses1 = pList1 pCatchClause
+--pCatchClauses = pList pCatchClause
 
 pZReturnStatement  = (\e -> AGS.sem_Statement_SWTSReturnStatement e)    <$> pExpression <* pSpecialSimbol ";"
                                  <|> AGS.sem_Statement_SWTSNilReturnStatement <$ pSpecialSimbol ";"
