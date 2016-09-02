@@ -80,36 +80,67 @@ data ConditionalExpression
 deriving ConditionalExpression : Show
 
 data ConditionalOrExpression
-  | Operation operation :: Operation
-              conditionalOrExpression1 :: ConditionalOrExpression
-              conditionalOrExpression2 :: ConditionalOrExpression
-  | ConditionalOrExpressionUnaryExpression unaryExpression :: UnaryExpression
-  | ConditionalOrExpressionIntanceOf unaryExpression :: UnaryExpression
+    | Mod -- :%:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | Or -- :||:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | And -- :&&:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | BitwiseOr  -- :|:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | BitwiseXor -- :^:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | BitwiseAnd -- :&:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | EqualTo -- :==:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | NotEqualTo -- :!=:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | LessThan -- :<:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | GreaterThan -- :>:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | LessThanOrEqualTo -- :<=:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | GreaterThanOrEqualTo -- :>=:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | LeftShift -- :<<:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | RightShift -- :>>:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | ZeroFillRightShift -- :>>>:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | Add -- :+:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | Sub -- :-:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | Mult -- :*:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | Div -- :/:
+        conditionalOrExpression1 :: ConditionalOrExpression
+        conditionalOrExpression2 :: ConditionalOrExpression
+    | ConditionalOrExpressionUnaryExpression unaryExpression :: UnaryExpression
+    | ConditionalOrExpressionIntanceOf unaryExpression :: UnaryExpression
                                      type_ :: Type
 deriving ConditionalOrExpression : Show
-
-data Operation
-    | Or -- :||:
-    | And -- :&&:
-    | BitwiseOr  -- :|:
-    | BitwisrXor -- :^:
-    | BitwiseAnd -- :&:
-    | EqualTo -- :==:
-    | NotEqualTo -- :!=:
-    | LessThan -- :<:
-    | GreaterThan -- :>:
-    | LessEqualOrEqualTo -- :<=:
-    | GreaterThanOrEqualTo -- :>=:
-    | LeftShift -- :<<:
-    | RightShift -- :>>:
-    | ZeroFillRightShift -- :>>>:
-    | Add -- :+:
-    | Sub -- :-:
-    | Mult -- :*:
-    | Div -- :/:
-    | Mod -- :%:
-
-deriving Operation : Show
 
 data UnaryExpression
     | UnaryExpressionPreIncrementExpression unaryExpression :: UnaryExpression
@@ -935,26 +966,27 @@ data CatchClause
 
 deriving CatchClause : Show
 
-
-
 --  ImportDeclaration ImportDeclarations J2s
-attr TypeName PackageOrTypeName Identifier
+attr Identifier
+    syn importStr :: String
+
+attr TypeName PackageOrTypeName
     syn importDeclarationList :: {[String]}
 
 attr ImportDeclaration ImportDeclarations J2s
     syn importDeclaration :: String
 
 sem Identifier
-    | Nil lhs.importDeclarationList = []
-    | Cons lhs.importDeclarationList = @tl
+    | Nil  lhs.importStr = ""
+    | Cons lhs.importStr = @hd : @tl
 
 sem TypeName
-    | TypeName lhs.importDeclarationList = @identifier.importDeclarationList ++ @typeName.importDeclarationList
+    | TypeName lhs.importDeclarationList = @identifier.importStr : @typeName.importDeclarationList
     | NilTypeName lhs.importDeclarationList = []
 
 sem PackageOrTypeName
     | NilPackageOrTypeName  lhs.importDeclarationList = []
-    | PackageOrTypeName lhs.importDeclarationList = @identifier.importDeclarationList ++ @packageOrTypeName.importDeclarationList
+    | PackageOrTypeName lhs.importDeclarationList = @identifier.importStr : @packageOrTypeName.importDeclarationList
 
 sem ImportDeclaration
     | SingleTypeImportDeclaration lhs.importDeclaration =

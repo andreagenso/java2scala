@@ -32,26 +32,27 @@ sem_ConditionalExpression_ConditionalExprComb = ConditionalExprComb -- Condition
                                                         
 sem_ConditionalOrExpression_Or                        = (:||:)
 sem_ConditionalOrExpression_And                       = (:&&:)
-sem_ConditionalOrExpression_OrEx                      = (:|:)
-sem_ConditionalOrExpression_AndEx                     = (:^:)
-sem_ConditionalOrExpression_AndIc                     = (:&:)
-sem_ConditionalOrExpression_Eq                        = (:==:)
-sem_ConditionalOrExpression_Dist                      = (:!=:)
+sem_ConditionalOrExpression_BitwiseOr                      = (:|:)
+sem_ConditionalOrExpression_BitwiseXor                     = (:^:)
+sem_ConditionalOrExpression_BitwisrAnd                     = (:&:)
+
+sem_ConditionalOrExpression_EqualTo                        = (:==:)
+sem_ConditionalOrExpression_NotEqualTo                      = (:!=:)
 -- sem_ConditionalOrExpression_Men                                                = (:<:) -- Cambio desde Aqui --
 -- sem_ConditionalOrExpression_ConditionalRelationalExpression = ConditionalRelationalExpression
 
-sem_ConditionalOrExpression_Men  = (:<:)
-sem_ConditionalOrExpression_May  = (:>:)
-sem_ConditionalOrExpression_MenQ = (:<=:)
-sem_ConditionalOrExpression_MayQ = (:>=:)
-sem_ConditionalOrExpression_Izq  = (:<<:)
-sem_ConditionalOrExpression_Der  = (:>>:)
-sem_ConditionalOrExpression_DDer = (:>>>:)
+sem_ConditionalOrExpression_LessThan  = (:<:)
+sem_ConditionalOrExpression_GreaterThan  = (:>:)
+sem_ConditionalOrExpression_LessThanOrEqualTo = (:<=:)
+sem_ConditionalOrExpression_GreaterThanOrEqualTo = (:>=:)
+sem_ConditionalOrExpression_LeftShift  = (:<<:)
+sem_ConditionalOrExpression_RightShift  = (:>>:)
+sem_ConditionalOrExpression_ZeroFillRightShift = (:>>>:)
 sem_ConditionalOrExpression_Add  = (:+:)
-sem_ConditionalOrExpression_Res  = (:-:)
+sem_ConditionalOrExpression_Sub  = (:-:)
 sem_ConditionalOrExpression_Mul  = (:*:)
-sem_ConditionalOrExpression_Div  = (:/:)
-sem_ConditionalOrExpression_Mod  = (:%:)
+sem_ConditionalOrExpression_Div  = (:/:) --
+sem_ConditionalOrExpression_Mod  = (:%:) --
 
 sem_ConditionalOrExpression_ConditionalOrExpressionUnaryExpression = ConditionalOrExpressionUnaryExpression
 sem_ConditionalOrExpression_ConditionalOrExpressionIntanceOf = ConditionalOrExpressionIntanceOf
@@ -68,9 +69,9 @@ sem_UnaryExpression_PostExpPrimaryPostfixZ                = PostExpPrimaryPostfi
 sem_UnaryExpression_PostfixExpressionPrimary              = PostfixExpressionPrimary
 
 
-sem_PostfixExpression_PostExpPrimaryPostfixZ = PostExpPrimaryPostfixZ                                                                                                                                                                                                                                                                             
+--sem_PostfixExpression_PostExpPrimaryPostfixZ = PostExpPrimaryPostfixZ
 -- sem_PostfixExpression_PostExpNamePostfixZ     = PostExpNamePostfixZ
-sem_PostfixExpression_PostfixExpressionPrimary = PostfixExpressionPrimary
+--sem_UnaryExpression_PostfixExpressionPrimary = PostfixExpressionPrimary
 -- sem_PostfixExpression_PostfixExpressionExpressionName = PostfixExpressionExpressionName
 
 sem_Primary_PrimNoNewArray               = PrimNoNewArray
@@ -164,11 +165,11 @@ sem_NonWildTypeArguments_NonWildTypeArgumentsC3 = NonWildTypeArgumentsC3
 sem_NonWildTypeArguments_NonWildTypeArgumentsC0 = NonWildTypeArgumentsC0
 sem_NonWildTypeArguments_NilNonWildTypeArguments = NilNonWildTypeArguments
                                                   
-sem_ArrayCreationExpression_ArrayCreationExpressionPrimitiveType   = ArrayCreationExpressionPrimitiveType
-sem_ArrayCreationExpression_ArrayCreationExpressionClassOrInterf   = ArrayCreationExpressionClassOrInterf
-sem_ArrayCreationExpression_ArrayCreationExpressionArrInitialPrim  = ArrayCreationExpressionArrInitialPrim
-sem_ArrayCreationExpression_ArrayCreationExpressionArrInitialClass = ArrayCreationExpressionArrInitialClass
-                                                                          
+sem_PrimaryNNA_ArrayCreationExpressionPrimitiveType   = ArrayCreationExpressionPrimitiveType
+sem_PrimaryNNA_ArrayCreationExpressionClassOrInterf   = ArrayCreationExpressionClassOrInterf
+sem_PrimaryNNA_ArrayCreationExpressionArrInitialPrim  = ArrayCreationExpressionArrInitialPrim
+sem_PrimaryNNA_ArrayCreationExpressionArrInitialClass = ArrayCreationExpressionArrInitialClass
+
 sem_ArrayInitializer_ArrayInitializer = ArrayInitializer
                                                   
 sem_VariableInitializer_VariableInitializerExp = VariableInitializerExp
@@ -293,7 +294,7 @@ sem_Statement_SWTSContinueStatement                = SWTSContinueStatement
 sem_Statement_SWTSReturnStatement                  = SWTSReturnStatement
 sem_Statement_SWTSNilReturnStatement               = SWTSNilReturnStatement
 sem_Statement_SWTSynchronizedStatement             = SWTSynchronizedStatement
-sem_Statement_SWTThrowStatement                    =    SWTTrhowStatement
+sem_Statement_SWTTrhowStatement                    = SWTTrhowStatement
 sem_Statement_SWTTryStatement                      = SWTTryStatement
 sem_Statement_SWTTryStatementFinally               = SWTTryStatementFinally
 
@@ -345,7 +346,7 @@ sem_AnnotationTypeElementDeclaration_AnnTypeElemDeclConstant                    
 sem_DefaultValue_DefaultValue = DefaultValue
 sem_DefaultValue_NilDefaultValue = NilDefaultValue
 
-sem_EnumDeclaration_NilEnumBodyDeclarations = NilEnumBodyDeclarations
+sem_EnumBodyDeclarations_NilEnumBodyDeclarations = NilEnumBodyDeclarations
 
 sem_EnumBody_EnumBody              = EnumBody
 
