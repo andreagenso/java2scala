@@ -12,6 +12,20 @@ import Data.String.Utils
 main  :: IO()
 main = do
        g <- readJavaFile
+       putStrLn (show g)
+
+readJavaFile = do
+    [path] <- getArgs
+    entrada <- readFile path
+    let tokens = classify (initPos path) entrada
+        nameScalaFile =  replace ".java" ".scala" path
+    scalaCode <- parseIO pJ2s tokens
+    return scalaCode
+
+{-
+main  :: IO()
+main = do
+       g <- readJavaFile
        writeScalaFile (snd g) (fst g)
 
 readJavaFile = do
@@ -25,3 +39,4 @@ readJavaFile = do
 writeScalaFile nameFile content = do
     writeFile nameFile content
     putStrLn (" Writing scala file " ++ nameFile ++ "..... ")
+-}

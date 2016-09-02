@@ -34,7 +34,7 @@ sem_ConditionalOrExpression_Or                        = (:||:)
 sem_ConditionalOrExpression_And                       = (:&&:)
 sem_ConditionalOrExpression_BitwiseOr                      = (:|:)
 sem_ConditionalOrExpression_BitwiseXor                     = (:^:)
-sem_ConditionalOrExpression_BitwisrAnd                     = (:&:)
+sem_ConditionalOrExpression_BitwiseAnd                     = (:&:)
 
 sem_ConditionalOrExpression_EqualTo                        = (:==:)
 sem_ConditionalOrExpression_NotEqualTo                      = (:!=:)
@@ -50,7 +50,7 @@ sem_ConditionalOrExpression_RightShift  = (:>>:)
 sem_ConditionalOrExpression_ZeroFillRightShift = (:>>>:)
 sem_ConditionalOrExpression_Add  = (:+:)
 sem_ConditionalOrExpression_Sub  = (:-:)
-sem_ConditionalOrExpression_Mul  = (:*:)
+sem_ConditionalOrExpression_Mult  = (:*:)
 sem_ConditionalOrExpression_Div  = (:/:) --
 sem_ConditionalOrExpression_Mod  = (:%:) --
 
@@ -165,10 +165,12 @@ sem_NonWildTypeArguments_NonWildTypeArgumentsC3 = NonWildTypeArgumentsC3
 sem_NonWildTypeArguments_NonWildTypeArgumentsC0 = NonWildTypeArgumentsC0
 sem_NonWildTypeArguments_NilNonWildTypeArguments = NilNonWildTypeArguments
                                                   
+{-
 sem_PrimaryNNA_ArrayCreationExpressionPrimitiveType   = ArrayCreationExpressionPrimitiveType
 sem_PrimaryNNA_ArrayCreationExpressionClassOrInterf   = ArrayCreationExpressionClassOrInterf
 sem_PrimaryNNA_ArrayCreationExpressionArrInitialPrim  = ArrayCreationExpressionArrInitialPrim
 sem_PrimaryNNA_ArrayCreationExpressionArrInitialClass = ArrayCreationExpressionArrInitialClass
+-}
 
 sem_ArrayInitializer_ArrayInitializer = ArrayInitializer
                                                   

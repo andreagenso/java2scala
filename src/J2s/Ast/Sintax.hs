@@ -550,8 +550,8 @@ sem_Dims_NilDims =  NilDims
 -}
 type Dims = [ () ]
 
-sem_Dims_Dims      = (:)
-sem_Dims_NilDims   =  []
+sem_Dims_Cons      = (:)
+sem_Dims_Nil   =  []
 
 
 data ArrayInitializer = ArrayInitializer VariableInitializers
