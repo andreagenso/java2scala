@@ -1,8 +1,14 @@
 file : "src/AG/Sintax.ag"
 options :
     data,
+    haskellsyntax,
+    strictdata
+
+file : "src/AG/ImportDeclarationSem.ag"
+options :
+    haskellsyntax,
     catas,
     semfuns,
     wrappers,
     signatures,
-    haskellsyntax
+    optimize

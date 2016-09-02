@@ -1,5 +1,6 @@
 .idea*
 dist*
+out*
 =3.2.0
 *GenerationTests_orig.java
 

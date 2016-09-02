@@ -9,7 +9,7 @@ import J2s.Integration.ScannerParser
 import UU.Scanner.Position
 
 import qualified AG.Sintax as AGS
-
+import qualified AG.ImportDeclarationSem as AGS
 -- 1
 pJ2s =  AGS.sem_J2s_J2s <$> pPackageDeclaration <*> pImportDeclarations <*> pTypeDeclarations
 -- -----------------------------------------------------------------------------------
