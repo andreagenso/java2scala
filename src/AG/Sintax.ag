@@ -5,21 +5,6 @@ module {AG.Sintax}
 -- Imports
 }
 
-
-data Tree
-   | Node  left  :: Tree
-           right :: Tree
-   | Tip   value :: Int
-
-attr Tree
-   syn sum :: Int
-
-sem Tree
-  | Node  lhs.sum  =  @left.sum + @right.sum
-  | Tip   lhs.sum  =  @value
-
-
-
 {-- 1 -}
 data J2s
         | J2s packageDeclaration :: PackageDeclaration
