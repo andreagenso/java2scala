@@ -7,19 +7,24 @@ import AG.Sintax
 }
 include "Sintax.ag"
 
---  ImportDeclaration ImportDeclarations J2s
+-- ------------------------------------------------
+-- Atomic datas
+-- ------------------------------------------------
 attr Identifier
     syn scalaIdentifier :: String
 
+sem Identifier
+    | Nil  lhs.scalaIdentifier = ""
+    | Cons lhs.scalaIdentifier = (@hd :  @tl) ++ " "
+
+-- ------------------------------------------------
+-- Import Declaration
+-- ------------------------------------------------
 attr TypeName PackageOrTypeName
     syn importDeclarationList :: {[String]}
 
 attr ImportDeclaration ImportDeclarations -- J2s
     syn scalaImportDeclaration :: String
-
-sem Identifier
-    | Nil  lhs.scalaIdentifier = ""
-    | Cons lhs.scalaIdentifier = @hd :  @tl
 
 sem TypeName
     | TypeName lhs.importDeclarationList = @identifier.scalaIdentifier : @typeName.importDeclarationList
@@ -47,23 +52,20 @@ sem ImportDeclarations
         @importDeclaration.scalaImportDeclaration ++ "\n" ++ @importDeclarations.scalaImportDeclaration
     | NilImportDeclarations  lhs.scalaImportDeclaration = ""
 
-attr J2s
-     syn scalaCode :: String
-
-sem J2s
-    | J2s lhs.scalaCode = @importDeclarations.scalaImportDeclaration ++
-                          @typeDeclarations.scalaTypeDeclaration
-
-
+-- ------------------------------------------------
+-- Type declarations
+-- ------------------------------------------------
 set ScalaAllTypeDeclaration = TypeDeclarations TypeDeclaration
                             Modifiers Modifier
-                            TypeParameters TypeParameterList
+                            TypeParameters TypeParameterList TypeParameter
                             Super
                             Interfaces
                             ClassBodyDeclarations ClassBodyDeclaration
                             Type PrimitiveOrReferenceType TypeZ ArrayType
                             VariableDeclarators VariableDeclarator
                             VariableDeclaratorId VariableDeclaratorIdZ
+                            VariableInitializer
+                            ReferenceType ArrayType
 
 attr ScalaAllTypeDeclaration
      syn scalaTypeDeclaration :: String
@@ -72,20 +74,174 @@ sem TypeDeclarations
     | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ "\n" ++ @tl.scalaTypeDeclaration
     | Nil lhs.scalaTypeDeclaration = ""
 
-sem PrimitiveOrReferenceType
-    | TypePrimitiveNumericType_TypeIntegral_Byte lhs.scalaTypeDeclaration = ""
-    | TypePrimitiveNumericType_TypeIntegral_Short lhs.scalaTypeDeclaration = ""
-    | TypePrimitiveNumericType_TypeIntegral_Int lhs.scalaTypeDeclaration = ""
-    | TypePrimitiveNumericType_TypeIntegral_Long lhs.scalaTypeDeclaration = ""
-    | TypePrimitiveNumericType_TypeIntegral_Char lhs.scalaTypeDeclaration = ""
-    | TypePrimitiveNumericType_TypeFloating_Float lhs.scalaTypeDeclaration = ""
-    | TypePrimitiveNumericType_TypeFloating_Double lhs.scalaTypeDeclaration = ""
-    | TypePrimitivePrimitivetypeBoolean lhs.scalaTypeDeclaration = ""
-    | TypeReference lhs.scalaTypeDeclaration = "" -- referenceType :: ReferenceType
+sem TypeDeclaration
+    | TypeDeclarationClassDeclarationNormalCD lhs.scalaTypeDeclaration =
+                              "\n" ++ @modifiers.scalaTypeDeclaration ++
+                              "class" ++ " " ++
+                              @identifier.scalaIdentifier ++
+                              @typeParameters.scalaTypeDeclaration ++
+                              @super.scalaTypeDeclaration ++
+                              @interfaces.scalaTypeDeclaration ++
+                              " { " ++ @classBodyDeclarations.scalaTypeDeclaration ++ "\n} "
+    | TypeDeclarationClassDeclarationEnumD lhs.scalaTypeDeclaration = "" -- ToDO modifiers :: Modifiers
+                                               -- identifier :: Identifier
+                                               -- interfaces :: Interfaces
+                                               -- enumBody ::EnumBody
+    | TypeDeclarationInterfaceDeclarationNormalInterfaceD lhs.scalaTypeDeclaration = "" -- ToDO  modifiers :: Modifiers
+                                                              -- identifier :: Identifier
+                                                              -- typeParameters :: TypeParameters
+                                                              -- extendsInterfaces :: ExtendsInterfaces
+                                                              -- listInterfaceMemberDeclarations :: ListInterfaceMemberDeclaration
+    | TypeDeclarationInterfaceDeclarationAnnotationTypeD lhs.scalaTypeDeclaration = "" -- ToDO  modifiers :: Modifiers
+                                                             -- identifier :: Identifier
+                                                             -- listAnnotationTypeElementDeclaration :: ListAnnotationTypeElementDeclaration
+    | TypeDeclarationSemiColon  lhs.scalaTypeDeclaration = "" -- ToDO review how to convert this case to Scala
 
-sem J2s
-    | J2s lhs.scalaTypeDeclaration = ""
+
+sem Modifiers
+    | Modifiers lhs.scalaTypeDeclaration = "" -- ToDO  modifier :: Modifier
+                -- modifiers :: Modifiers
+    | NilModifiers lhs.scalaTypeDeclaration = ""
+
+sem Modifier
+    | ModifierAnnotation lhs.scalaTypeDeclaration = "" -- ToDO annotation :: Annotation
+    | ModifierPublic lhs.scalaTypeDeclaration = ""
+    | ModifierProtected lhs.scalaTypeDeclaration = "protected "
+    | ModifierPrivate lhs.scalaTypeDeclaration = "private "
+    | ModifierAbstract lhs.scalaTypeDeclaration = "" -- ToDO
+    | ModifiersStatic lhs.scalaTypeDeclaration = "val " -- ToDo
+    | ModifierFinal lhs.scalaTypeDeclaration = "" -- ToDO
+    | ModifierStrictfp lhs.scalaTypeDeclaration = "" -- ToDO
+    | FieldModifierTransient lhs.scalaTypeDeclaration = "" -- ToDO
+    | FieldModifierVolatile lhs.scalaTypeDeclaration = "" -- ToDO
+    | MethodModifierSynchronized lhs.scalaTypeDeclaration = "" -- ToDO
+    | MethodModifierNative lhs.scalaTypeDeclaration = "" -- ToDO
+
+
+sem TypeParameters
+    | TypeParametersC1 lhs.scalaTypeDeclaration = "" -- ToDO typeParameterList :: TypeParameterList
+    | TypeParametersC2 lhs.scalaTypeDeclaration = "" -- ToDO typeParameterList :: TypeParameterList
+    | TypeParametersC3 lhs.scalaTypeDeclaration = "" -- ToDO typeParameterList :: TypeParameterList
+    | TypeParametersC0 lhs.scalaTypeDeclaration = "" -- ToDO typeParameterList :: TypeParameterList
+    | NilTypeParameters lhs.scalaTypeDeclaration = "" -- ToDO
+
+sem TypeParameterList
+    | Cons lhs.scalaTypeDeclaration = "" -- ToDO
+    | Nil lhs.scalaTypeDeclaration = "" -- ToDO
+
+sem TypeParameter
+    | TypeParameterBound lhs.scalaTypeDeclaration = "" -- ToDO identifier :: Identifier
+                          -- typeBound :: TypeBound
+    | TypeParameter lhs.scalaTypeDeclaration = "" -- ToDO identifier :: Identifier
+
+sem Super
+    | Super lhs.scalaTypeDeclaration = "" -- ToDO  classOrInterfaceType :: ClassOrInterfaceType
+    | NilSuper lhs.scalaTypeDeclaration = "" -- ToDO
+
+sem Interfaces
+    | Interfaces lhs.scalaTypeDeclaration = "" -- ToDO interfaceTypeList :: InterfaceTypeList
+    | NilInterfaces lhs.scalaTypeDeclaration = "" -- ToDO
+
+sem ClassBodyDeclarations
+    | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ "\n" ++ @tl.scalaTypeDeclaration
+    | Nil  lhs.scalaTypeDeclaration = "" -- ToDO
+
+sem ClassBodyDeclaration
+    | ClassBodyDeclClassMemberDeclFieldDeclaration lhs.scalaTypeDeclaration = @modifiers.scalaTypeDeclaration ++
+                                                                              @type_.scalaTypeDeclaration ++
+                                                                              @variableDeclarators.scalaTypeDeclaration
+                                                                              -- ToDO type_ :: Type
+    | ClassBodyDeclClassMemberDeclMethodDeclaration lhs.scalaTypeDeclaration = "" -- ToDO                     modifiers :: Modifiers
+                                                                       -- typeParameters :: TypeParameters
+                                                                       -- resultType :: ResultType
+                                                                       -- methosDeclarator :: MethodDeclarator
+                                                                       -- throws :: Throws
+                                                                       -- methodBody :: MethodBody
+    | ClassBodyDeclClassMemberDeclClassDeclarationNormalCD lhs.scalaTypeDeclaration = " ClassBodyDeclClassMemberDeclClassDeclarationNormalCD ???? " -- ToDO              modifiers :: Modifiers
+                                                                       -- identifier :: Identifier
+                                                                       -- typeParameters :: TypeParameters
+                                                                       -- super :: Super
+                                                                       -- interfaces :: Interfaces
+                                                                       -- classBodyDeclarations :: ClassBodyDeclarations
+    | ClassBodyDeclClassMemberDeclClassDeclarationEnumD lhs.scalaTypeDeclaration = "" -- ToDO                 modifiers :: Modifiers
+                                                                       -- identifier :: Identifier
+                                                                       -- interfaces :: Interfaces
+                                                                       -- enumBody :: EnumBody
+    | ClassBodyDeclClassMemberDeclInterfaceDeclarationNormalInterfaceD  lhs.scalaTypeDeclaration = "" -- ToDO modifiers :: Modifiers
+                                                                       -- identifier :: Identifier
+                                                                       -- typeParameters :: TypeParameters
+                                                                       -- extendsInterfaces :: ExtendsInterfaces
+                                                                       -- listInterfaceMemberDeclaration :: ListInterfaceMemberDeclaration
+    | ClassBodyDeclClassMemberDeclInterfaceDeclarationAnnotationTypeD   lhs.scalaTypeDeclaration = "" -- ToDO modifiers :: Modifiers
+                                                                       -- identifier :: Identifier
+                                                                       -- listAnnotationTypeElementDeclaration :: ListAnnotationTypeElementDeclaration
+    | ClassBodyDeclClassMemberDeclSemiColon  lhs.scalaTypeDeclaration = "" -- ToDO
+    | ClassBodyInstanceInitializer lhs.scalaTypeDeclaration = "" -- ToDO  blockStatements :: BlockStatements {- Block -- InstanceInitializer -}
+    | ClassBodyStaticInitializer lhs.scalaTypeDeclaration = "" -- ToDO  blockStatements :: BlockStatements {- StaticInitializer -}
+    | ClassBodyConstructorDeclaration lhs.scalaTypeDeclaration = "" -- ToDO  modifiers :: Modifiers
+                                       -- typeParameters :: TypeParameters
+                                       -- identifier :: Identifier
+                                       -- formalParameterList :: FormalParameterList
+                                       -- throws :: Throws
+                                       -- constructorBody :: ConstructorBody
+    | ClassBodyConstructorDeclarationNoFormalParList lhs.scalaTypeDeclaration = "" -- ToDO  modifiers :: Modifiers
+                                                     -- typeParameters :: TypeParameters
+                                                     -- identifiers :: Identifier
+                                                     -- throws :: Throws
+                                                     -- constructorBody :: ConstructorBody
+sem Type  -- ToDo check
+    | TypePrimitiveType lhs.scalaTypeDeclaration = @primitiveOrReferenceType.scalaTypeDeclaration ++
+                                                   @typeZ.scalaTypeDeclaration
+sem TypeZ
+    | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
+    | Nil lhs.scalaTypeDeclaration = ""
+
+sem ArrayType
+    | ArrayType lhs.scalaTypeDeclaration = "" -- ToDO
+
+sem PrimitiveOrReferenceType
+    | TypePrimitiveNumericType_TypeIntegral_Byte lhs.scalaTypeDeclaration = "" -- ToDo
+    | TypePrimitiveNumericType_TypeIntegral_Short lhs.scalaTypeDeclaration = "" -- ToDo
+    | TypePrimitiveNumericType_TypeIntegral_Int lhs.scalaTypeDeclaration = "" -- ToDo
+    | TypePrimitiveNumericType_TypeIntegral_Long lhs.scalaTypeDeclaration = "" -- ToDo
+    | TypePrimitiveNumericType_TypeIntegral_Char lhs.scalaTypeDeclaration = "" -- ToDo
+    | TypePrimitiveNumericType_TypeFloating_Float lhs.scalaTypeDeclaration = "" -- ToDo
+    | TypePrimitiveNumericType_TypeFloating_Double lhs.scalaTypeDeclaration = "" -- ToDo
+    | TypePrimitivePrimitivetypeBoolean lhs.scalaTypeDeclaration = "" -- ToDo
+    | TypeReference lhs.scalaTypeDeclaration = @referenceType.scalaTypeDeclaration -- ToDo
+
+sem ReferenceType
+    | ReferenceTypeClassOrInterfaceType  lhs.scalaTypeDeclaration =  @identifier.scalaIdentifier ++ " "
+                                        -- ToDO typeArguments :: TypeArguments
+                                        -- ToDO zClassOrInterfaceType :: ZClassOrInterfaceType
+
+sem VariableDeclarators
+    | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
+    | Nil lhs.scalaTypeDeclaration = ""
+
+sem VariableDeclarator
+    | VariableDeclaratorId lhs.scalaTypeDeclaration = @variableDeclaratorId.scalaTypeDeclaration  -- ToDo variableDeclaratorId :: VariableDeclaratorId
+    | VariableDeclaratorIdAsig lhs.scalaTypeDeclaration = @variableDeclaratorId.scalaTypeDeclaration ++ @variableInitializer.scalaTypeDeclaration  -- ToDo variableDeclaratorId :: VariableDeclaratorId
+                               -- variableInitializer :: VariableInitializer
+sem VariableDeclaratorId
+    | VarDeclaratorId lhs.scalaTypeDeclaration = @identifier.scalaIdentifier
+    | VarDeclaratorIdVDZ lhs.scalaTypeDeclaration = @identifier.scalaIdentifier ++ " " ++ @variableDeclaratorIdZ.scalaTypeDeclaration
 
 sem VariableDeclaratorIdZ
-    | VarDeclaratorIdCorchete lhs.scalaTypeDeclaration = ""
-    | VarDeclaratorIdZ lhs.scalaTypeDeclaration = "" -- @variableDeclaratorIdZ.scalaTypeDeclaration
+    | VarDeclaratorIdCorchete lhs.scalaTypeDeclaration = "[]" -- ToDo
+    | VarDeclaratorIdZ lhs.scalaTypeDeclaration = @variableDeclaratorIdZ.scalaTypeDeclaration -- ToDo
+
+sem VariableInitializer
+    | VariableInitializerExp lhs.scalaTypeDeclaration = "" -- ToDo expression :: Expression
+    | VariableInitializerArr lhs.scalaTypeDeclaration = "" -- ToDo attayInitializer :: ArrayInitializer
+
+
+-- ------------------------------------------------
+-- J2S scala code
+-- ------------------------------------------------
+attr J2s
+     syn scalaCode :: String
+
+sem J2s
+    | J2s lhs.scalaCode = @importDeclarations.scalaImportDeclaration ++
+                          @typeDeclarations.scalaTypeDeclaration
