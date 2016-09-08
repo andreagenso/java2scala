@@ -20,7 +20,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-
 /**
  * @test
  * @bug 4635230 6283345 6303830 6824440
@@ -74,83 +73,1005 @@ import javax.xml.transform.stream.StreamResult;
  * Test that recreates merlin-xmldsig-twenty-three test vectors but with
  * different keys and X.509 data.
  */
+
 public class GenerationTests {
 
     private static XMLSignatureFactory fac;
     private static KeyInfoFactory kifac;
     private static DocumentBuilder db;
     private static CanonicalizationMethod withoutComments;
-    private static SignatureMethod dsaSha1, rsaSha1, rsaSha256, rsaSha384, rsaSha512;
-    private static DigestMethod sha1, sha256, sha384, sha512;
-    private static KeyInfo dsa, rsa, rsa1024;
-    private static KeySelector kvks = new KeySelectors.KeyValueKeySelector();
-    private static KeySelector sks;
-    private static Key signingKey;
-    private static PublicKey validatingKey;
-    private static Certificate signingCert;
-    private static KeyStore ks;
-    private final static String DIR = System.getProperty("test.src", ".");
-    private final static String DATA_DIR =
-            DIR + System.getProperty("file.separator") + "data";
-    private final static String KEYSTORE =
-            DATA_DIR + System.getProperty("file.separator") + "certs" +
-                    System.getProperty("file.separator") + "test.jks";
-    private final static String CRL =
-            DATA_DIR + System.getProperty("file.separator") + "certs" +
-                    System.getProperty("file.separator") + "crl";
-    private final static String ENVELOPE =
-            DATA_DIR + System.getProperty("file.separator") + "envelope.xml";
-    private static URIDereferencer httpUd = null;
-    private final static String STYLESHEET =
-            "http://www.w3.org/TR/xml-stylesheet";
-    private final static String STYLESHEET_B64 =
-            "http://www.w3.org/Signature/2002/04/xml-stylesheet.b64";
 
-    public static void main(String args[]) throws Exception {
-        setup();
-        test_create_signature_enveloped_dsa();
-        test_create_signature_enveloping_b64_dsa();
-        test_create_signature_enveloping_dsa();
-        test_create_signature_enveloping_hmac_sha1_40();
-        test_create_signature_enveloping_hmac_sha256();
-        test_create_signature_enveloping_hmac_sha384();
-        test_create_signature_enveloping_hmac_sha512();
-        test_create_signature_enveloping_rsa();
-        test_create_signature_external_b64_dsa();
-        test_create_signature_external_dsa();
-        test_create_signature_keyname();
-        test_create_signature_retrievalmethod_rawx509crt();
-        test_create_signature_x509_crt_crl();
-        test_create_signature_x509_crt();
-        test_create_signature_x509_is();
-        test_create_signature_x509_ski();
-        test_create_signature_x509_sn();
-//      test_create_signature();
-        test_create_exc_signature();
-        test_create_sign_spec();
-        test_create_signature_enveloping_sha256_dsa();
-        test_create_signature_enveloping_sha384_rsa_sha256();
-        test_create_signature_enveloping_sha512_rsa_sha384();
-        test_create_signature_enveloping_sha512_rsa_sha512();
-    }
+}
 
-    private static void setup() throws Exception {
-        fac = XMLSignatureFactory.getInstance();
-        kifac = fac.getKeyInfoFactory();
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        db = dbf.newDocumentBuilder();
+public class GenerationTests {
 
-        // get key & self-signed certificate from keystore
-        FileInputStream fis = new FileInputStream(KEYSTORE);
-        ks = KeyStore.getInstance("JKS");
-        ks.load(fis, "changeit".toCharArray());
-        signingKey = ks.getKey("user", "changeit".toCharArray());
-        signingCert = ks.getCertificate("user");
-        //validatingKey = signingCert.getPublicKey();
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
 
-        // create common objects
+}
 
-    }
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
+
+}
+
+public class GenerationTests {
+
+    private static XMLSignatureFactory fac;
+    private static KeyInfoFactory kifac;
+    private static DocumentBuilder db;
+    private static CanonicalizationMethod withoutComments;
 
 }

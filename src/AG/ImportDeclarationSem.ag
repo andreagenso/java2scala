@@ -14,12 +14,12 @@ attr Identifier
 attr TypeName PackageOrTypeName
     syn importDeclarationList :: {[String]}
 
-attr ImportDeclaration ImportDeclarations J2s
-    syn importDeclaration :: String
+attr ImportDeclaration ImportDeclarations -- J2s
+    syn scalaImportDeclaration :: String
 
 sem Identifier
     | Nil  lhs.importStr = ""
-    | Cons lhs.importStr = @hd : @tl
+    | Cons lhs.importStr = importStr_Syn_Identifier (wrap_Identifier @tl Inh_Identifier) --@hd :  @tl
 
 sem TypeName
     | TypeName lhs.importDeclarationList = @identifier.importStr : @typeName.importDeclarationList
@@ -30,22 +30,61 @@ sem PackageOrTypeName
     | PackageOrTypeName lhs.importDeclarationList = @identifier.importStr : @packageOrTypeName.importDeclarationList
 
 sem ImportDeclaration
-    | SingleTypeImportDeclaration lhs.importDeclaration =
+    | SingleTypeImportDeclaration lhs.scalaImportDeclaration =
         "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList
-    | TypeImportOnDemandDeclaration lhs.importDeclaration =
+    | TypeImportOnDemandDeclaration lhs.scalaImportDeclaration =
         "import" ++ " " ++
         foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @packageOrTypeName.importDeclarationList ++
         "._"
-    | SingleStaticImportDeclaration lhs.importDeclaration =
+    | SingleStaticImportDeclaration lhs.scalaImportDeclaration =
         "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList
-    | StaticImportOnDemandDeclaration lhs.importDeclaration =
+    | StaticImportOnDemandDeclaration lhs.scalaImportDeclaration =
         "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList ++
         "._"
 
 sem ImportDeclarations
-    | ImportDeclarations lhs.importDeclaration =
-        @importDeclaration.importDeclaration ++ "\n" ++ @importDeclarations.importDeclaration
-    | NilImportDeclarations  lhs.importDeclaration = ""
+    | ImportDeclarations lhs.scalaImportDeclaration =
+        @importDeclaration.scalaImportDeclaration ++ "\n" ++ @importDeclarations.scalaImportDeclaration
+    | NilImportDeclarations  lhs.scalaImportDeclaration = ""
+
+-- sem J2s
+--    | J2s lhs.importDeclaration = @importDeclarations.importDeclaration
+
+
+attr J2s
+     syn scalaCode :: String
 
 sem J2s
-    | J2s lhs.importDeclaration = @importDeclarations.importDeclaration
+    | J2s lhs.scalaCode = @importDeclarations.scalaImportDeclaration ++
+                          @typeDeclarations.scalaTypeDeclaration
+
+
+
+
+set ScalaAllTypeDeclaration = TypeDeclarations TypeDeclaration
+                            Modifiers Modifier
+                            Identifier
+                            TypeParameters TypeParameterList
+                            Super
+                            Interfaces
+                            ClassBodyDeclarations ClassBodyDeclaration
+                            Type PrimitiveOrReferenceType TypeZ ArrayType
+                            VariableDeclarators VariableDeclarator
+                            VariableDeclaratorId VariableDeclaratorIdZ
+
+attr ScalaAllTypeDeclaration
+     syn scalaTypeDeclaration :: String
+
+sem PrimitiveOrReferenceType
+    | TypePrimitiveNumericType_TypeIntegral_Byte lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeIntegral_Short lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeIntegral_Int lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeIntegral_Long lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeIntegral_Char lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeFloating_Float lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeFloating_Double lhs.scalaTypeDeclaration = ""
+    | TypePrimitivePrimitivetypeBoolean lhs.scalaTypeDeclaration = ""
+    | TypeReference lhs.scalaTypeDeclaration = "" -- referenceType :: ReferenceType
+
+sem J2s
+    | J2s lhs.scalaTypeDeclaration = ""
