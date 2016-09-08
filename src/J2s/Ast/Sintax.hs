@@ -724,11 +724,11 @@ data VariableDeclarator = VariableDeclaratorId VariableDeclaratorId
                                                 deriving Show
                                                 
 data VariableDeclaratorId = VarDeclaratorId Identifier
-                                                  | VarDeclaratorIdVDZ Identifier VariableDeclatatorIdZ
+                                                  | VarDeclaratorIdVDZ Identifier VariableDeclaratorIdZ
                                                   deriving Show                                           
 
-data VariableDeclatatorIdZ = VarDeclaratorIdCorchete
-                                                   | VarDeclaratorIdZ VariableDeclatatorIdZ
+data VariableDeclaratorIdZ = VarDeclaratorIdCorchete
+                                                   | VarDeclaratorIdZ VariableDeclaratorIdZ
                                               deriving Show                                           
                                                                                                             
                                         

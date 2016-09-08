@@ -9,6 +9,7 @@ import UU.Scanner.Position
 --import J2s.Ast.Semantic as AGS
 import qualified AG.Sintax as AGS
 import qualified AG.ImportDeclarationSem as AGS
+
 -- 1
 pJ2s =  AGS.sem_J2s_J2s <$> pPackageDeclaration <*> pImportDeclarations <*> pTypeDeclarations
 -- -----------------------------------------------------------------------------------
@@ -222,15 +223,15 @@ pZPrimaryOrExpression = AGS.sem_ZPrimaryOrExpression_ZPOEExpressionDeArrayAccess
 -- 28 -  OK
 pType =  AGS.sem_Type_TypePrimitiveType <$> pPrimitiveOrRefereceType <*> pTypeZ
 
-pPrimitiveOrRefereceType =  AGS.sem_PrimitiveOrRefereceType_TypePrimitivePrimitivetypeBoolean  <$ pKeyWord "boolean"
-                          <|> AGS.sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeIntegral_Byte   <$ pKeyWord "byte"
-                          <|> AGS.sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeIntegral_Short  <$ pKeyWord "short"
-                          <|> AGS.sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeIntegral_Int    <$ pKeyWord "int"
-                          <|> AGS.sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeIntegral_Long   <$ pKeyWord "long"
-                          <|> AGS.sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeIntegral_Char   <$ pKeyWord "char"
-                          <|> AGS.sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeFloating_Float  <$ pKeyWord "float"
-                          <|> AGS.sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeFloating_Double <$ pKeyWord "double"
-                      <|> AGS.sem_PrimitiveOrRefereceType_TypeReferece          <$> pReferenceType
+pPrimitiveOrRefereceType =  AGS.sem_PrimitiveOrReferenceType_TypePrimitivePrimitivetypeBoolean  <$ pKeyWord "boolean"
+                          <|> AGS.sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeIntegral_Byte   <$ pKeyWord "byte"
+                          <|> AGS.sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeIntegral_Short  <$ pKeyWord "short"
+                          <|> AGS.sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeIntegral_Int    <$ pKeyWord "int"
+                          <|> AGS.sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeIntegral_Long   <$ pKeyWord "long"
+                          <|> AGS.sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeIntegral_Char   <$ pKeyWord "char"
+                          <|> AGS.sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeFloating_Float  <$ pKeyWord "float"
+                          <|> AGS.sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeFloating_Double <$ pKeyWord "double"
+                          <|> AGS.sem_PrimitiveOrReferenceType_TypeReference <$> pReferenceType
 
 pTypeZ = pFoldr (AGS.sem_TypeZ_Cons, AGS.sem_TypeZ_Nil) pArrayType
 pArrayType = AGS.sem_ArrayType_ArrayType <$ pSpecialSimbol "[" <* pSpecialSimbol "]"
@@ -473,8 +474,8 @@ pVariableDeclaratorId   = (\i fvd -> fvd i) <$> pIdentifier <*> pZVariableDeclar
 pZVariableDeclaratorIdZ = (\vd i -> AGS.sem_VariableDeclaratorId_VarDeclaratorIdVDZ i vd) <$> pVariableDeclaratorIdZ
                        <|> pSucceed (\i -> AGS.sem_VariableDeclaratorId_VarDeclaratorId i)
 pVariableDeclaratorIdZ   = (\fvd -> fvd)  <$ pSpecialSimbol "[" <* pSpecialSimbol "]" <*> pVariableDeclaratorIdZFi
-pVariableDeclaratorIdZFi = (\vd -> AGS.sem_VariableDeclatatorIdZ_VarDeclaratorIdZ vd)  <$> pVariableDeclaratorIdZ
-                                            <|> pSucceed (AGS.sem_VariableDeclatatorIdZ_VarDeclaratorIdCorchete)
+pVariableDeclaratorIdZFi = (\vd -> AGS.sem_VariableDeclaratorIdZ_VarDeclaratorIdZ vd)  <$> pVariableDeclaratorIdZ
+                                            <|> pSucceed (AGS.sem_VariableDeclaratorIdZ_VarDeclaratorIdCorchete)
                                           
 pResultType = AGS.sem_ResultType_ResultTypeVoid <$ pKeyWord "void"
                    <|> AGS.sem_ResultType_ResultTypeType <$> pType

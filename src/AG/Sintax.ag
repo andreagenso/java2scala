@@ -252,11 +252,11 @@ deriving ZPrimaryOrExpression : Show
 
 -- 29
 data Type
-    | TypePrimitiveType primitiveOrReferenceType :: PrimitiveOrRefereceType
+    | TypePrimitiveType primitiveOrReferenceType :: PrimitiveOrReferenceType
                         typeZ :: TypeZ
 deriving Type : Show
 
-data PrimitiveOrRefereceType
+data PrimitiveOrReferenceType
     | TypePrimitiveNumericType_TypeIntegral_Byte
     | TypePrimitiveNumericType_TypeIntegral_Short
     | TypePrimitiveNumericType_TypeIntegral_Int
@@ -265,9 +265,9 @@ data PrimitiveOrRefereceType
     | TypePrimitiveNumericType_TypeFloating_Float
     | TypePrimitiveNumericType_TypeFloating_Double
     | TypePrimitivePrimitivetypeBoolean
-    | TypeReferece referenceType :: ReferenceType
+    | TypeReference referenceType :: ReferenceType
 
-deriving PrimitiveOrRefereceType : Show
+deriving PrimitiveOrReferenceType : Show
 
 type TypeZ = [ArrayType]  {-- en referenceType, el ArrayType que era recursivo -}
 
@@ -614,15 +614,15 @@ deriving VariableDeclarator : Show
 data VariableDeclaratorId
     | VarDeclaratorId identifier :: Identifier
     | VarDeclaratorIdVDZ identifier :: Identifier
-                         variableDeclaratorIdZ :: VariableDeclatatorIdZ
+                         variableDeclaratorIdZ :: VariableDeclaratorIdZ
 
 deriving VariableDeclaratorId : Show
 
-data VariableDeclatatorIdZ
+data VariableDeclaratorIdZ
     | VarDeclaratorIdCorchete
-    | VarDeclaratorIdZ variableDeclaratorIdZ :: VariableDeclatatorIdZ
+    | VarDeclaratorIdZ variableDeclaratorIdZ :: VariableDeclaratorIdZ
 
-deriving VariableDeclatatorIdZ : Show
+deriving VariableDeclaratorIdZ : Show
 
 data ResultType
     | ResultTypeType type_ :: Type

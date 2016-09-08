@@ -9,43 +9,83 @@ include "Sintax.ag"
 
 --  ImportDeclaration ImportDeclarations J2s
 attr Identifier
-    syn importStr :: String
+    syn scalaIdentifier :: String
 
 attr TypeName PackageOrTypeName
     syn importDeclarationList :: {[String]}
 
-attr ImportDeclaration ImportDeclarations J2s
-    syn importDeclaration :: String
+attr ImportDeclaration ImportDeclarations -- J2s
+    syn scalaImportDeclaration :: String
 
 sem Identifier
-    | Nil  lhs.importStr = ""
-    | Cons lhs.importStr = @hd : @tl
+    | Nil  lhs.scalaIdentifier = ""
+    | Cons lhs.scalaIdentifier = @hd :  @tl
 
 sem TypeName
-    | TypeName lhs.importDeclarationList = @identifier.importStr : @typeName.importDeclarationList
+    | TypeName lhs.importDeclarationList = @identifier.scalaIdentifier : @typeName.importDeclarationList
     | NilTypeName lhs.importDeclarationList = []
 
 sem PackageOrTypeName
     | NilPackageOrTypeName  lhs.importDeclarationList = []
-    | PackageOrTypeName lhs.importDeclarationList = @identifier.importStr : @packageOrTypeName.importDeclarationList
+    | PackageOrTypeName lhs.importDeclarationList = @identifier.scalaIdentifier : @packageOrTypeName.importDeclarationList
 
 sem ImportDeclaration
-    | SingleTypeImportDeclaration lhs.importDeclaration =
+    | SingleTypeImportDeclaration lhs.scalaImportDeclaration =
         "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList
-    | TypeImportOnDemandDeclaration lhs.importDeclaration =
+    | TypeImportOnDemandDeclaration lhs.scalaImportDeclaration =
         "import" ++ " " ++
         foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @packageOrTypeName.importDeclarationList ++
         "._"
-    | SingleStaticImportDeclaration lhs.importDeclaration =
+    | SingleStaticImportDeclaration lhs.scalaImportDeclaration =
         "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList
-    | StaticImportOnDemandDeclaration lhs.importDeclaration =
+    | StaticImportOnDemandDeclaration lhs.scalaImportDeclaration =
         "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList ++
         "._"
 
 sem ImportDeclarations
-    | ImportDeclarations lhs.importDeclaration =
-        @importDeclaration.importDeclaration ++ "\n" ++ @importDeclarations.importDeclaration
-    | NilImportDeclarations  lhs.importDeclaration = ""
+    | ImportDeclarations lhs.scalaImportDeclaration =
+        @importDeclaration.scalaImportDeclaration ++ "\n" ++ @importDeclarations.scalaImportDeclaration
+    | NilImportDeclarations  lhs.scalaImportDeclaration = ""
+
+attr J2s
+     syn scalaCode :: String
 
 sem J2s
-    | J2s lhs.importDeclaration = @importDeclarations.importDeclaration
+    | J2s lhs.scalaCode = @importDeclarations.scalaImportDeclaration ++
+                          @typeDeclarations.scalaTypeDeclaration
+
+
+set ScalaAllTypeDeclaration = TypeDeclarations TypeDeclaration
+                            Modifiers Modifier
+                            TypeParameters TypeParameterList
+                            Super
+                            Interfaces
+                            ClassBodyDeclarations ClassBodyDeclaration
+                            Type PrimitiveOrReferenceType TypeZ ArrayType
+                            VariableDeclarators VariableDeclarator
+                            VariableDeclaratorId VariableDeclaratorIdZ
+
+attr ScalaAllTypeDeclaration
+     syn scalaTypeDeclaration :: String
+
+sem TypeDeclarations
+    | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ "\n" ++ @tl.scalaTypeDeclaration
+    | Nil lhs.scalaTypeDeclaration = ""
+
+sem PrimitiveOrReferenceType
+    | TypePrimitiveNumericType_TypeIntegral_Byte lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeIntegral_Short lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeIntegral_Int lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeIntegral_Long lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeIntegral_Char lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeFloating_Float lhs.scalaTypeDeclaration = ""
+    | TypePrimitiveNumericType_TypeFloating_Double lhs.scalaTypeDeclaration = ""
+    | TypePrimitivePrimitivetypeBoolean lhs.scalaTypeDeclaration = ""
+    | TypeReference lhs.scalaTypeDeclaration = "" -- referenceType :: ReferenceType
+
+sem J2s
+    | J2s lhs.scalaTypeDeclaration = ""
+
+sem VariableDeclaratorIdZ
+    | VarDeclaratorIdCorchete lhs.scalaTypeDeclaration = ""
+    | VarDeclaratorIdZ lhs.scalaTypeDeclaration = "" -- @variableDeclaratorIdZ.scalaTypeDeclaration

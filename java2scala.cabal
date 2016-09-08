@@ -34,7 +34,7 @@ executable java2scala
                    uuagc-cabal,
                    MissingH
   other-modules:
-    AG.Sintax
+    AG.Sintax AG.ImportDeclarationSem
 
 executable test
   main-is:       Main.hs
