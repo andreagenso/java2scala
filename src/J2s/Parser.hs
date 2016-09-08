@@ -474,7 +474,7 @@ pVariableDeclaratorId   = (\i fvd -> fvd i) <$> pIdentifier <*> pZVariableDeclar
 pZVariableDeclaratorIdZ = (\vd i -> AGS.sem_VariableDeclaratorId_VarDeclaratorIdVDZ i vd) <$> pVariableDeclaratorIdZ
                        <|> pSucceed (\i -> AGS.sem_VariableDeclaratorId_VarDeclaratorId i)
 pVariableDeclaratorIdZ   = (\fvd -> fvd)  <$ pSpecialSimbol "[" <* pSpecialSimbol "]" <*> pVariableDeclaratorIdZFi
-pVariableDeclaratorIdZFi = (\vd -> AGS.sem_VariableDeclaratorIdZ_VarDeclaratorIdCorchete vd)  <$> pVariableDeclaratorIdZ
+pVariableDeclaratorIdZFi = (\vd -> AGS.sem_VariableDeclaratorIdZ_VarDeclaratorIdZ vd)  <$> pVariableDeclaratorIdZ
                                             <|> pSucceed (AGS.sem_VariableDeclaratorIdZ_VarDeclaratorIdCorchete)
                                           
 pResultType = AGS.sem_ResultType_ResultTypeVoid <$ pKeyWord "void"
@@ -548,12 +548,12 @@ pZAssertStatement = (\ ce e -> AGS.sem_Statement_SWTSAssertStatementCondEx e ce)
 pZContinueStatement = (\i -> AGS.sem_Statement_SWTSContinueStatement i ) <$> pIdentifier <* pSpecialSimbol ";"
                                   <|> AGS.sem_Statement_SWTSNilContinueStatement <$ pSpecialSimbol ";"
                                   
-pZTryStatement =  (\l b -> AGS.sem_Statement_SWTTryStatement b l) <$> pCatchClauses1
-              <|> (\l f b -> AGS.sem_Statement_SWTTryStatementFinally b l f) <$> pCatchClauses <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
+pZTryStatement =  (\l b -> AGS.sem_Statement_SWTTryStatement b l) <$> pCatchClause
+              <|> (\l f b -> AGS.sem_Statement_SWTTryStatementFinally b l f) <$> pCatchClause <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
                                                                                                      
 -- ToDO Check in grammar
-pCatchClauses1 = pList1 pCatchClause
-pCatchClauses = pList pCatchClause
+-- pCatchClauses1 = pList1 pCatchClause
+-- pCatchClauses = pList pCatchClause
 
 pZReturnStatement  = (\e -> AGS.sem_Statement_SWTSReturnStatement e)    <$> pExpression <* pSpecialSimbol ";"
                                  <|> AGS.sem_Statement_SWTSNilReturnStatement <$ pSpecialSimbol ";"

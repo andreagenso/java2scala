@@ -18,3 +18,5 @@ cabal configure --ghc-options="-DEXTERNAL_UUAGC"
 cabal build --ghc-options="-DEXTERNAL_UUAGC"
 cabal install --ghc-options="-DEXTERNAL_UUAGC"
 
+./dist/build/java2scala/java2scala "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/TmpImport.java"
+

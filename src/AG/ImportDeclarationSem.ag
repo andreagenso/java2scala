@@ -9,7 +9,7 @@ include "Sintax.ag"
 
 --  ImportDeclaration ImportDeclarations J2s
 attr Identifier
-    syn importStr :: String
+    syn scalaIdentifier :: String
 
 attr TypeName PackageOrTypeName
     syn importDeclarationList :: {[String]}
@@ -18,16 +18,16 @@ attr ImportDeclaration ImportDeclarations -- J2s
     syn scalaImportDeclaration :: String
 
 sem Identifier
-    | Nil  lhs.importStr = ""
-    | Cons lhs.importStr = importStr_Syn_Identifier (wrap_Identifier @tl Inh_Identifier) --@hd :  @tl
+    | Nil  lhs.scalaIdentifier = ""
+    | Cons lhs.scalaIdentifier = @hd :  @tl
 
 sem TypeName
-    | TypeName lhs.importDeclarationList = @identifier.importStr : @typeName.importDeclarationList
+    | TypeName lhs.importDeclarationList = @identifier.scalaIdentifier : @typeName.importDeclarationList
     | NilTypeName lhs.importDeclarationList = []
 
 sem PackageOrTypeName
     | NilPackageOrTypeName  lhs.importDeclarationList = []
-    | PackageOrTypeName lhs.importDeclarationList = @identifier.importStr : @packageOrTypeName.importDeclarationList
+    | PackageOrTypeName lhs.importDeclarationList = @identifier.scalaIdentifier : @packageOrTypeName.importDeclarationList
 
 sem ImportDeclaration
     | SingleTypeImportDeclaration lhs.scalaImportDeclaration =
@@ -47,10 +47,6 @@ sem ImportDeclarations
         @importDeclaration.scalaImportDeclaration ++ "\n" ++ @importDeclarations.scalaImportDeclaration
     | NilImportDeclarations  lhs.scalaImportDeclaration = ""
 
--- sem J2s
---    | J2s lhs.importDeclaration = @importDeclarations.importDeclaration
-
-
 attr J2s
      syn scalaCode :: String
 
@@ -59,11 +55,8 @@ sem J2s
                           @typeDeclarations.scalaTypeDeclaration
 
 
-
-
 set ScalaAllTypeDeclaration = TypeDeclarations TypeDeclaration
                             Modifiers Modifier
-                            Identifier
                             TypeParameters TypeParameterList
                             Super
                             Interfaces
@@ -74,6 +67,10 @@ set ScalaAllTypeDeclaration = TypeDeclarations TypeDeclaration
 
 attr ScalaAllTypeDeclaration
      syn scalaTypeDeclaration :: String
+
+sem TypeDeclarations
+    | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ "\n" ++ @tl.scalaTypeDeclaration
+    | Nil lhs.scalaTypeDeclaration = ""
 
 sem PrimitiveOrReferenceType
     | TypePrimitiveNumericType_TypeIntegral_Byte lhs.scalaTypeDeclaration = ""
@@ -88,3 +85,7 @@ sem PrimitiveOrReferenceType
 
 sem J2s
     | J2s lhs.scalaTypeDeclaration = ""
+
+sem VariableDeclaratorIdZ
+    | VarDeclaratorIdCorchete lhs.scalaTypeDeclaration = ""
+    | VarDeclaratorIdZ lhs.scalaTypeDeclaration = "" -- @variableDeclaratorIdZ.scalaTypeDeclaration
