@@ -278,18 +278,18 @@ data PrimitiveOrRefereceType = TypePrimitiveNumericType_TypeIntegral_Byte
                                                         | TypeReferece   ReferenceType 
                                                         deriving Show
                                                         
-sem_PrimitiveOrRefereceType_TypePrimitivePrimitivetypeBoolean = TypePrimitivePrimitivetypeBoolean
-sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeIntegral_Byte = TypePrimitiveNumericType_TypeIntegral_Byte
-sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeIntegral_Short = TypePrimitiveNumericType_TypeIntegral_Short
-sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeIntegral_Int = TypePrimitiveNumericType_TypeIntegral_Int
-sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeIntegral_Long = TypePrimitiveNumericType_TypeIntegral_Long
-sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeIntegral_Char = TypePrimitiveNumericType_TypeIntegral_Char
-sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeFloating_Float = TypePrimitiveNumericType_TypeFloating_Float
-sem_PrimitiveOrRefereceType_TypePrimitiveNumericType_TypeFloating_Double = TypePrimitiveNumericType_TypeFloating_Double
+sem_PrimitiveOrReferenceType_TypePrimitivePrimitivetypeBoolean = TypePrimitivePrimitivetypeBoolean
+sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeIntegral_Byte = TypePrimitiveNumericType_TypeIntegral_Byte
+sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeIntegral_Short = TypePrimitiveNumericType_TypeIntegral_Short
+sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeIntegral_Int = TypePrimitiveNumericType_TypeIntegral_Int
+sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeIntegral_Long = TypePrimitiveNumericType_TypeIntegral_Long
+sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeIntegral_Char = TypePrimitiveNumericType_TypeIntegral_Char
+sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeFloating_Float = TypePrimitiveNumericType_TypeFloating_Float
+sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeFloating_Double = TypePrimitiveNumericType_TypeFloating_Double
                                                         
                                                         
 -- sem_PrimitiveOrRefereceType_TypePrimitive = TypePrimitive -- PrimitiveType
-sem_PrimitiveOrRefereceType_TypeReferece  = TypeReferece   -- ReferenceType 
+sem_PrimitiveOrReferenceType_TypeReference  = TypeReferece   -- ReferenceType
                                                                 
 {- data TypeZ = ArrayTypeZ TypeZ
            | ArrayType

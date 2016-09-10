@@ -242,8 +242,8 @@ sem_VariableDeclarator_VariableDeclaratorIdAsig = VariableDeclaratorIdAsig
                                                                         
 sem_VariableDeclaratorId_VarDeclaratorId  = VarDeclaratorId
 sem_VariableDeclaratorId_VarDeclaratorIdVDZ = VarDeclaratorIdVDZ
-sem_VariableDeclatatorIdZ_VarDeclaratorIdCorchete = VarDeclaratorIdCorchete
-sem_VariableDeclatatorIdZ_VarDeclaratorIdZ        = VarDeclaratorIdZ
+sem_VariableDeclaratorIdZ_VarDeclaratorIdCorchete = VarDeclaratorIdCorchete
+sem_VariableDeclaratorIdZ_VarDeclaratorIdZ        = VarDeclaratorIdZ
 
                                                                                 
 sem_ResultType_ResultTypeType = ResultTypeType

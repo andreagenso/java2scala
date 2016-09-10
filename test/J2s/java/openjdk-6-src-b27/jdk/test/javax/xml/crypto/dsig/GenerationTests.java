@@ -76,13 +76,22 @@ import javax.xml.transform.stream.StreamResult;
 
 public class GenerationTests {
 
-    private static XMLSignatureFactory fac;
-    private static KeyInfoFactory kifac;
-    private static DocumentBuilder db;
-    private static CanonicalizationMethod withoutComments;
+    private static int estatica;
 
-}
+    public static void main(String[] args) {
+        GenerationTests instancia1 = new GenerationTests();
+        GenerationTests instancia2 = new GenerationTests();
 
+        instancia1.estatica = 4;
+        System.out.println("Estatica: " + estatica);
+        instancia2.estatica = 6;
+        System.out.println("Estatica: " + estatica);
+    }
+
+
+
+}
+/*
 public class GenerationTests {
 
     private static XMLSignatureFactory fac;
@@ -1043,7 +1052,7 @@ public class GenerationTests {
 }
 public class GenerationTests {
 
-    private static XMLSignatureFactory fac;
+    private static XMLSignatureFactory fac = null;
     private static KeyInfoFactory kifac;
     private static DocumentBuilder db;
     private static CanonicalizationMethod withoutComments;
@@ -1075,3 +1084,5 @@ public class GenerationTests {
     private static CanonicalizationMethod withoutComments;
 
 }
+
+*/

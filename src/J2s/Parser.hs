@@ -552,8 +552,8 @@ pZTryStatement =  (\l b -> AGS.sem_Statement_SWTTryStatement b l) <$> pCatchClau
               <|> (\l f b -> AGS.sem_Statement_SWTTryStatementFinally b l f) <$> pCatchClause <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
                                                                                                      
 -- ToDO Check in grammar
--- pCatchClauses1 = pList1 pCatchClause
--- pCatchClauses = pList pCatchClause
+--pCatchClauses1 = pList1 pCatchClause
+--pCatchClauses = pList pCatchClause
 
 pZReturnStatement  = (\e -> AGS.sem_Statement_SWTSReturnStatement e)    <$> pExpression <* pSpecialSimbol ";"
                                  <|> AGS.sem_Statement_SWTSNilReturnStatement <$ pSpecialSimbol ";"

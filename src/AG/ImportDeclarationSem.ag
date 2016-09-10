@@ -70,9 +70,56 @@ set ScalaAllTypeDeclaration = TypeDeclarations TypeDeclaration
 attr ScalaAllTypeDeclaration
      syn scalaTypeDeclaration :: String
 
+{-
+set ScalaCheckVariableDeclarator = VariableDeclarators VariableDeclarator
+                                 VariableDeclaratorId VariableDeclaratorIdZ
+                                 VariableInitializer
+                                 Identifier
+                                 Expression
+                                 ConditionalOrExpression
+                                 UnaryExpression
+                                 AssignmentOperator
+                                 ConditionalExpression
+                                 ArrayInitializer
+                                 VariableInitializers
+                                 Type
+                                 TypeZ
+                                 PrimitiveOrReferenceType
+                                 ReferenceType
+                                 TypeArguments
+                                 ZClassOrInterfaceType
+                                 ActualTypeArgumentList
+                                 ActualTypeArgument
+                                 WildcardBounds
+                                 ArrayType
+                                 Primary
+                                 PrimaryNoNewArray
+                                 ZPostfixExpression
+                                 ZPrimary
+                                 PrimaryNNAArrayFieldAccessOrMethodInvocation
+                                 NonWildTypeArguments
+                                 ArgumentList
+                                 ReferenceTypeList
+                                 PrimaryNNA
+                                 ZPrimaryNoNewArray
+                                 PrimitiveType
+                                 TypeName
+                                 DimExprs
+                                 Dims
+                                 PrimNNAClassOrInterfaceType
+                                 ClassOrInterfaceType
+                                 ZCOITTypeDeclSpecifier
+                                 ZPostfixExp
+                                 ZPrimaryOrExpression
+
+attr ScalaCheckVariableDeclarator
+    syn scalaCheckVariableDeclarator :: self
+-}
+
+
 sem TypeDeclarations
     | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ "\n" ++ @tl.scalaTypeDeclaration
-    | Nil lhs.scalaTypeDeclaration = ""
+    | Nil  lhs.scalaTypeDeclaration = ""
 
 sem TypeDeclaration
     | TypeDeclarationClassDeclarationNormalCD lhs.scalaTypeDeclaration =
@@ -99,8 +146,7 @@ sem TypeDeclaration
 
 
 sem Modifiers
-    | Modifiers lhs.scalaTypeDeclaration = "" -- ToDO  modifier :: Modifier
-                -- modifiers :: Modifiers
+    | Modifiers lhs.scalaTypeDeclaration = @modifier.scalaTypeDeclaration ++ @modifiers.scalaTypeDeclaration  -- ToDO check static final, etc
     | NilModifiers lhs.scalaTypeDeclaration = ""
 
 sem Modifier
@@ -143,13 +189,24 @@ sem Interfaces
     | NilInterfaces lhs.scalaTypeDeclaration = "" -- ToDO
 
 sem ClassBodyDeclarations
-    | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ "\n" ++ @tl.scalaTypeDeclaration
+    | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
     | Nil  lhs.scalaTypeDeclaration = "" -- ToDO
 
+{-
+{
+
+checkVariableDeclarators :: VariableDeclarators -> String ->  String -> String
+checkVariableDeclarators [] _ _ = ""
+checkVariableDeclarators ((VariableDeclaratorId variabledeclaratorId):xs) variableDeclarators  type_ = variableDeclarators ++ ": " ++ type_ ++ "= null"
+checkVariableDeclarators (x:xs) variableDeclarators type_ = variableDeclarators ++ ": " ++ type_ -- ToDo
+}
+-}
+
 sem ClassBodyDeclaration
-    | ClassBodyDeclClassMemberDeclFieldDeclaration lhs.scalaTypeDeclaration = @modifiers.scalaTypeDeclaration ++
-                                                                              @type_.scalaTypeDeclaration ++
-                                                                              @variableDeclarators.scalaTypeDeclaration
+    | ClassBodyDeclClassMemberDeclFieldDeclaration lhs.scalaTypeDeclaration = { "\n\t" ++ @modifiers.scalaTypeDeclaration ++
+--                                                                              (checkVariableDeclarators @variableDeclarators.scalaCheckVariableDeclarator @variableDeclarators.scalaTypeDeclaration @type_.scalaTypeDeclaration)
+                                                                                @variableDeclarators.scalaTypeDeclaration ++ ":" ++ @type_.scalaTypeDeclaration
+                                                                              }
                                                                               -- ToDO type_ :: Type
     | ClassBodyDeclClassMemberDeclMethodDeclaration lhs.scalaTypeDeclaration = "" -- ToDO                     modifiers :: Modifiers
                                                                        -- typeParameters :: TypeParameters
@@ -194,7 +251,7 @@ sem Type  -- ToDo check
                                                    @typeZ.scalaTypeDeclaration
 sem TypeZ
     | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
-    | Nil lhs.scalaTypeDeclaration = ""
+    | Nil  lhs.scalaTypeDeclaration = ""
 
 sem ArrayType
     | ArrayType lhs.scalaTypeDeclaration = "" -- ToDO
@@ -214,27 +271,56 @@ sem ReferenceType
     | ReferenceTypeClassOrInterfaceType  lhs.scalaTypeDeclaration =  @identifier.scalaIdentifier ++ " "
                                         -- ToDO typeArguments :: TypeArguments
                                         -- ToDO zClassOrInterfaceType :: ZClassOrInterfaceType
-
 sem VariableDeclarators
-    | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
-    | Nil lhs.scalaTypeDeclaration = ""
+    | Cons lhs.scalaCheckVariableDeclarator = @hd.scalaCheckVariableDeclarator : @tl.scalaCheckVariableDeclarator
+           lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
+    | Nil  lhs.scalaCheckVariableDeclarator  = []
+           lhs.scalaTypeDeclaration = ""
+
+--    | Cons lhs.scalaCheckVariableDeclarator = @hd.scalaCheckVariableDeclarator ++ @tl.scalaCheckVariableDeclarator
+--        | Nil lhs.scalaCheckVariableDeclarator  = []
+
+--sem VariableDeclarator
+--    | VariableDeclaratorId lhs.scalaTypeDeclaration = @variableDeclaratorId.scalaTypeDeclaration -- ToDo variableDeclaratorId :: VariableDeclaratorId
+--    | VariableDeclaratorIdAsig lhs.scalaTypeDeclaration = @variableDeclaratorId.scalaTypeDeclaration ++ @variableInitializer.scalaTypeDeclaration  -- ToDo variableDeclaratorId :: VariableDeclaratorId
+                               -- variableInitializer :: VariableInitializer
 
 sem VariableDeclarator
-    | VariableDeclaratorId lhs.scalaTypeDeclaration = @variableDeclaratorId.scalaTypeDeclaration  -- ToDo variableDeclaratorId :: VariableDeclaratorId
-    | VariableDeclaratorIdAsig lhs.scalaTypeDeclaration = @variableDeclaratorId.scalaTypeDeclaration ++ @variableInitializer.scalaTypeDeclaration  -- ToDo variableDeclaratorId :: VariableDeclaratorId
-                               -- variableInitializer :: VariableInitializer
+    | VariableDeclaratorId -- lhs.scalaCheckVariableDeclarator = {VariableDeclaratorId @variableDeclaratorId.scalaCheckVariableDeclarator }
+                           lhs.scalaTypeDeclaration = @variableDeclaratorId.scalaTypeDeclaration -- ToDo variableDeclaratorId :: VariableDeclaratorId
+    | VariableDeclaratorIdAsig -- lhs.scalaCheckVariableDeclarator = { VariableDeclaratorIdAsig @variableDeclaratorId.scalaCheckVariableDeclarator @variableInitializer.scalaCheckVariableDeclarator }
+                           lhs.scalaTypeDeclaration = @variableDeclaratorId.scalaTypeDeclaration ++ @variableInitializer.scalaTypeDeclaration  -- ToDo variableDeclaratorId :: VariableDeclaratorId
+
+
 sem VariableDeclaratorId
-    | VarDeclaratorId lhs.scalaTypeDeclaration = @identifier.scalaIdentifier
-    | VarDeclaratorIdVDZ lhs.scalaTypeDeclaration = @identifier.scalaIdentifier ++ " " ++ @variableDeclaratorIdZ.scalaTypeDeclaration
+    | VarDeclaratorId -- lhs.scalaCheckVariableDeclarator = {VarDeclaratorId @identifier.scalaIdentifier}
+                      lhs.scalaTypeDeclaration = @identifier.scalaIdentifier
+    | VarDeclaratorIdVDZ -- lhs.scalaCheckVariableDeclarator = {VarDeclaratorIdVDZ @identifier.scalaIdentifier @variableDeclaratorIdZ.scalaCheckVariableDeclarator}
+                      lhs.scalaTypeDeclaration = @identifier.scalaIdentifier ++ " " ++ @variableDeclaratorIdZ.scalaTypeDeclaration
 
 sem VariableDeclaratorIdZ
-    | VarDeclaratorIdCorchete lhs.scalaTypeDeclaration = "[]" -- ToDo
-    | VarDeclaratorIdZ lhs.scalaTypeDeclaration = @variableDeclaratorIdZ.scalaTypeDeclaration -- ToDo
+    | VarDeclaratorIdCorchete -- lhs.scalaCheckVariableDeclarator = { VarDeclaratorIdCorchete }
+                              lhs.scalaTypeDeclaration = "[]" -- ToDo
+    | VarDeclaratorIdZ -- lhs.scalaCheckVariableDeclarator = { VarDeclaratorIdZ  @variableDeclaratorIdZ.scalaCheckVariableDeclarator }
+                       lhs.scalaTypeDeclaration = @variableDeclaratorIdZ.scalaTypeDeclaration -- ToDo
 
 sem VariableInitializer
     | VariableInitializerExp lhs.scalaTypeDeclaration = "" -- ToDo expression :: Expression
     | VariableInitializerArr lhs.scalaTypeDeclaration = "" -- ToDo attayInitializer :: ArrayInitializer
 
+
+-- ------------------------------------------------
+--
+-- ------------------------------------------------
+
+--sem VariableDeclarators
+--    | Cons lhs.scalaCheckVariableDeclarator = @hd.scalaCheckVariableDeclarator ++ @tl.scalaCheckVariableDeclarator
+--    | Nil lhs.scalaCheckVariableDeclarator  = []
+
+
+--sem VariableDeclarator
+--    | VariableDeclaratorId lhs.scalaCheckVariableDeclarator = (VariableDeclaratorId @variableDeclaratorId) : []
+--    | VariableDeclaratorIdAsig lhs.scalaCheckVariableDeclarator = (VariableDeclaratorIdAsig @variableDeclaratorId @variableInitializer) : []
 
 -- ------------------------------------------------
 -- J2S scala code
