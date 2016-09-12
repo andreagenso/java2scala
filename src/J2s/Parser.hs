@@ -7,7 +7,7 @@ import UU.Scanner.Position
 
 --import J2s.Ast.Sintax  as AGS
 --import J2s.Ast.Semantic as AGS
-import qualified AG.Sintax as AGS
+-- import qualified AG.Sintax as AGS
 import qualified AG.ImportDeclarationSem as AGS
 
 -- 1

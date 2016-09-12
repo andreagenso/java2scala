@@ -427,7 +427,9 @@ type ElementValues = [ElementValue]
 
 type PackageName = [Identifier]
 
-type Identifier  = [Char]
+{
+type Identifier  = String
+}
 
 -- *****************************************
 -- FIN Los siguientes dataTypes representan la estructutra de Conditional expresion

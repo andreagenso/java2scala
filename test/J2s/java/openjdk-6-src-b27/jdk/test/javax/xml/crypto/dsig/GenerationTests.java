@@ -91,7 +91,7 @@ public class GenerationTests {
 
 
 }
-/*
+
 public class GenerationTests {
 
     private static XMLSignatureFactory fac;
@@ -1084,5 +1084,3 @@ public class GenerationTests {
     private static CanonicalizationMethod withoutComments;
 
 }
-
-*/
