@@ -8,7 +8,6 @@ cabal-version:     >= 1.8
 author:            Andrea Moruno
 maintainer:        tatiana.moruno@gmail.com
 extra-source-files: uuagc_options
-extra-source-files: src-ag/Syntax.ag
 
 flag bootstrap_external
    description: Use an external uuagc executable for bootstrapping
@@ -71,9 +70,7 @@ library
                    uuagc,
                    uuagc-cabal,
                    MissingH
-  hs-source-dirs: src, test, src-ag
-     if !flag(bootstrap_external)
-        hs-source-dirs: src-generated
+  hs-source-dirs: src, test
   exposed-modules: J2s.Scanner J2s.Parser J2s.Integration
         J2s.Scanner.Token J2s.Scanner.Show J2s.Scanner.Lexical J2s.Scanner.Generic
         J2s.Scanner.Position J2s.Integration.ScannerParser J2s.Ast.Syntax J2s.Ast.Semantic

@@ -11,7 +11,7 @@ include "Syntax.ag"
 attr TypeName PackageOrTypeName
     syn importDeclarationList :: {[String]}
 
-attr ImportDeclaration ImportDeclarations -- J2s
+attr ImportDeclaration ImportDeclarations
     syn scalaImportDeclaration :: String
 
 sem TypeName
@@ -64,7 +64,10 @@ set ScalaFieldDeclaration = ClassBodyDeclaration VariableDeclarators VariableDec
 
 -- modifiers type variableName
 {
-type TypeFieldDeclaration = ([(String, Bool, Bool)], String, String)
+-- Modifier isStatic isFinal
+type TypeModifierIsStaticIsFinal = (String, Bool, Bool)
+-- Modifiers Types Variables
+type TypeFieldDeclaration = ([TypeModifierIsStaticIsFinal], String, String)
 }
 attr ScalaFieldDeclaration
     chn scalaFieldDeclaration :: {[TypeFieldDeclaration]}
@@ -167,20 +170,20 @@ checkVariableDeclarators ((modifiers, type_, variable):xs)
             | elemFinal modifiers = "val "  ++ variable ++ ": " ++ (defaultValueType type_) ++ "\n" ++ (checkVariableDeclarators xs)
             | otherwise  = (takeModifiers modifiers) ++ " var "  ++ variable ++ ": " ++ (defaultValueType type_) ++ "\n" ++ (checkVariableDeclarators xs)
 
-elemStatic :: [(String, Bool, Bool)] -> Bool
+elemStatic :: [TypeModifierIsStaticIsFinal] -> Bool
 elemStatic [] = False
 elemStatic ((_, True, _):modifiers) = True  || elemStatic modifiers
 elemStatic (m:modifiers)            = False || elemStatic modifiers
 
-elemFinal :: [(String, Bool, Bool)] -> Bool
+elemFinal :: [TypeModifierIsStaticIsFinal] -> Bool
 elemFinal [] = False
 elemFinal ((_, _, True):modifiers) = True  || elemStatic modifiers
 elemFinal (m:modifiers)            = False || elemStatic modifiers
 
-elemStaticFinal :: [(String, Bool, Bool)] -> Bool
+elemStaticFinal :: [TypeModifierIsStaticIsFinal] -> Bool
 elemStaticFinal modifiers = (elemStatic modifiers) && (elemFinal modifiers)
 
-takeModifiers :: [(String, Bool, Bool)] -> String
+takeModifiers :: [TypeModifierIsStaticIsFinal] -> String
 takeModifiers modifiers = foldl (\s (fs, t1, t2) -> s ++ fs) ("") modifiers
 
 defaultValueType :: String -> String
