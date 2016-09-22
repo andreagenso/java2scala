@@ -74,6 +74,7 @@ import javax.xml.transform.stream.StreamResult;
  * different keys and X.509 data.
  */
 
+/* Pablo's example
 public class GenerationTests {
 
     private static int estatica;
@@ -90,7 +91,7 @@ public class GenerationTests {
 
 
 
-}
+}*/
 
 public class GenerationTests {
 
@@ -98,6 +99,18 @@ public class GenerationTests {
     private static KeyInfoFactory kifac;
     private static DocumentBuilder db;
     private static CanonicalizationMethod withoutComments;
+
+    static volatile int i = 0, j = 0;
+
+    private static byte attr1;
+    private static short attr2;
+    private static int attr3;
+    private static long attr4;
+    private static float attr5;
+    private static double attr6;
+    private static char attr7;
+    private static boolean attr8;
+
 
 }
 
