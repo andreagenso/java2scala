@@ -74,10 +74,11 @@ import javax.xml.transform.stream.StreamResult;
  * different keys and X.509 data.
  */
 
-/* Pablo's example
+// Pablo's example
 public class GenerationTests {
 
     private static int estatica;
+    private static final int xxx;
 
     public static void main(String[] args) {
         GenerationTests instancia1 = new GenerationTests();
@@ -88,10 +89,7 @@ public class GenerationTests {
         instancia2.estatica = 6;
         System.out.println("Estatica: " + estatica);
     }
-
-
-
-}*/
+}
 
 public class GenerationTests {
 
