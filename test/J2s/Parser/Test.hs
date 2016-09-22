@@ -2,7 +2,7 @@
 module J2s.Parser.Test where
 
 import Content
-import J2s.Ast.Sintax
+import J2s.Ast.Syntax
 import J2s.Parser
 import Control.Monad ( forM, forM_, liftM )
 import Debug.Trace ( trace )
@@ -35,7 +35,7 @@ testParserEncodingDir :: IO()
 testParserEncodingDir = runSafeIO $ runProxy $ runEitherK $
                                       contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/com/sun/javadoc/testEncoding/") />/ handlerParser
 
--- Todo check sintax
+-- Todo check syntax
 tsp0 = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/0compilationUnit.java")
 tsp1 = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/1compilationUnitSimple.java")
 tsp2 = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/2packageDeclarationMarkerAnnotation.java")

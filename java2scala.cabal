@@ -8,7 +8,7 @@ cabal-version:     >= 1.8
 author:            Andrea Moruno
 maintainer:        tatiana.moruno@gmail.com
 extra-source-files: uuagc_options
-extra-source-files: src-ag/Sintax.ag
+extra-source-files: src-ag/Syntax.ag
 
 flag bootstrap_external
    description: Use an external uuagc executable for bootstrapping
@@ -34,7 +34,7 @@ executable java2scala
                    uuagc-cabal,
                    MissingH
   other-modules:
-    AG.Sintax AG.ImportDeclarationSem
+    AG.Syntax AG.J2SAttrSem
 
 executable test
   main-is:       Main.hs
@@ -76,8 +76,8 @@ library
         hs-source-dirs: src-generated
   exposed-modules: J2s.Scanner J2s.Parser J2s.Integration
         J2s.Scanner.Token J2s.Scanner.Show J2s.Scanner.Lexical J2s.Scanner.Generic
-        J2s.Scanner.Position J2s.Integration.ScannerParser J2s.Ast.Sintax J2s.Ast.Semantic
-        AG.Sintax AG.ImportDeclarationSem
+        J2s.Scanner.Position J2s.Integration.ScannerParser J2s.Ast.Syntax J2s.Ast.Semantic
+        AG.Syntax AG.J2SAttrSem
   extensions: TypeSynonymInstances, MultiParamTypeClasses
 
   ghc-options:  -fno-warn-missing-signatures

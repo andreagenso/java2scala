@@ -1,9 +1,9 @@
-module {AG.ImportDeclarationSem}
+module {AG.J2SAttrSem}
 {} -- Exports of this module, empty for none
 {
 -- Imports
 }
-include "Sintax.ag"
+include "Syntax.ag"
 
 -- ------------------------------------------------
 -- Import Declaration

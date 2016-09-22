@@ -1,6 +1,6 @@
 module J2s.Ast.Semantic where
 
-import J2s.Ast.Sintax
+import J2s.Ast.Syntax
 
 -- tomar en cuenta comentarios
 sem_J2s_J2s = J2s

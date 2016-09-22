@@ -1,5 +1,5 @@
 -- | Defines the data types
-module {AG.Sintax}
+module {AG.Syntax}
 {} -- Exports of this module, empty for none
 {
 -- Imports

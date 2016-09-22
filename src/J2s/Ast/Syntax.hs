@@ -1,4 +1,4 @@
-module J2s.Ast.Sintax where
+module J2s.Ast.Syntax where
 
 -- 1
 data J2s = J2s  PackageDeclaration   ImportDeclarations  TypeDeclarations

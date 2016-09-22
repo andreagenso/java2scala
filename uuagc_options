@@ -1,4 +1,4 @@
-file : "src/AG/Sintax.ag"
+file : "src/AG/Syntax.ag"
 options :
     data,
     catas,
@@ -6,7 +6,7 @@ options :
     haskellsyntax,
     strictdata
 
-file : "src/AG/ImportDeclarationSem.ag"
+file : "src/AG/J2SAttrSem.ag"
 options :
     data,
     catas,

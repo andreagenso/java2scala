@@ -1,6 +1,6 @@
 module Main where
 
-import qualified AG.ImportDeclarationSem as AGS
+import qualified AG.J2SAttrSem as AGS
 import System.Environment
 import UU.Parsing
 import J2s.Parser

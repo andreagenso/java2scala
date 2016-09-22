@@ -2,7 +2,7 @@ module Main where
 
 import J2s.Scanner.Test
 import J2s.Parser.Test
-import J2s.Ast.Sintax
+import J2s.Ast.Syntax
 
 import J2s.Scanner.Position
 import J2s.Scanner

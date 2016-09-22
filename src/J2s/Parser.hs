@@ -5,10 +5,10 @@ import J2s.Scanner
 import J2s.Integration.ScannerParser
 import UU.Scanner.Position
 
---import J2s.Ast.Sintax  as AGS
+--import J2s.Ast.Syntax  as AGS
 --import J2s.Ast.Semantic as AGS
--- import qualified AG.Sintax as AGS
-import qualified AG.ImportDeclarationSem as AGS
+-- import qualified AG.Syntax as AGS
+import qualified AG.J2SAttrSem as AGS
 
 -- 1
 pJ2s =  AGS.sem_J2s_J2s <$> pPackageDeclaration <*> pImportDeclarations <*> pTypeDeclarations
