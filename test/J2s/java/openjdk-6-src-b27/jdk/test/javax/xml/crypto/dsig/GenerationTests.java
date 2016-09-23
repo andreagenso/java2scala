@@ -75,7 +75,7 @@ import javax.xml.transform.stream.StreamResult;
  */
 
 // Pablo's example
-public class GenerationTests {
+/*public class GenerationTests {
 
     private static int estatica;
     private static final int xxx;
@@ -89,7 +89,7 @@ public class GenerationTests {
         instancia2.estatica = 6;
         System.out.println("Estatica: " + estatica);
     }
-}
+}*/
 
 public class GenerationTests {
 
@@ -98,7 +98,8 @@ public class GenerationTests {
     private static DocumentBuilder db;
     private static CanonicalizationMethod withoutComments;
 
-    static volatile int i = 0, j = 0;
+
+    private int i = 0, j = 0;
 
     private static byte attr1;
     private static short attr2;
@@ -109,8 +110,15 @@ public class GenerationTests {
     private static char attr7;
     private static boolean attr8;
 
+    public int attr9 = 12;
+    protected static final double attr10 = 12.5;
+
+    protected static transient KeyInfoFactory attr11;
+
+    transient volatile int aa;
 
 }
+/*
 
 public class GenerationTests {
 
@@ -1095,3 +1103,4 @@ public class GenerationTests {
     private static CanonicalizationMethod withoutComments;
 
 }
+*/
