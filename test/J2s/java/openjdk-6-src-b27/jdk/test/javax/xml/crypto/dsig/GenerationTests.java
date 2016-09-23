@@ -118,7 +118,6 @@ public class GenerationTests {
     transient volatile int aa;
 
 }
-/*
 
 public class GenerationTests {
 
@@ -1103,4 +1102,3 @@ public class GenerationTests {
     private static CanonicalizationMethod withoutComments;
 
 }
-*/
