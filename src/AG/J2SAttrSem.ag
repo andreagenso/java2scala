@@ -2,7 +2,6 @@ module {AG.J2SAttrSem}
 {} -- Exports of this module, empty for none
 {
 import Data.List
--- Imports
 }
 include "Syntax.ag"
 
@@ -44,6 +43,13 @@ sem ImportDeclarations
 -- ------------------------------------------------
 -- Type declarations
 -- ------------------------------------------------
+set ScalaAllNTab = ClassBodyDeclaration
+                         VariableDeclarators
+                         VariableDeclarator
+                         VariableDeclaratorId VariableDeclaratorIdZ
+                         VariableInitializer
+                         VariableInitializers
+
 set ScalaAllTypeDeclaration = TypeDeclarations TypeDeclaration
                             TypeParameters TypeParameterList TypeParameter
                             Super
@@ -63,6 +69,9 @@ set ScalaFieldDeclaration = ClassBodyDeclaration VariableDeclarators VariableDec
                          Modifiers
                          Modifier
 
+attr ScalaAllNTab
+    chn scalaNTab :: String
+
 -- modifiers type variableName
 {
 -- Modifier isStatic isFinal
@@ -81,13 +90,14 @@ sem TypeDeclaration
     | TypeDeclarationClassDeclarationNormalCD
                               modifiers.scalaFieldDeclaration = []
                               lhs.scalaTypeDeclaration =
-                              -- ToDo check Modifier of class "\n" ++ @modifiers.scalaTypeDeclaration ++
-                              "class" ++ " " ++
-                              @identifier ++
-                              @typeParameters.scalaTypeDeclaration ++
-                              @super.scalaTypeDeclaration ++
-                              @interfaces.scalaTypeDeclaration ++
-                              " { " ++ @classBodyDeclarations.scalaTypeDeclaration ++ "\n} "
+                                  -- ToDo check Modifier of class "\n" ++ @modifiers.scalaTypeDeclaration ++
+                                  "\nclass" ++ " " ++
+                                  @identifier ++
+                                  @typeParameters.scalaTypeDeclaration ++
+                                  @super.scalaTypeDeclaration ++
+                                  @interfaces.scalaTypeDeclaration ++
+                                  " { " ++ @classBodyDeclarations.scalaTypeDeclaration ++ "\n} \n"
+
     | TypeDeclarationClassDeclarationEnumD
                                 modifiers.scalaFieldDeclaration = []
                                 lhs.scalaTypeDeclaration = "" -- ToDO modifiers :: Modifiers
@@ -161,6 +171,7 @@ sem ClassBodyDeclarations
     | Cons
             hd.scalaFieldDeclaration = []
             lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
+            hd.scalaNTab = ""
     | Nil
             lhs.scalaTypeDeclaration = ""
 
@@ -169,13 +180,13 @@ sem ReferenceTypeList
     | Cons  hd.scalaFieldDeclaration = []
 
 {
-checkVariableDeclarators :: [TypeFieldDeclaration] -> String
-checkVariableDeclarators [] = ""
-checkVariableDeclarators ((modifiers, type_, variable):xs)
-            | elemStaticFinal modifiers = "\n" ++ (takeModifiers modifiers) ++ "val "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs)
-            | elemStatic modifiers = "\n" ++ (takeModifiers modifiers) ++  "var "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs)
-            | elemFinal modifiers = "\n" ++ (takeModifiers modifiers) ++ "val "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs)
-            | otherwise  = "\n" ++ (takeModifiers modifiers) ++ "var "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs)
+checkVariableDeclarators :: [TypeFieldDeclaration] -> String -> String
+checkVariableDeclarators [] _ = ""
+checkVariableDeclarators ((modifiers, type_, variable):xs)  nTab
+            | elemStaticFinal modifiers = "\n" ++ nTab ++ (takeModifiers modifiers) ++ "val "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs nTab)
+            | elemStatic modifiers = "\n" ++ nTab ++ (takeModifiers modifiers) ++  "var "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs nTab)
+            | elemFinal modifiers = "\n" ++ nTab ++(takeModifiers modifiers) ++ "val "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs nTab)
+            | otherwise  = "\n" ++ nTab ++ (takeModifiers modifiers) ++ "var "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs nTab)
 
 elemStatic :: [TypeModifierIsStaticIsFinal] -> Bool
 elemStatic [] = False
@@ -213,7 +224,10 @@ sem ClassBodyDeclaration
                         modifiers.scalaFieldDeclaration = @lhs.scalaFieldDeclaration
                         type_.scalaFieldDeclaration = @modifiers.scalaFieldDeclaration
                         variableDeclarators.scalaFieldDeclaration = @type_.scalaFieldDeclaration
-                        lhs.scalaTypeDeclaration = {checkVariableDeclarators @variableDeclarators.scalaFieldDeclaration}
+                        lhs.scalaTypeDeclaration = {checkVariableDeclarators @variableDeclarators.scalaFieldDeclaration @variableDeclarators.scalaNTab}
+                        variableDeclarators.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaNTab = @variableDeclarators.scalaNTab
+
     | ClassBodyDeclClassMemberDeclMethodDeclaration
                         modifiers.scalaFieldDeclaration = []
                         lhs.scalaTypeDeclaration = ""
@@ -279,14 +293,23 @@ sem ReferenceType
                                         -- ToDO zClassOrInterfaceType :: ZClassOrInterfaceType
 sem VariableDeclarators
     | Cons lhs.scalaFieldDeclaration = @hd.scalaFieldDeclaration ++ @tl.scalaFieldDeclaration
+
+           hd.scalaNTab = @lhs.scalaNTab
+           tl.scalaNTab = @lhs.scalaNTab
+           lhs.scalaNTab = @hd.scalaNTab
     | Nil  lhs.scalaFieldDeclaration  = []
+           lhs.scalaNTab = @lhs.scalaNTab
 
 
 sem VariableDeclaratorId
-    | VarDeclaratorId lhs.scalaFieldDeclaration = { foldl (\x (fs, tp, _) -> ((fs, tp, @identifier): x))    ([]::[TypeFieldDeclaration]) @lhs.scalaFieldDeclaration }
-    | VarDeclaratorIdVDZ lhs.scalaFieldDeclaration = { (foldl (\x (fs, tp, _) -> ((fs, tp, @identifier): x)) ([]::[TypeFieldDeclaration]) @lhs.scalaFieldDeclaration) ++
-                         @variableDeclaratorIdZ.scalaFieldDeclaration
-                      }
+    | VarDeclaratorId
+        lhs.scalaFieldDeclaration = { foldl (\x (fs, tp, _) -> ((fs, tp, @identifier): x))    ([]::[TypeFieldDeclaration]) @lhs.scalaFieldDeclaration }
+        lhs.scalaNTab= @lhs.scalaNTab ++ "\t"
+    | VarDeclaratorIdVDZ
+        lhs.scalaFieldDeclaration = { (foldl (\x (fs, tp, _) -> ((fs, tp, @identifier): x)) ([]::[TypeFieldDeclaration]) @lhs.scalaFieldDeclaration) ++
+            @variableDeclaratorIdZ.scalaFieldDeclaration
+        }
+        lhs.scalaNTab = @lhs.scalaNTab ++ "\t"
 
 sem ResultType
     | ResultTypeType type_.scalaFieldDeclaration = []
@@ -295,57 +318,81 @@ sem FormalParameterList
     | FormalParameterListFormal
                                 type_.scalaFieldDeclaration = []
                                 variableDeclaratorId.scalaFieldDeclaration = []
+                                variableDeclaratorId.scalaNTab = ""
 
     | FormalParameterListLast
                                 type_.scalaFieldDeclaration = []
                                 variableDeclaratorId.scalaFieldDeclaration = []
+                                variableDeclaratorId.scalaNTab = ""
 
 sem ForStatement
     | ForStatementEnhancedForStatementNoVarModif type_.scalaFieldDeclaration = []
     | ForStatementEnhancedForStatement type_.scalaFieldDeclaration = []
 
 sem ForInit
-    | ForInitLocalVar type_.scalaFieldDeclaration = []
+    | ForInitLocalVar
+        type_.scalaFieldDeclaration = []
+        variableDeclarators.scalaNTab = ""
 
 sem WildcardBounds
     | WilcardBoundsExtendsReferenceType type_.scalaFieldDeclaration = []
     | WilcardBoundsSuperReferenceType type_.scalaFieldDeclaration = []
 
 sem InterfaceMemberDeclaration
-    | InterfaceMemberDeclarationConstant modifiers.scalaFieldDeclaration = []
-                                         type_.scalaFieldDeclaration = []
-                                         variableDeclarators.scalaFieldDeclaration = []
-    | InterfaceMemberDeclarationAbstract modifiers.scalaFieldDeclaration = []
-    | InterfaceMemberDeclTypeDeclarationClassDeclarationNormalCD modifiers.scalaFieldDeclaration = []
-    | InterfaceMemberDeclTypeDeclarationClassDeclarationEnumD    modifiers.scalaFieldDeclaration = []
-    | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD modifiers.scalaFieldDeclaration = []
-    | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD  modifiers.scalaFieldDeclaration = []
+    | InterfaceMemberDeclarationConstant
+        modifiers.scalaFieldDeclaration = []
+        type_.scalaFieldDeclaration = []
+        variableDeclarators.scalaFieldDeclaration = []
+        variableDeclarators.scalaNTab = ""
+    | InterfaceMemberDeclarationAbstract
+        modifiers.scalaFieldDeclaration = []
+    | InterfaceMemberDeclTypeDeclarationClassDeclarationNormalCD
+        modifiers.scalaFieldDeclaration = []
+    | InterfaceMemberDeclTypeDeclarationClassDeclarationEnumD
+        modifiers.scalaFieldDeclaration = []
+    | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD
+        modifiers.scalaFieldDeclaration = []
+    | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD
+        modifiers.scalaFieldDeclaration = []
 
 sem ConditionalOrExpression
     | ConditionalOrExpressionIntanceOf
             type_.scalaFieldDeclaration = []
 
 sem CatchClause
-    | CatchClause type_.scalaFieldDeclaration = []
+    | CatchClause
+        type_.scalaFieldDeclaration = []
+        variableDeclaratorId.scalaNTab = ""
 
 sem BlockStatement
-    | BlockStatementLocalVariableDeclarationStatement      modifiers.scalaFieldDeclaration = [] -- ToDo
-                                                           type_.scalaFieldDeclaration = [] -- ToDo
+    | BlockStatementLocalVariableDeclarationStatement
+        modifiers.scalaFieldDeclaration = [] -- ToDo
+        type_.scalaFieldDeclaration = [] -- ToDo
+        variableDeclarators.scalaNTab = ""
     | BlockStatementClassDeclarationNormalClassDeclaration modifiers.scalaFieldDeclaration = [] -- ToDo
     | BlockStatementClassDeclarationEnumDeclaration        modifiers.scalaFieldDeclaration = [] -- ToDo
 
 sem ArrayInitializer
-    | ArrayInitializer variableInitializers.scalaFieldDeclaration = [] -- ToDo
+    | ArrayInitializer
+        variableInitializers.scalaFieldDeclaration = [] -- ToDo
+        variableInitializers.scalaNTab = "" -- ToDo
 
 sem AnnotationTypeElementDeclaration
-    | AnnTypeElemDeclAbstract                                            modifiers.scalaFieldDeclaration = [] -- ToDo
-                                                                         type_.scalaFieldDeclaration = [] -- ToDo
-    | AnnTypeElemDeclConstant                                            modifiers.scalaFieldDeclaration = [] -- ToDo
-                                                                         type_.scalaFieldDeclaration = [] -- ToDo
-    | AnnTypeElemDeclTypeDeclarationClassDeclarationNormalCD             modifiers.scalaFieldDeclaration = [] -- ToDo
-    | AnnTypeElemDeclTypeDeclarationClassDeclarationEnumD                modifiers.scalaFieldDeclaration = [] -- ToDo
-    | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD modifiers.scalaFieldDeclaration = [] -- ToDo
-    | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD  modifiers.scalaFieldDeclaration = [] -- ToDo
+    | AnnTypeElemDeclAbstract
+        modifiers.scalaFieldDeclaration = [] -- ToDo
+        type_.scalaFieldDeclaration = [] -- ToDo
+    | AnnTypeElemDeclConstant
+        modifiers.scalaFieldDeclaration = [] -- ToDo
+        type_.scalaFieldDeclaration = [] -- ToDo
+        variableDeclarators.scalaNTab = "" -- ToDo check if is neccesary for parent
+    | AnnTypeElemDeclTypeDeclarationClassDeclarationNormalCD
+        modifiers.scalaFieldDeclaration = [] -- ToDo
+    | AnnTypeElemDeclTypeDeclarationClassDeclarationEnumD
+        modifiers.scalaFieldDeclaration = [] -- ToDo
+    | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD
+        modifiers.scalaFieldDeclaration = [] -- ToDo
+    | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD
+        modifiers.scalaFieldDeclaration = [] -- ToDo
 
 
 sem ActualTypeArgument
