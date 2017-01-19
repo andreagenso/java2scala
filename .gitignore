@@ -1,6 +1,9 @@
 .idea*
 dist*
 out*
+project*
+target*
+doc/papers*
 =3.2.0
 *GenerationTests_orig.java
 

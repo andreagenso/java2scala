@@ -41,6 +41,26 @@ sem ImportDeclarations
     | NilImportDeclarations  lhs.scalaImportDeclaration = ""
 
 -- ------------------------------------------------
+-- Package declaration
+-- ------------------------------------------------
+set ScalaPackageDeclaration = PackageDeclaration
+
+attr ScalaPackageDeclaration
+    syn scalaPackageDeclaration :: String
+
+attr PackageName
+    syn scalaPackageDeclarationList :: {[String]}
+
+sem PackageDeclaration
+    | PackageDeclaration lhs.scalaPackageDeclaration =
+        "package " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @packageName.scalaPackageDeclarationList ++ "\n"
+    | NilPackageDeclaration lhs.scalaPackageDeclaration = ""
+
+sem PackageName
+    | Nil  lhs.scalaPackageDeclarationList = []
+    | Cons lhs.scalaPackageDeclarationList = @hd : @tl.scalaPackageDeclarationList
+
+-- ------------------------------------------------
 -- Type declarations
 -- ------------------------------------------------
 set ScalaAllNTab = ClassBodyDeclaration
@@ -405,5 +425,6 @@ attr J2s
      syn scalaCode :: String
 
 sem J2s
-    | J2s lhs.scalaCode = @importDeclarations.scalaImportDeclaration ++
+    | J2s lhs.scalaCode = @packageDeclaration.scalaPackageDeclaration ++
+                          @importDeclarations.scalaImportDeclaration ++
                           @typeDeclarations.scalaTypeDeclaration
