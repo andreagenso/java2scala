@@ -48,21 +48,58 @@ final strictfp class ClaseF {
 public class Example {
 }
 
-public static final strictfp class CDA {
+final strictfp class CDA {
 }
 
 
-public static final strictfp class CEA {
+final strictfp class CEA {
 }
 
-public static strictfp class CFA {
+strictfp class CFA {
 }
 
-public abstract strictfp class CGA {
+strictfp class CGA {
 }
 
 
-static class  VVV {
+class  VVV {
 
 }
 
+// Interfaces
+
+interface InterfaceA {}
+abstract interface InterfaceB {}
+
+strictfp interface InterfaceC {
+}
+strictfp interface InterfaceD {}
+strictfp interface InterfaceE {}
+abstract  interface InterfaceF {}
+/*public interface Example {
+}*/
+
+// Definicion de interfaces genericas
+interface Par1<T, S> {}
+interface Par2<T, S extends T> {}
+interface Par3<T, S extends String> {}
+interface Par4<T, S extends Double> {}
+interface Par5<T, S extends ClaseA, U> {}
+class Par6<T, S extends ClaseA & InterfaceA & InterfaceB, U> {}
+class Par7<T, S extends Integer & InterfaceA & InterfaceB, U > {}
+
+// Herencia
+interface InterfaceBA extends InterfaceA {}
+interface ClaseBB extends code.java.InterfaceC {}
+
+
+interface CA {}
+strictfp interface CB {}
+interface CC {}
+//public static
+strictfp interface CD {}
+//public
+abstract strictfp interface CE {}
+strictfp interface CF {}
+abstract strictfp interface CG {}
+abstract interface CH {}
