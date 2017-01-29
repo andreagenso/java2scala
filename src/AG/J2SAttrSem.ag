@@ -113,8 +113,15 @@ attr ScalaFieldDeclaration
 set ScalaNormalClassDeclaration = Modifiers
                                 Modifier
 
+set ScalaSuperTypeDeclaration = ClassOrInterfaceType
+                              ZClassOrInterfaceType
+                              ZCOITTypeDeclSpecifier
+
 attr ScalaNormalClassDeclaration
     chn scalaNormalClassDeclaration :: TypeModifierIsStaticIsFinal
+
+attr ScalaSuperTypeDeclaration
+    syn scalaSuperTypeDeclaration :: String
 
 -- ------------------------------------------------
 -- NormalInterfaceDeclaration
@@ -344,18 +351,29 @@ sem TypeBound
     | NilAdditionalBoundList lhs.scalaTypeDeclaration = ""
 
 sem ClassOrInterfaceType
-        | ClassOrInterfaceType lhs.scalaTypeDeclaration =  @identifier ++ @zClassOrInterfaceType.scalaTypeDeclaration -- ToDo @typeArguments.scalaTypeDeclaration ++
+    | ClassOrInterfaceType lhs.scalaTypeDeclaration =  @identifier ++ @zClassOrInterfaceType.scalaTypeDeclaration -- used in typeArguments of normal class ToDo @typeArguments.scalaTypeDeclaration ++
+                           lhs.scalaSuperTypeDeclaration = " extends " ++ @identifier ++ @zClassOrInterfaceType.scalaSuperTypeDeclaration -- used in Super
+
+-- pointSuperTypeDeclaration :: String -> String -> String
+-- pointSuperTypeDeclaration hd "" = ++ "." ++ hd
+-- pointSuperTypeDeclaration hd tl = ++ "." ++ hd ++ "." ++ tl
 
 sem ZClassOrInterfaceType
-    | Cons lhs.scalaTypeDeclaration =  @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
+    | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
+
+           lhs.scalaSuperTypeDeclaration = "." ++ @hd.scalaSuperTypeDeclaration ++ @tl.scalaSuperTypeDeclaration
     | Nil lhs.scalaTypeDeclaration = ""
+
+          lhs.scalaSuperTypeDeclaration = ""
 
 sem ZCOITTypeDeclSpecifier
     | ZCOITTypeDeclSpecifier lhs.scalaTypeDeclaration = @identifier -- ToDo ++ @typeArguments.scalaTypeDeclaration
+                             lhs.scalaSuperTypeDeclaration = @identifier -- ToDo ++ @typeArguments.scalaTypeDeclaration
 
 sem Super
-    | Super lhs.scalaTypeDeclaration = "" -- ToDO  classOrInterfaceType :: ClassOrInterfaceType
-    | NilSuper lhs.scalaTypeDeclaration = "" -- ToDO
+    | Super lhs.scalaTypeDeclaration = @classOrInterfaceType.scalaSuperTypeDeclaration
+    | NilSuper lhs.scalaTypeDeclaration = ""
+
 
 sem Interfaces
     | Interfaces lhs.scalaTypeDeclaration = "" -- ToDO interfaceTypeList :: InterfaceTypeList

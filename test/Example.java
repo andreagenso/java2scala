@@ -1,5 +1,11 @@
 package code.java;
 
+
+class ClaseBA extends ClaseA {
+}
+class ClaseBB extends code.java.ClaseC {
+}
+
 class Par1<T, S> {
     Par1(T fst, S snd) {
     }
