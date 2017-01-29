@@ -73,7 +73,8 @@ set ScalaAllNTab = ClassBodyDeclaration
                          VariableInitializers
 
 set ScalaAllTypeDeclaration = TypeDeclarations TypeDeclaration
-                            TypeParameters TypeParameterList TypeParameter
+                            TypeParameters TypeParameterList TypeParameter TypeBound
+                            ZCOITTypeDeclSpecifier ZClassOrInterfaceType ClassOrInterfaceType
                             Super
                             Interfaces
                             ClassBodyDeclarations ClassBodyDeclaration
@@ -313,20 +314,44 @@ sem Modifier
                            lhs.scalaNormalInterfaceDeclaration = @lhs.scalaNormalInterfaceDeclaration
 
 sem TypeParameters
-    | TypeParametersC1 lhs.scalaTypeDeclaration = "" -- ToDO typeParameterList :: TypeParameterList
-    | TypeParametersC2 lhs.scalaTypeDeclaration = "" -- ToDO typeParameterList :: TypeParameterList
-    | TypeParametersC3 lhs.scalaTypeDeclaration = "" -- ToDO typeParameterList :: TypeParameterList
-    | TypeParametersC0 lhs.scalaTypeDeclaration = "" -- ToDO typeParameterList :: TypeParameterList
-    | NilTypeParameters lhs.scalaTypeDeclaration = "" -- ToDO
+    | TypeParametersC1 lhs.scalaTypeDeclaration = "[" ++ @typeParameterList.scalaTypeDeclaration ++ "]" -- ToDO check >>>
+    | TypeParametersC2 lhs.scalaTypeDeclaration = "[" ++ @typeParameterList.scalaTypeDeclaration ++ "]" -- ToDO check >>
+    | TypeParametersC3 lhs.scalaTypeDeclaration = "[" ++ @typeParameterList.scalaTypeDeclaration ++ "]" -- ToDO check >
+    | TypeParametersC0 lhs.scalaTypeDeclaration = "[" ++ @typeParameterList.scalaTypeDeclaration ++ "]" -- ToDO
+    | NilTypeParameters lhs.scalaTypeDeclaration = ""
+
+{
+commaTypeParameters :: String -> String -> String
+commaTypeParameters hd "" = hd
+commaTypeParameters hd tl = hd ++ ", " ++ tl
+}
 
 sem TypeParameterList
-    | Cons lhs.scalaTypeDeclaration = "" -- ToDO
-    | Nil lhs.scalaTypeDeclaration = "" -- ToDO
+    | Cons lhs.scalaTypeDeclaration = commaTypeParameters @hd.scalaTypeDeclaration @tl.scalaTypeDeclaration
+    | Nil lhs.scalaTypeDeclaration = ""
 
 sem TypeParameter
-    | TypeParameterBound lhs.scalaTypeDeclaration = "" -- ToDO identifier :: Identifier
-                          -- typeBound :: TypeBound
-    | TypeParameter lhs.scalaTypeDeclaration = "" -- ToDO identifier :: Identifier
+    | TypeParameterBound lhs.scalaTypeDeclaration = @identifier ++ @typeBound.scalaTypeDeclaration
+    | TypeParameter lhs.scalaTypeDeclaration = @identifier
+
+{
+typeBoundInterface :: String -> String
+typeBoundInterface str = replace "<:" "with" str
+}
+
+sem TypeBound
+    | TypeBound lhs.scalaTypeDeclaration =  " <: " ++ @classOrInterfaceType.scalaTypeDeclaration ++ (typeBoundInterface @typeBound.scalaTypeDeclaration)
+    | NilAdditionalBoundList lhs.scalaTypeDeclaration = ""
+
+sem ClassOrInterfaceType
+        | ClassOrInterfaceType lhs.scalaTypeDeclaration =  @identifier ++ @zClassOrInterfaceType.scalaTypeDeclaration -- ToDo @typeArguments.scalaTypeDeclaration ++
+
+sem ZClassOrInterfaceType
+    | Cons lhs.scalaTypeDeclaration =  @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
+    | Nil lhs.scalaTypeDeclaration = ""
+
+sem ZCOITTypeDeclSpecifier
+    | ZCOITTypeDeclSpecifier lhs.scalaTypeDeclaration = @identifier -- ToDo ++ @typeArguments.scalaTypeDeclaration
 
 sem Super
     | Super lhs.scalaTypeDeclaration = "" -- ToDO  classOrInterfaceType :: ClassOrInterfaceType
