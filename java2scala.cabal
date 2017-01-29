@@ -31,6 +31,7 @@ executable java2scala
                    system-filepath,
                    uuagc,
                    uuagc-cabal,
+                   text >=1.2.2.1,
                    MissingH
   other-modules:
     AG.Syntax AG.J2SAttrSem
@@ -52,6 +53,7 @@ executable test
                    system-filepath,
                    uuagc,
                    uuagc-cabal,
+                   text >=1.2.2.1,
                    MissingH
 
 library
@@ -69,6 +71,7 @@ library
                    system-filepath,
                    uuagc,
                    uuagc-cabal,
+                   text >=1.2.2.1,
                    MissingH
   hs-source-dirs: src, test
   exposed-modules: J2s.Scanner J2s.Parser J2s.Integration

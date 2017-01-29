@@ -2,6 +2,8 @@ module {AG.J2SAttrSem}
 {} -- Exports of this module, empty for none
 {
 import Data.List
+import qualified Data.Text as T
+import Data.String.Utils
 }
 include "Syntax.ag"
 
@@ -54,7 +56,7 @@ attr PackageName
 sem PackageDeclaration
     | PackageDeclaration lhs.scalaPackageDeclaration =
         "package " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @packageName.scalaPackageDeclarationList ++ "\n"
-    | NilPackageDeclaration lhs.scalaPackageDeclaration = ""
+    | NilPackageDeclaration lhs.scalaPackageDeclaration = "\n"
 
 sem PackageName
     | Nil  lhs.scalaPackageDeclarationList = []
@@ -94,13 +96,38 @@ attr ScalaAllNTab
 
 -- modifiers type variableName
 {
--- Modifier isStatic isFinal
+    -- Modifier isStatic isFinal
 type TypeModifierIsStaticIsFinal = (String, Bool, Bool)
 -- Modifiers Types Variables
 type TypeFieldDeclaration = ([TypeModifierIsStaticIsFinal], String, String)
 }
 attr ScalaFieldDeclaration
     chn scalaFieldDeclaration :: {[TypeFieldDeclaration]}
+
+
+-- ------------------------------------------------
+-- NormalClassDeclaration
+-- ------------------------------------------------
+
+set ScalaNormalClassDeclaration = Modifiers
+                                Modifier
+
+attr ScalaNormalClassDeclaration
+    chn scalaNormalClassDeclaration :: TypeModifierIsStaticIsFinal
+
+-- -----------------------------------------------
+-- sem Type declarations
+-- ------------------------------------------------
+{
+-- modifiers of normalClassDeclaration
+normalClassDeclaration :: TypeModifierIsStaticIsFinal -> String
+normalClassDeclaration ("", False, b2) = "class" ++ " "
+normalClassDeclaration ("", True, b2) = "object" ++ " "
+normalClassDeclaration (str, b1, b2) = if b1 then
+                                            str ++ " " ++ "object" ++ " "
+                                       else
+                                            str ++ " " ++ "class" ++ " "
+}
 
 sem TypeDeclarations
     | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ "\n" ++ @tl.scalaTypeDeclaration
@@ -109,9 +136,11 @@ sem TypeDeclarations
 sem TypeDeclaration
     | TypeDeclarationClassDeclarationNormalCD
                               modifiers.scalaFieldDeclaration = []
+                              modifiers.scalaNormalClassDeclaration = ("", False, False)
+
                               lhs.scalaTypeDeclaration =
                                   -- ToDo check Modifier of class "\n" ++ @modifiers.scalaTypeDeclaration ++
-                                  "\nclass" ++ " " ++
+                                  (normalClassDeclaration @modifiers.scalaNormalClassDeclaration) ++
                                   @identifier ++
                                   @typeParameters.scalaTypeDeclaration ++
                                   @super.scalaTypeDeclaration ++
@@ -121,12 +150,18 @@ sem TypeDeclaration
     | TypeDeclarationClassDeclarationEnumD
                                 modifiers.scalaFieldDeclaration = []
                                 lhs.scalaTypeDeclaration = "" -- ToDO modifiers :: Modifiers
+
+                                modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | TypeDeclarationInterfaceDeclarationNormalInterfaceD
                                 modifiers.scalaFieldDeclaration = []
                                 lhs.scalaTypeDeclaration = "" -- ToDO  modifiers :: Modifiers
+
+                                modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | TypeDeclarationInterfaceDeclarationAnnotationTypeD
                                 modifiers.scalaFieldDeclaration = []
                                 lhs.scalaTypeDeclaration = "" -- ToDO  modifiers :: Modifiers
+
+                                modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | TypeDeclarationSemiColon  lhs.scalaTypeDeclaration = "" -- ToDO review how to convert this case to Scala
 
 
@@ -142,26 +177,70 @@ changeOrderVolatileTransient modifiers = map (\tdf -> partition' tdf) modifiers
         joinTuple (fst, snd) = fst ++ snd
 }
 
+{
+-- modifiers functions for normalClassDeclaration.
+strictFpModifier :: TypeModifierIsStaticIsFinal -> TypeModifierIsStaticIsFinal
+strictFpModifier (str, b1, b2) = if T.isInfixOf (T.pack("strfp")) (T.pack(str))
+                                then ("@scala.annotation.strictfp\n" ++ T.unpack(T.strip(T.pack(replace "strfp" "" str))), b1, b2)
+                                else (T.unpack(T.strip(T.pack(str))), b1, b2)
+
+joinTypeModifier :: TypeModifierIsStaticIsFinal -> TypeModifierIsStaticIsFinal -> TypeModifierIsStaticIsFinal
+joinTypeModifier ("", b1, b11) (str2, b2, b22) = (T.unpack(T.strip(T.pack(str2))), b1 || b2, b11 || b22)
+joinTypeModifier (str1, b1, b11) ("", b2, b22) = (T.unpack(T.strip(T.pack(str1))), b1 || b2, b11 || b22)
+joinTypeModifier (str1, b1, b11) (str2, b2, b22) = (T.unpack(T.strip(T.pack(str1))) ++  " " ++ T.unpack(T.strip(T.pack(str2))), b1 || b2, b11 || b22)
+
+}
+
 sem Modifiers
     | Modifiers
                     modifier.scalaFieldDeclaration = @lhs.scalaFieldDeclaration
                     modifiers.scalaFieldDeclaration = @modifier.scalaFieldDeclaration
                     lhs.scalaFieldDeclaration = changeOrderVolatileTransient @modifiers.scalaFieldDeclaration   -- ToDO check static final, etc
+
+                    modifier.scalaNormalClassDeclaration = joinTypeModifier @lhs.scalaNormalClassDeclaration  ("", False, False)
+                    modifiers.scalaNormalClassDeclaration = @modifier.scalaNormalClassDeclaration
+                    lhs.scalaNormalClassDeclaration = strictFpModifier @modifiers.scalaNormalClassDeclaration
     | NilModifiers  lhs.scalaFieldDeclaration = changeOrderVolatileTransient @lhs.scalaFieldDeclaration
+
+                    lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration
 
 sem Modifier
     | ModifierAnnotation lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO annotation :: Annotation
+
+                         lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration -- ToDO annotation :: Annotation
     | ModifierPublic lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)}
+
+                     lhs.scalaNormalClassDeclaration = joinTypeModifier @lhs.scalaNormalClassDeclaration ("", False, False)
     | ModifierProtected lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("protected", False, False)], "", ""): @lhs.scalaFieldDeclaration)}
+
+                        lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration  ("protected", False, False)
     | ModifierPrivate lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("private", False, False)], "", ""): @lhs.scalaFieldDeclaration)}
+
+                      lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("private", False, False)
     | ModifierAbstract lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+
+                       lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("abstract", False, False)
     | ModifiersStatic lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", True, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDo
+
+                      lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("", True, False)
     | ModifierFinal lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, True)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+
+                    lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("final", False, True)
     | ModifierStrictfp lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+
+                        lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("strfp", False, False)
     | FieldModifierTransient lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("@transient", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+
+                             lhs.scalaNormalClassDeclaration = ("", False, False)
     | FieldModifierVolatile lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("@volatile", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+
+                            lhs.scalaNormalClassDeclaration = ("", False, False)
     | MethodModifierSynchronized lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+
+                                 lhs.scalaNormalClassDeclaration = ("", False, False)
     | MethodModifierNative lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+
+                           lhs.scalaNormalClassDeclaration = ("", False, False)
 
 sem TypeParameters
     | TypeParametersC1 lhs.scalaTypeDeclaration = "" -- ToDO typeParameterList :: TypeParameterList
@@ -248,21 +327,32 @@ sem ClassBodyDeclaration
                         variableDeclarators.scalaNTab = @lhs.scalaNTab
                         lhs.scalaNTab = @variableDeclarators.scalaNTab
 
+                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | ClassBodyDeclClassMemberDeclMethodDeclaration
                         modifiers.scalaFieldDeclaration = []
                         lhs.scalaTypeDeclaration = ""
+
+                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | ClassBodyDeclClassMemberDeclClassDeclarationNormalCD
                         lhs.scalaFieldDeclaration = []  -- ToDO              modifiers :: Modifiers
                         lhs.scalaTypeDeclaration = ""
+
+                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | ClassBodyDeclClassMemberDeclClassDeclarationEnumD
                         lhs.scalaFieldDeclaration = [] -- ToDO                 modifiers :: Modifiers
                         lhs.scalaTypeDeclaration = ""
+
+                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | ClassBodyDeclClassMemberDeclInterfaceDeclarationNormalInterfaceD
                         lhs.scalaFieldDeclaration = [] -- ToDO modifiers :: Modifiers
                         lhs.scalaTypeDeclaration = ""
+
+                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | ClassBodyDeclClassMemberDeclInterfaceDeclarationAnnotationTypeD
                         lhs.scalaFieldDeclaration = [] -- ToDO modifiers :: Modifiers
                         lhs.scalaTypeDeclaration = ""
+
+                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | ClassBodyDeclClassMemberDeclSemiColon
                         lhs.scalaFieldDeclaration = [] -- ToDO
                         lhs.scalaTypeDeclaration = ""
@@ -275,9 +365,13 @@ sem ClassBodyDeclaration
     | ClassBodyConstructorDeclaration
                         lhs.scalaFieldDeclaration = [] -- ToDO  modifiers :: Modifiers
                         lhs.scalaTypeDeclaration = ""
+
+                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | ClassBodyConstructorDeclarationNoFormalParList
                         lhs.scalaFieldDeclaration = [] -- ToDO  modifiers :: Modifiers
                         lhs.scalaTypeDeclaration = ""
+
+                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
 
 sem Type  -- ToDo check
     | TypePrimitiveType lhs.scalaFieldDeclaration = @primitiveOrReferenceType.scalaFieldDeclaration
@@ -364,16 +458,28 @@ sem InterfaceMemberDeclaration
         type_.scalaFieldDeclaration = []
         variableDeclarators.scalaFieldDeclaration = []
         variableDeclarators.scalaNTab = ""
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | InterfaceMemberDeclarationAbstract
         modifiers.scalaFieldDeclaration = []
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | InterfaceMemberDeclTypeDeclarationClassDeclarationNormalCD
         modifiers.scalaFieldDeclaration = []
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | InterfaceMemberDeclTypeDeclarationClassDeclarationEnumD
         modifiers.scalaFieldDeclaration = []
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD
         modifiers.scalaFieldDeclaration = []
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD
         modifiers.scalaFieldDeclaration = []
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
 
 sem ConditionalOrExpression
     | ConditionalOrExpressionIntanceOf
@@ -389,8 +495,16 @@ sem BlockStatement
         modifiers.scalaFieldDeclaration = [] -- ToDo
         type_.scalaFieldDeclaration = [] -- ToDo
         variableDeclarators.scalaNTab = ""
-    | BlockStatementClassDeclarationNormalClassDeclaration modifiers.scalaFieldDeclaration = [] -- ToDo
-    | BlockStatementClassDeclarationEnumDeclaration        modifiers.scalaFieldDeclaration = [] -- ToDo
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
+    | BlockStatementClassDeclarationNormalClassDeclaration
+        modifiers.scalaFieldDeclaration = [] -- ToDo
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
+    | BlockStatementClassDeclarationEnumDeclaration
+        modifiers.scalaFieldDeclaration = [] -- ToDo
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
 
 sem ArrayInitializer
     | ArrayInitializer
@@ -401,19 +515,30 @@ sem AnnotationTypeElementDeclaration
     | AnnTypeElemDeclAbstract
         modifiers.scalaFieldDeclaration = [] -- ToDo
         type_.scalaFieldDeclaration = [] -- ToDo
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | AnnTypeElemDeclConstant
         modifiers.scalaFieldDeclaration = [] -- ToDo
         type_.scalaFieldDeclaration = [] -- ToDo
         variableDeclarators.scalaNTab = "" -- ToDo check if is neccesary for parent
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | AnnTypeElemDeclTypeDeclarationClassDeclarationNormalCD
         modifiers.scalaFieldDeclaration = [] -- ToDo
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | AnnTypeElemDeclTypeDeclarationClassDeclarationEnumD
         modifiers.scalaFieldDeclaration = [] -- ToDo
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD
         modifiers.scalaFieldDeclaration = [] -- ToDo
+
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
     | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD
         modifiers.scalaFieldDeclaration = [] -- ToDo
 
+        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
 
 sem ActualTypeArgument
     | ActualTypeReferenceType type_.scalaFieldDeclaration = [] -- ToDo
