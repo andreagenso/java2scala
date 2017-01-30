@@ -2,21 +2,61 @@ package code.java
 trait InterfaceA { 
 } 
 
-trait InterfaceB { 
+abstract trait InterfaceB { 
 } 
 
-class ClaseA { 
+@scala.annotation.strictfp
+ trait InterfaceC { 
 } 
 
-class ClaseC { 
+abstract trait InterfaceF { 
 } 
 
-class ClaseBC extends ClaseA with InterfaceA { 
+trait Par1[T, S] { 
 } 
 
-class ClaseBD extends code.java.ClaseC with InterfaceB with InterfaceA { 
+trait Par2[T, S <: T] { 
 } 
 
-class ClaseBE extends code.java.ClaseC with InterfaceB with code.java.InterfaceA { 
+trait Par3[T, S <: String] { 
+} 
+
+trait Par4[T, S <: Double] { 
+} 
+
+trait Par5[T, S <: ClaseA, U] { 
+} 
+
+class Par6[T, S <: ClaseA with InterfaceA with InterfaceB, U] { 
+} 
+
+class Par7[T, S <: Integer with InterfaceA with InterfaceB, U] { 
+} 
+
+trait InterfaceBA extends InterfaceA { 
+} 
+
+trait ClaseBB extends code.java.InterfaceC { 
+} 
+
+trait CA { 
+} 
+
+@scala.annotation.strictfp
+ trait CB { 
+} 
+
+trait CC { 
+} 
+
+@scala.annotation.strictfp
+ trait CD { 
+} 
+
+@scala.annotation.strictfp
+abstract trait CE { 
+} 
+
+abstract trait CH { 
 } 
 

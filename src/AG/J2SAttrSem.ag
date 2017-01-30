@@ -105,7 +105,6 @@ type TypeFieldDeclaration = ([TypeModifierIsStaticIsFinal], String, String)
 attr ScalaFieldDeclaration
     chn scalaFieldDeclaration :: {[TypeFieldDeclaration]}
 
-
 -- ------------------------------------------------
 -- NormalClassDeclaration
 -- ------------------------------------------------
@@ -136,8 +135,16 @@ attr ScalaImplementsInterfaceTypeDeclaration
 set ScalaNormalInterfaceDeclaration = Modifiers
                                     Modifier
 
+set ScalaExtendInterface = ExtendsInterfaces
+                          ClassOrInterfaceType
+                          ZClassOrInterfaceType
+                          ZCOITTypeDeclSpecifier
+
 attr ScalaNormalInterfaceDeclaration
     chn scalaNormalInterfaceDeclaration :: TypeModifierIsStaticIsFinal
+
+attr ScalaExtendInterface
+    syn scalaExtendInterface ::  String
 
 -- -----------------------------------------------
 -- sem Type declarations
@@ -197,6 +204,7 @@ sem TypeDeclaration
                                     (normalInterfaceDeclaration @modifiers.scalaNormalInterfaceDeclaration) ++
                                     @identifier ++
                                     @typeParameters.scalaTypeDeclaration ++ --ToDo
+                                    @extendsInterfaces.scalaExtendInterface ++
                                     " { " ++  "\n} \n" --ToDo Body es listInterfaceMemberDeclaration
 
                                 modifiers.scalaNormalClassDeclaration = ("", False, False)
@@ -218,6 +226,13 @@ sem TypeDeclaration
                                 modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
     | TypeDeclarationSemiColon  lhs.scalaTypeDeclaration = "" -- ToDO review how to convert this case to Scala
 
+
+
+sem ExtendsInterfaces
+    | ExtendsInterfaceType
+                lhs.scalaExtendInterface =  @classOrInterfacesType.scalaExtendInterface ++ @extendsInterfaces.scalaExtendInterface
+    | NilExtendsInterfaces
+                lhs.scalaExtendInterface = ""
 
 {
 concatenateModifiers :: [TypeFieldDeclaration] -> TypeFieldDeclaration -> [TypeFieldDeclaration]
@@ -361,10 +376,7 @@ sem ClassOrInterfaceType
     | ClassOrInterfaceType lhs.scalaTypeDeclaration =  @identifier ++ @zClassOrInterfaceType.scalaTypeDeclaration -- used in typeArguments of normal class ToDo @typeArguments.scalaTypeDeclaration ++
                            lhs.scalaSuperTypeDeclaration = " extends " ++ @identifier ++ @zClassOrInterfaceType.scalaSuperTypeDeclaration -- used in Super
                            lhs.scalaImplementsInterfaceTypeDeclaration = @identifier ++ @zClassOrInterfaceType.scalaImplementsInterfaceTypeDeclaration
-
--- pointSuperTypeDeclaration :: String -> String -> String
--- pointSuperTypeDeclaration hd "" = ++ "." ++ hd
--- pointSuperTypeDeclaration hd tl = ++ "." ++ hd ++ "." ++ tl
+                           lhs.scalaExtendInterface = " extends " ++ @identifier ++ @zClassOrInterfaceType.scalaExtendInterface
 
 sem ZClassOrInterfaceType
     | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
@@ -372,16 +384,19 @@ sem ZClassOrInterfaceType
            lhs.scalaSuperTypeDeclaration = "." ++ @hd.scalaSuperTypeDeclaration ++ @tl.scalaSuperTypeDeclaration
 
            lhs.scalaImplementsInterfaceTypeDeclaration = "." ++ @hd.scalaImplementsInterfaceTypeDeclaration ++ @tl.scalaImplementsInterfaceTypeDeclaration
+
+           lhs.scalaExtendInterface =  "." ++ @hd.scalaExtendInterface ++ @tl.scalaExtendInterface
+
     | Nil lhs.scalaTypeDeclaration = ""
-
           lhs.scalaSuperTypeDeclaration = ""
-
           lhs.scalaImplementsInterfaceTypeDeclaration = ""
+          lhs.scalaExtendInterface = ""
 
 sem ZCOITTypeDeclSpecifier
     | ZCOITTypeDeclSpecifier lhs.scalaTypeDeclaration = @identifier -- ToDo ++ @typeArguments.scalaTypeDeclaration
                              lhs.scalaSuperTypeDeclaration = @identifier -- ToDo ++ @typeArguments.scalaTypeDeclaration
                              lhs.scalaImplementsInterfaceTypeDeclaration = @identifier
+                             lhs.scalaExtendInterface = @identifier
 
 sem Super
     | Super lhs.scalaTypeDeclaration = @classOrInterfaceType.scalaSuperTypeDeclaration
