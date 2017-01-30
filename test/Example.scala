@@ -1,22 +1,22 @@
 package code.java
-class ClaseBA extends ClaseA { 
+trait InterfaceA { 
 } 
 
-class ClaseBB extends code.java.ClaseC { 
+trait InterfaceB { 
 } 
 
-class Par1[T, S] { 
+class ClaseA { 
 } 
 
-class Par2[T, S <: T] { 
+class ClaseC { 
 } 
 
-class Par5[T, S <: ClaseA, U] { 
+class ClaseBC extends ClaseA with InterfaceA { 
 } 
 
-class Par6[T, S <: ClaseA with InterfaceA with InterfaceB, U] { 
+class ClaseBD extends code.java.ClaseC with InterfaceB with InterfaceA { 
 } 
 
-class Par7[T, S <: Integer with InterfaceA with InterfaceB, U] { 
+class ClaseBE extends code.java.ClaseC with InterfaceB with code.java.InterfaceA { 
 } 
 

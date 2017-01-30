@@ -117,11 +117,18 @@ set ScalaSuperTypeDeclaration = ClassOrInterfaceType
                               ZClassOrInterfaceType
                               ZCOITTypeDeclSpecifier
 
+set ScalaImplementsInterfaceTypeDeclaration =  InterfaceTypeList ClassOrInterfaceType
+                                            ZClassOrInterfaceType
+                                            ZCOITTypeDeclSpecifier
+
 attr ScalaNormalClassDeclaration
     chn scalaNormalClassDeclaration :: TypeModifierIsStaticIsFinal
 
 attr ScalaSuperTypeDeclaration
     syn scalaSuperTypeDeclaration :: String
+
+attr ScalaImplementsInterfaceTypeDeclaration
+    syn scalaImplementsInterfaceTypeDeclaration :: String
 
 -- ------------------------------------------------
 -- NormalInterfaceDeclaration
@@ -353,6 +360,7 @@ sem TypeBound
 sem ClassOrInterfaceType
     | ClassOrInterfaceType lhs.scalaTypeDeclaration =  @identifier ++ @zClassOrInterfaceType.scalaTypeDeclaration -- used in typeArguments of normal class ToDo @typeArguments.scalaTypeDeclaration ++
                            lhs.scalaSuperTypeDeclaration = " extends " ++ @identifier ++ @zClassOrInterfaceType.scalaSuperTypeDeclaration -- used in Super
+                           lhs.scalaImplementsInterfaceTypeDeclaration = @identifier ++ @zClassOrInterfaceType.scalaImplementsInterfaceTypeDeclaration
 
 -- pointSuperTypeDeclaration :: String -> String -> String
 -- pointSuperTypeDeclaration hd "" = ++ "." ++ hd
@@ -362,22 +370,30 @@ sem ZClassOrInterfaceType
     | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
 
            lhs.scalaSuperTypeDeclaration = "." ++ @hd.scalaSuperTypeDeclaration ++ @tl.scalaSuperTypeDeclaration
+
+           lhs.scalaImplementsInterfaceTypeDeclaration = "." ++ @hd.scalaImplementsInterfaceTypeDeclaration ++ @tl.scalaImplementsInterfaceTypeDeclaration
     | Nil lhs.scalaTypeDeclaration = ""
 
           lhs.scalaSuperTypeDeclaration = ""
 
+          lhs.scalaImplementsInterfaceTypeDeclaration = ""
+
 sem ZCOITTypeDeclSpecifier
     | ZCOITTypeDeclSpecifier lhs.scalaTypeDeclaration = @identifier -- ToDo ++ @typeArguments.scalaTypeDeclaration
                              lhs.scalaSuperTypeDeclaration = @identifier -- ToDo ++ @typeArguments.scalaTypeDeclaration
+                             lhs.scalaImplementsInterfaceTypeDeclaration = @identifier
 
 sem Super
     | Super lhs.scalaTypeDeclaration = @classOrInterfaceType.scalaSuperTypeDeclaration
     | NilSuper lhs.scalaTypeDeclaration = ""
 
-
 sem Interfaces
-    | Interfaces lhs.scalaTypeDeclaration = "" -- ToDO interfaceTypeList :: InterfaceTypeList
-    | NilInterfaces lhs.scalaTypeDeclaration = "" -- ToDO
+    | Interfaces lhs.scalaTypeDeclaration = @interfaceTypeList.scalaImplementsInterfaceTypeDeclaration   -- ToDO interfaceTypeList :: InterfaceTypeList
+    | NilInterfaces lhs.scalaTypeDeclaration = ""
+
+sem InterfaceTypeList
+    | Cons lhs.scalaImplementsInterfaceTypeDeclaration = " with " ++ @hd.scalaImplementsInterfaceTypeDeclaration ++ @tl.scalaImplementsInterfaceTypeDeclaration
+    | Nil lhs.scalaImplementsInterfaceTypeDeclaration = ""
 
 sem ClassBodyDeclarations
     | Cons
