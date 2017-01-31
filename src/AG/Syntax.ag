@@ -918,10 +918,12 @@ data EnumBodyDeclarations
 
 deriving EnumBodyDeclarations : Show
 
+{- OJO check
 data StaticInitializer
     | StaticInitializer blockStatements :: BlockStatements
 
 deriving StaticInitializer : Show
+-}
 
 data ConstructorBody
     | ConstructorBody explicitConstructorInvocation :: ExplicitConstructorInvocation
