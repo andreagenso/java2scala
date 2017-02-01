@@ -111,7 +111,8 @@ attr ScalaAllNTab
     -- Modifier isStatic isFinal
 type TypeModifierIsStaticIsFinal = (String, Bool, Bool)
 -- Modifiers Types Variables
-type TypeFieldDeclaration = ([TypeModifierIsStaticIsFinal], String, String)
+type TypeFieldInitialization = Maybe String
+type TypeFieldDeclaration = ([TypeModifierIsStaticIsFinal], String, String, TypeFieldInitialization)
 }
 attr ScalaFieldDeclaration
     chn scalaFieldDeclaration :: {[TypeFieldDeclaration]}
@@ -275,12 +276,12 @@ sem ExtendsInterfaces
 {
 concatenateModifiers :: [TypeFieldDeclaration] -> TypeFieldDeclaration -> [TypeFieldDeclaration]
 concatenateModifiers [] tpl = tpl:[]
-concatenateModifiers ((f,s,t):[]) (ftpl, stpl, ttpl) = ((ftpl ++ f), s, t):[]
+concatenateModifiers ((f,s,t,ti):[]) (ftpl, stpl, ttpl, titpl) = ((ftpl ++ f), s, t, ti):[]
 
 changeOrderVolatileTransient :: [TypeFieldDeclaration] -> [TypeFieldDeclaration]
 changeOrderVolatileTransient modifiers = map (\tdf -> partition' tdf) modifiers
     where
-        partition' (ms, t, v) =  ((joinTuple (partition (\(m, _, _) -> (m == "@volatile" || m == "@transient")) ms)), t, v)
+        partition' (ms, t, v, ti) =  ((joinTuple (partition (\(m, _, _) -> (m == "@volatile" || m == "@transient")) ms)), t, v, ti)
         joinTuple (fst, snd) = fst ++ snd
 }
 
@@ -319,62 +320,62 @@ sem Modifiers
                     lhs.scalaNormalInterfaceDeclaration = @lhs.scalaNormalInterfaceDeclaration
 
 sem Modifier
-    | ModifierAnnotation lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO annotation :: Annotation
+    | ModifierAnnotation lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", "", Nothing): @lhs.scalaFieldDeclaration)} -- ToDO annotation :: Annotation
 
                          lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration -- ToDO annotation :: Annotation
 
                          lhs.scalaNormalInterfaceDeclaration =  @lhs.scalaNormalInterfaceDeclaration -- ToDo
-    | ModifierPublic lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)}
+    | ModifierPublic lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", "", Nothing): @lhs.scalaFieldDeclaration)}
 
                      lhs.scalaNormalClassDeclaration = joinTypeModifier @lhs.scalaNormalClassDeclaration ("", False, False)
 
                      lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("", False, False)
-    | ModifierProtected lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("protected", False, False)], "", ""): @lhs.scalaFieldDeclaration)}
+    | ModifierProtected lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("protected", False, False)], "", "", Nothing): @lhs.scalaFieldDeclaration)}
 
                         lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration  ("protected", False, False)
 
                         lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("protected", False, False)
-    | ModifierPrivate lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("private", False, False)], "", ""): @lhs.scalaFieldDeclaration)}
+    | ModifierPrivate lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("private", False, False)], "", "", Nothing): @lhs.scalaFieldDeclaration)}
 
                       lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("private", False, False)
 
                       lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("private", False, False)
-    | ModifierAbstract lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+    | ModifierAbstract lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", "", Nothing): @lhs.scalaFieldDeclaration)} -- ToDO
 
                        lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("abstract", False, False)
 
                        lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("abstract", False, False)
-    | ModifiersStatic lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", True, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDo
+    | ModifiersStatic lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", True, False)], "", "", Nothing): @lhs.scalaFieldDeclaration)} -- ToDo
 
                       lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("", True, False)
 
                       lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("", True, False)
-    | ModifierFinal lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, True)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+    | ModifierFinal lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, True)], "", "", Nothing): @lhs.scalaFieldDeclaration)} -- ToDO
 
                     lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("final", False, True)
 
                     lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("", False, True)
-    | ModifierStrictfp lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+    | ModifierStrictfp lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", "", Nothing): @lhs.scalaFieldDeclaration)} -- ToDO
 
                         lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("strfp", False, False)
 
                         lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("strfp", False, False)
-    | FieldModifierTransient lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("@transient", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+    | FieldModifierTransient lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("@transient", False, False)], "", "", Nothing): @lhs.scalaFieldDeclaration)} -- ToDO
 
                              lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration
 
                              lhs.scalaNormalInterfaceDeclaration = @lhs.scalaNormalInterfaceDeclaration
-    | FieldModifierVolatile lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("@volatile", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+    | FieldModifierVolatile lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("@volatile", False, False)], "", "", Nothing): @lhs.scalaFieldDeclaration)} -- ToDO
 
                             lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration
 
                             lhs.scalaNormalInterfaceDeclaration = @lhs.scalaNormalInterfaceDeclaration
-    | MethodModifierSynchronized lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+    | MethodModifierSynchronized lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", "", Nothing): @lhs.scalaFieldDeclaration)} -- ToDO
 
                                  lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration
 
                                  lhs.scalaNormalInterfaceDeclaration = @lhs.scalaNormalInterfaceDeclaration
-    | MethodModifierNative lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", ""): @lhs.scalaFieldDeclaration)} -- ToDO
+    | MethodModifierNative lhs.scalaFieldDeclaration = {foldl concatenateModifiers [] (([("", False, False)], "", "", Nothing): @lhs.scalaFieldDeclaration)} -- ToDO
 
                            lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration
 
@@ -481,11 +482,19 @@ sem ReferenceTypeList
 {
 checkVariableDeclarators :: [TypeFieldDeclaration] -> String -> String
 checkVariableDeclarators [] _ = ""
-checkVariableDeclarators ((modifiers, type_, variable):xs)  nTab
-            | elemStaticFinal modifiers = "\n" ++ nTab ++ (takeModifiers modifiers) ++ "val "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs nTab)
-            | elemStatic modifiers = "\n" ++ nTab ++ (takeModifiers modifiers) ++  "var "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs nTab)
-            | elemFinal modifiers = "\n" ++ nTab ++(takeModifiers modifiers) ++ "val "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs nTab)
-            | otherwise  = "\n" ++ nTab ++ (takeModifiers modifiers) ++ "var "  ++ variable ++ ": " ++ (defaultValueType type_) ++  (checkVariableDeclarators xs nTab)
+checkVariableDeclarators ((modifiers, type_, variable, typeInitialization):xs)  nTab
+            | elemStaticFinal modifiers = "\n" ++ nTab ++ (takeModifiers modifiers) ++ "val "  ++ variable ++
+                ": " ++ (checkTypeInitialization typeInitialization type_) ++  (checkVariableDeclarators xs nTab)
+            | elemStatic modifiers = "\n" ++ nTab ++ (takeModifiers modifiers) ++  "var "  ++ variable ++
+                ": " ++ (checkTypeInitialization typeInitialization type_) ++  (checkVariableDeclarators xs nTab)
+            | elemFinal modifiers = "\n" ++ nTab ++(takeModifiers modifiers) ++ "val "  ++ variable ++
+                ": " ++ (checkTypeInitialization typeInitialization type_) ++  (checkVariableDeclarators xs nTab)
+            | otherwise  = "\n" ++ nTab ++ (takeModifiers modifiers) ++ "var "  ++ variable ++
+                ": " ++ (checkTypeInitialization typeInitialization type_) ++  (checkVariableDeclarators xs nTab)
+
+checkTypeInitialization :: TypeFieldInitialization -> String -> String
+checkTypeInitialization Nothing type_ = defaultValueType type_
+checkTypeInitialization (Just initialization) type_ = type_ ++ " = " ++ initialization
 
 elemStatic :: [TypeModifierIsStaticIsFinal] -> Bool
 elemStatic [] = False
@@ -525,10 +534,9 @@ sem ClassBodyDeclaration
                         variableDeclarators.scalaFieldDeclaration = @type_.scalaFieldDeclaration
                         lhs.scalaTypeDeclaration = {checkVariableDeclarators @variableDeclarators.scalaFieldDeclaration @variableDeclarators.scalaNTab}
                         variableDeclarators.scalaNTab = @lhs.scalaNTab
-                        lhs.scalaNTab = @variableDeclarators.scalaNTab -- ToDo check con nueva estructuracion de NTab
+                        lhs.scalaNTab = @lhs.scalaNTab
 
                         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-
                         modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
     | ClassBodyDeclClassMemberDeclMethodDeclaration
                         modifiers.scalaFieldDeclaration = []
@@ -637,7 +645,7 @@ sem Type  -- ToDo check
 
 {
 addTypeToModifiers :: String -> TypeFieldDeclaration -> TypeFieldDeclaration
-addTypeToModifiers type_ (modifiers, t, variableDeclarators)  = (modifiers, type_, variableDeclarators)
+addTypeToModifiers type_ (modifiers, t, variableDeclarators, ti)  = (modifiers, type_, variableDeclarators, ti)
 }
 
 sem PrimitiveOrReferenceType
@@ -673,16 +681,31 @@ sem VariableDeclarators
     | Nil  lhs.scalaFieldDeclaration  = []
            lhs.scalaNTab = @lhs.scalaNTab
 
+sem VariableDeclarator
+    | VariableDeclaratorId
+            lhs.scalaFieldDeclaration = @variableDeclaratorId.scalaFieldDeclaration
+    | VariableDeclaratorIdAsig
+            lhs.scalaFieldDeclaration =
+
+        variableDeclaratorId :: VariableDeclaratorId
+        variableInitializer :: VariableInitializer
+
+sem VariableInitializer
+
 
 sem VariableDeclaratorId
     | VarDeclaratorId
-        lhs.scalaFieldDeclaration = { foldl (\x (fs, tp, _) -> ((fs, tp, @identifier): x))    ([]::[TypeFieldDeclaration]) @lhs.scalaFieldDeclaration }
-        lhs.scalaNTab= @lhs.scalaNTab ++ "\t"
+        lhs.scalaFieldDeclaration = {
+            foldl (\x (fs, tp, _, _) -> ((fs, tp, @identifier, Nothing): x))
+            ([]::[TypeFieldDeclaration]) @lhs.scalaFieldDeclaration }
+        lhs.scalaNTab= @lhs.scalaNTab ++ "\t" -- ToDo Check
     | VarDeclaratorIdVDZ
-        lhs.scalaFieldDeclaration = { (foldl (\x (fs, tp, _) -> ((fs, tp, @identifier): x)) ([]::[TypeFieldDeclaration]) @lhs.scalaFieldDeclaration) ++
+        lhs.scalaFieldDeclaration = {
+            (foldl (\x (fs, tp, _, ti) -> ((fs, tp, @identifier, (Just ti)): x))
+            ([]::[TypeFieldDeclaration]) @lhs.scalaFieldDeclaration) ++
             @variableDeclaratorIdZ.scalaFieldDeclaration
         }
-        lhs.scalaNTab = @lhs.scalaNTab ++ "\t"
+        lhs.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo Check
 
 sem ResultType
     | ResultTypeType type_.scalaFieldDeclaration = []
