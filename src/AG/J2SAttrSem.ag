@@ -681,6 +681,7 @@ sem VariableDeclarators
     | Nil  lhs.scalaFieldDeclaration  = []
            lhs.scalaNTab = @lhs.scalaNTab
 
+{-
 sem VariableDeclarator
     | VariableDeclaratorId
             lhs.scalaFieldDeclaration = @variableDeclaratorId.scalaFieldDeclaration
@@ -691,6 +692,7 @@ sem VariableDeclarator
         variableInitializer :: VariableInitializer
 
 sem VariableInitializer
+-}
 
 
 sem VariableDeclaratorId
@@ -701,7 +703,7 @@ sem VariableDeclaratorId
         lhs.scalaNTab= @lhs.scalaNTab ++ "\t" -- ToDo Check
     | VarDeclaratorIdVDZ
         lhs.scalaFieldDeclaration = {
-            (foldl (\x (fs, tp, _, ti) -> ((fs, tp, @identifier, (Just ti)): x))
+            (foldl (\x (fs, tp, _, ti) -> ((fs, tp, @identifier, (Just "HHHHHH")): x))
             ([]::[TypeFieldDeclaration]) @lhs.scalaFieldDeclaration) ++
             @variableDeclaratorIdZ.scalaFieldDeclaration
         }

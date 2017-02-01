@@ -1,6 +1,6 @@
 module Main where
 
-import qualified AG.J2SAttrSem as AGS
+import qualified AG.Syntax as AGS
 import System.Environment
 import UU.Parsing
 import J2s.Parser
@@ -9,7 +9,6 @@ import UU.Scanner.Position
 import Data.String.Utils
 
 
-{-
 main  :: IO()
 main = do
        g <- readJavaFile
@@ -22,8 +21,8 @@ readJavaFile = do
         nameScalaFile =  replace ".java" ".scala" path
     scalaCode <- parseIO pJ2s tokens
     return scalaCode
--}
 
+{-
 main  :: IO()
 main = do
        g <- readJavaFile
@@ -40,3 +39,4 @@ readJavaFile = do
 writeScalaFile nameFile content = do
     writeFile nameFile content
     putStrLn (" Writing scala file " ++ nameFile ++ "..... ")
+-}
