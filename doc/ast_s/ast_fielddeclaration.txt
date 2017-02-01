@@ -1,0 +1,51 @@
+package code.java;
+
+class ClaseB {}
+
+class ClaseA {
+
+    // modificadores
+    private int var1 = 1;
+    protected String var2 = "";
+    protected String var3;
+}
+
+========================================
+AST es :
+========================================
+
+J2s
+	(PackageDeclaration [] ["code","java"]) 
+
+	NilImportDeclarations 
+
+	[TypeDeclarationClassDeclarationNormalCD NilModifiers "ClaseB" NilTypeParameters NilSuper NilInterfaces [],
+
+	 TypeDeclarationClassDeclarationNormalCD NilModifiers "ClaseA" NilTypeParameters NilSuper NilInterfaces 	
+		[ClassBodyDeclClassMemberDeclFieldDeclaration 
+			(Modifiers ModifierPrivate NilModifiers) 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeIntegral_Int []) 
+			[VariableDeclaratorIdAsig (VarDeclaratorId "var1") 
+				(VariableInitializerExp (ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "1") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			(Modifiers ModifierProtected NilModifiers) 
+			(TypePrimitiveType (TypeReferece (ReferenceTypeClassOrInterfaceType "String" NilTypeArguments [])) [])
+			[VariableDeclaratorIdAsig (VarDeclaratorId "var2") 
+				(VariableInitializerExp (ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_StringLiteral "\"\"") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			(Modifiers ModifierProtected NilModifiers) 
+			(TypePrimitiveType (TypeReferece (ReferenceTypeClassOrInterfaceType "String" NilTypeArguments [])) []) 
+			[VariableDeclaratorId (VarDeclaratorId "var3")]]]
+
