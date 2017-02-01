@@ -193,13 +193,13 @@ strictFpTab str nTab = (replace "@scala.annotation.strictfp\n" ("@scala.annotati
 
 {
 -- modifiers of normalinterfaceDeclaration
-normalInterfaceDeclaration :: TypeModifierIsStaticIsFinal -> String
-normalInterfaceDeclaration ("", False, b2) = "trait" ++ " "
-normalInterfaceDeclaration ("", True, b2) = "object" ++ " "
-normalInterfaceDeclaration (str, b1, b2) = if b1 then
-                                                str ++ " " ++ "object" ++ " "
+normalInterfaceDeclaration :: TypeModifierIsStaticIsFinal -> String -> String
+normalInterfaceDeclaration ("", False, b2) nTab = "trait" ++ " "
+normalInterfaceDeclaration ("", True, b2) nTab = "object" ++ " "
+normalInterfaceDeclaration (str, b1, b2) nTab = if b1 then
+                                                (strictFpTab str nTab) ++ " " ++ "object" ++ " "
                                             else
-                                                str ++ " " ++ "trait" ++ " "
+                                                (strictFpTab str nTab) ++ " " ++ "trait" ++ " "
 }
 
 sem TypeDeclarations
@@ -225,12 +225,11 @@ sem TypeDeclaration
                                   @typeParameters.scalaTypeDeclaration ++ -- ToDo
                                   @super.scalaTypeDeclaration ++
                                   @interfaces.scalaTypeDeclaration ++
-                                  " { \n" ++ @classBodyDeclarations.scalaTypeDeclaration ++ "}\n\n"
+                                  " { \n" ++ @classBodyDeclarations.scalaTypeDeclaration ++ @lhs.scalaNTab ++ "}\n\n"
 
     | TypeDeclarationClassDeclarationEnumD
                                 modifiers.scalaFieldDeclaration = []
                                 lhs.scalaTypeDeclaration = "" -- ToDO modifiers :: Modifiers
-
                                 modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
                                 modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
 
@@ -246,11 +245,12 @@ sem TypeDeclaration
                                 lhs.scalaNTab = @lhs.scalaNTab
 
                                 lhs.scalaTypeDeclaration =
-                                    (normalInterfaceDeclaration @modifiers.scalaNormalInterfaceDeclaration) ++
+                                    @lhs.scalaNTab ++
+                                    (normalInterfaceDeclaration @modifiers.scalaNormalInterfaceDeclaration @lhs.scalaNTab) ++
                                     @identifier ++
                                     @typeParameters.scalaTypeDeclaration ++ --ToDo
                                     @extendsInterfaces.scalaExtendInterface ++
-                                    " { " ++ @listInterfaceMemberDeclarations.scalaBodyNormalInterface ++  "}\n\n"
+                                    " {\n" ++ @listInterfaceMemberDeclarations.scalaBodyNormalInterface ++ @lhs.scalaNTab ++ "}\n\n"
 
     | TypeDeclarationInterfaceDeclarationAnnotationTypeD
                                 modifiers.scalaFieldDeclaration = []
@@ -579,7 +579,7 @@ sem ClassBodyDeclaration
 
                         lhs.scalaTypeDeclaration =
                             @lhs.scalaNTab ++
-                            (normalInterfaceDeclaration @modifiers.scalaNormalInterfaceDeclaration) ++
+                            (normalInterfaceDeclaration @modifiers.scalaNormalInterfaceDeclaration @lhs.scalaNTab) ++
                             @identifier ++
                             @typeParameters.scalaTypeDeclaration ++ --ToDo
                             @extendsInterfaces.scalaExtendInterface ++
@@ -749,10 +749,11 @@ sem InterfaceMemberDeclaration
             @typeParameters.scalaTypeDeclaration ++
             @super.scalaTypeDeclaration ++
             @interfaces.scalaTypeDeclaration ++
-            " { " ++ @classBodyDeclarations.scalaTypeDeclaration ++ "}\n\n"
+            " { \n" ++ @classBodyDeclarations.scalaTypeDeclaration ++ @lhs.scalaNTab ++ "}\n\n"
 
         lhs.scalaBodyNormalInterface = ""
         lhs.scalaExtendClassBodyNormalCD = ""
+
     | InterfaceMemberDeclTypeDeclarationClassDeclarationEnumD
         modifiers.scalaFieldDeclaration = []
         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
@@ -762,6 +763,7 @@ sem InterfaceMemberDeclaration
         lhs.scalaExtendClassBodyNormalCD = ""
         lhs.scalaNTab = @lhs.scalaNTab
         enumBody.scalaNTab = @lhs.scalaNTab ++ "\t"
+
     | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD
         modifiers.scalaFieldDeclaration = []
         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
@@ -769,11 +771,12 @@ sem InterfaceMemberDeclaration
         listInterfaceMemberDeclaration.scalaNTab = @lhs.scalaNTab ++ "\t"
 
         lhs.scalaBodyNormalInterface =
-            (normalInterfaceDeclaration @modifiers.scalaNormalInterfaceDeclaration) ++
+            @lhs.scalaNTab ++
+            (normalInterfaceDeclaration @modifiers.scalaNormalInterfaceDeclaration @lhs.scalaNTab) ++
             @identifier ++
             @typeParameters.scalaTypeDeclaration ++ --ToDo
             @extendsInterfaces.scalaExtendInterface ++
-            " { " ++ @listInterfaceMemberDeclaration.scalaBodyNormalInterface ++  "}\n\n"
+            " {\n" ++ @listInterfaceMemberDeclaration.scalaBodyNormalInterface ++ @lhs.scalaNTab ++  "}\n\n"
 
         lhs.scalaTypeDeclaration = ""
         lhs.scalaExtendClassBodyNormalCD = ""
