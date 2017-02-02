@@ -13,7 +13,6 @@ class ClaseA {
 		@transient var var5: Float = 0
 		@volatile var var6: Int = 0
 		var var7: ClaseB =  new ClaseB(var1,var1)
-
 		var tipo1: Byte = 0
 		var tipo2: Short = 1
 		var tipo3: Char = 'a'
@@ -22,15 +21,11 @@ class ClaseA {
 		var tipo6: Float = .2f
 		var tipo7: Double = 0.009
 		var tipo8: Boolean = False
-
 		var tipo9: String = ""
-		var tipo10: code =  new codejavaClaseB(var1,var1)
+		var tipo10: code.java.ClaseB =  new codejavaClaseB(var1,var1)
 		var tipo11: Int = 0
 		var tipo12: Int = 0
 		var tipo13: Int = 0
-
-	// code.java.ClaseB tipo10 = new code.java.ClaseB(var1, var1);
-
 		var exp1: String = ""
 		var exp2: String = exp1
 		var exp3: Integer = 2
@@ -38,7 +33,6 @@ class ClaseA {
 		var exp5: Boolean = tipo8 False
 		var exp6: Int = 1 2 50
 		var exp7: ClaseB =  new ClaseB(var1,var1)
-		var d: Boolean =
+		var d: Boolean = }
 
 
-}

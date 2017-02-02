@@ -115,8 +115,7 @@ set ScalaFieldDeclInitialization = VariableInitializer
                                     Primary
                                     PrimaryNoNewArray
                                     PrimaryNNA
-                                    ClassOrInterfaceType
-                                    Type PrimitiveOrReferenceType
+                                    ClassOrInterfaceType ZClassOrInterfaceType ZCOITTypeDeclSpecifier
 
 attr ScalaAllNTab
     chn scalaNTab :: String
@@ -450,20 +449,18 @@ sem ListInterfaceMemberDeclaration
 
 sem ZClassOrInterfaceType
     | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
-
            lhs.scalaSuperTypeDeclaration = "." ++ @hd.scalaSuperTypeDeclaration ++ @tl.scalaSuperTypeDeclaration
-
            lhs.scalaImplementsInterfaceTypeDeclaration = "." ++ @hd.scalaImplementsInterfaceTypeDeclaration ++ @tl.scalaImplementsInterfaceTypeDeclaration
-
            lhs.scalaExtendInterface =  "." ++ @hd.scalaExtendInterface ++ @tl.scalaExtendInterface
-
            lhs.scalaExtendClassBodyNormalCD = "." ++ @hd.scalaExtendClassBodyNormalCD ++ @tl.scalaExtendClassBodyNormalCD
+           lhs.scalaFieldDeclInitialization = "." ++ @hd.scalaExtendInterface ++ @tl.scalaExtendInterface
 
     | Nil lhs.scalaTypeDeclaration = ""
           lhs.scalaSuperTypeDeclaration = ""
           lhs.scalaImplementsInterfaceTypeDeclaration = ""
           lhs.scalaExtendInterface = ""
           lhs.scalaExtendClassBodyNormalCD = ""
+          lhs.scalaFieldDeclInitialization = ""
 
 sem ZCOITTypeDeclSpecifier
     | ZCOITTypeDeclSpecifier lhs.scalaTypeDeclaration = @identifier -- ToDo ++ @typeArguments.scalaTypeDeclaration
@@ -471,6 +468,7 @@ sem ZCOITTypeDeclSpecifier
                              lhs.scalaImplementsInterfaceTypeDeclaration = @identifier
                              lhs.scalaExtendInterface = @identifier
                              lhs.scalaExtendClassBodyNormalCD = @identifier
+                             lhs.scalaFieldDeclInitialization = @identifier
 
 sem Super
     | Super lhs.scalaTypeDeclaration = @classOrInterfaceType.scalaSuperTypeDeclaration
@@ -666,7 +664,7 @@ sem ClassBodyDeclaration
 
 sem Type  -- ToDo check
     | TypePrimitiveType lhs.scalaFieldDeclaration = @primitiveOrReferenceType.scalaFieldDeclaration
-                        lhs.scalaFieldDeclInitialization = @primitiveOrReferenceType.scalaFieldDeclInitialization
+                        -- lhs.scalaFieldDeclInitialization = @primitiveOrReferenceType.scalaFieldDeclInitialization
 
 {
 addTypeToModifiers :: String -> TypeFieldDeclaration -> TypeFieldDeclaration
@@ -676,36 +674,36 @@ addTypeToModifiers type_ (modifiers, t, variableDeclarators, ti)  = (modifiers, 
 sem PrimitiveOrReferenceType
     | TypePrimitiveNumericType_TypeIntegral_Byte
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Byte") @lhs.scalaFieldDeclaration
-                                lhs.scalaFieldDeclInitialization = "Byte"
+                                -- lhs.scalaFieldDeclInitialization = "Byte"
     | TypePrimitiveNumericType_TypeIntegral_Short
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Short") @lhs.scalaFieldDeclaration -- ToDo
-                                lhs.scalaFieldDeclInitialization = "Short"
+                                -- lhs.scalaFieldDeclInitialization = "Short"
     | TypePrimitiveNumericType_TypeIntegral_Int
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Int") @lhs.scalaFieldDeclaration -- ToDo
-                                lhs.scalaFieldDeclInitialization = "Int"
+                                -- lhs.scalaFieldDeclInitialization = "Int"
     | TypePrimitiveNumericType_TypeIntegral_Long
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Long") @lhs.scalaFieldDeclaration -- ToDo
-                                lhs.scalaFieldDeclInitialization = "Long"
+                                -- lhs.scalaFieldDeclInitialization = "Long"
     | TypePrimitiveNumericType_TypeIntegral_Char
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Char") @lhs.scalaFieldDeclaration -- ToDo
-                                lhs.scalaFieldDeclInitialization = "Char"
+                                -- lhs.scalaFieldDeclInitialization = "Char"
     | TypePrimitiveNumericType_TypeFloating_Float
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Float") @lhs.scalaFieldDeclaration -- ToDo
-                                lhs.scalaFieldDeclInitialization = "Float"
+                                -- lhs.scalaFieldDeclInitialization = "Float"
     | TypePrimitiveNumericType_TypeFloating_Double
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Double") @lhs.scalaFieldDeclaration -- ToDo
-                                lhs.scalaFieldDeclInitialization = "Double"
+                                -- lhs.scalaFieldDeclInitialization = "Double"
     | TypePrimitivePrimitivetypeBoolean
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Boolean") @lhs.scalaFieldDeclaration -- ToDo
-                                lhs.scalaFieldDeclInitialization = "Boolean"
+                                -- lhs.scalaFieldDeclInitialization = "Boolean"
     | TypeReference
-                                lhs.scalaFieldDeclaration = @referenceType.scalaFieldDeclaration -- ToDo
-                                lhs.scalaFieldDeclInitialization = "" -- ToDo
+                                lhs.scalaFieldDeclaration = @referenceType.scalaFieldDeclaration
+                                -- map (addTypeToModifiers @referenceType.scalaFieldDeclInitialization) @lhs.scalaFieldDeclaration
+                                -- lhs.scalaFieldDeclInitialization = ""
 
 sem ReferenceType
-    | ReferenceTypeClassOrInterfaceType  lhs.scalaFieldDeclaration =  map (addTypeToModifiers @identifier) @lhs.scalaFieldDeclaration -- ToDo
+    | ReferenceTypeClassOrInterfaceType  lhs.scalaFieldDeclaration =  map (addTypeToModifiers (@identifier ++ @zClassOrInterfaceType.scalaFieldDeclInitialization)) @lhs.scalaFieldDeclaration -- ToDo
                                         -- ToDO typeArguments :: TypeArguments
-                                        -- ToDO zClassOrInterfaceType :: ZClassOrInterfaceType
 sem VariableDeclarators
     | Cons lhs.scalaFieldDeclaration = @hd.scalaFieldDeclaration ++ @tl.scalaFieldDeclaration
            hd.scalaNTab = @lhs.scalaNTab
