@@ -97,7 +97,7 @@ set ScalaAllTypeDeclaration = TypeDeclarations TypeDeclaration
 attr ScalaAllTypeDeclaration
      syn scalaTypeDeclaration :: String
 
-set ScalaFieldDeclaration = ClassBodyDeclaration VariableDeclarators VariableDeclarator
+set ScalaFieldDeclaration = VariableDeclarators VariableDeclarator
                          VariableDeclaratorId VariableDeclaratorIdZ
                          VariableInitializer
                          VariableInitializers
@@ -108,13 +108,15 @@ set ScalaFieldDeclaration = ClassBodyDeclaration VariableDeclarators VariableDec
                          Modifier
 
 set ScalaFieldDeclInitialization = VariableInitializer
-                                    Expression
+                                    Expression ArgumentList
                                     ConditionalOrExpression
                                     UnaryExpression
                                     TypeName
                                     Primary
                                     PrimaryNoNewArray
                                     PrimaryNNA
+                                    ClassOrInterfaceType
+                                    Type PrimitiveOrReferenceType
 
 attr ScalaAllNTab
     chn scalaNTab :: String
@@ -229,7 +231,7 @@ sem TypeDeclarations
 
 sem TypeDeclaration
     | TypeDeclarationClassDeclarationNormalCD
-                              modifiers.scalaFieldDeclaration = []
+                              modifiers.scalaFieldDeclaration = []  -- ToDo
                               modifiers.scalaNormalClassDeclaration = ("", False, False)
                               modifiers.scalaNormalInterfaceDeclaration = ("", False, False)
                               classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
@@ -433,6 +435,7 @@ sem ClassOrInterfaceType
                            lhs.scalaImplementsInterfaceTypeDeclaration = @identifier ++ @zClassOrInterfaceType.scalaImplementsInterfaceTypeDeclaration
                            lhs.scalaExtendInterface = " extends " ++ @identifier ++ @zClassOrInterfaceType.scalaExtendInterface
                            lhs.scalaExtendClassBodyNormalCD = " extends " ++ @identifier ++ @zClassOrInterfaceType.scalaExtendClassBodyNormalCD
+                           lhs.scalaFieldDeclInitialization = @identifier ++ @zClassOrInterfaceType.scalaTypeDeclaration
 
 sem ListInterfaceMemberDeclaration
     | Cons lhs.scalaExtendClassBodyNormalCD = @hd.scalaExtendClassBodyNormalCD ++ @tl.scalaExtendClassBodyNormalCD
@@ -483,7 +486,7 @@ sem InterfaceTypeList
 
 sem ClassBodyDeclarations
     | Cons
-            hd.scalaFieldDeclaration = []
+            --hd.scalaFieldDeclaration = []
             lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
             hd.scalaNTab = @lhs.scalaNTab
             tl.scalaNTab = @hd.scalaNTab
@@ -545,9 +548,10 @@ defaultValueType type_
 
 sem ClassBodyDeclaration
     | ClassBodyDeclClassMemberDeclFieldDeclaration
-                        modifiers.scalaFieldDeclaration = @lhs.scalaFieldDeclaration
+                        modifiers.scalaFieldDeclaration = ([("", False, False)], "", "", Nothing) : [] -- ToDo
                         type_.scalaFieldDeclaration = @modifiers.scalaFieldDeclaration
                         variableDeclarators.scalaFieldDeclaration = @type_.scalaFieldDeclaration
+
                         lhs.scalaTypeDeclaration = {checkVariableDeclarators @variableDeclarators.scalaFieldDeclaration @variableDeclarators.scalaNTab}
                         variableDeclarators.scalaNTab = @lhs.scalaNTab
                         lhs.scalaNTab = @lhs.scalaNTab
@@ -555,7 +559,7 @@ sem ClassBodyDeclaration
                         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
                         modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
     | ClassBodyDeclClassMemberDeclMethodDeclaration
-                        modifiers.scalaFieldDeclaration = []
+                        modifiers.scalaFieldDeclaration = ([("", False, False)], "", "", Nothing) : [] -- ToDo
                         lhs.scalaTypeDeclaration = ""
 
                         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
@@ -566,7 +570,7 @@ sem ClassBodyDeclaration
     | ClassBodyDeclClassMemberDeclClassDeclarationNormalCD
                         -- lhs.scalaFieldDeclaration = []  -- ToDO              modifiers :: Modifiers
 
-                        modifiers.scalaFieldDeclaration = []
+                        modifiers.scalaFieldDeclaration = ([("", False, False)], "", "", Nothing) : [] -- ToDo
                         modifiers.scalaNormalClassDeclaration = ("", False, False)
                         modifiers.scalaNormalInterfaceDeclaration = ("", False, False)
                         lhs.scalaNTab = @lhs.scalaNTab
@@ -583,8 +587,9 @@ sem ClassBodyDeclaration
                             "\n" ++ @lhs.scalaNTab ++ "}\n\n"
 
     | ClassBodyDeclClassMemberDeclClassDeclarationEnumD
-                        lhs.scalaFieldDeclaration = [] -- ToDO                 modifiers :: Modifiers
+                        --lhs.scalaFieldDeclaration = [] -- ToDO                 modifiers :: Modifiers
                         lhs.scalaTypeDeclaration = ""
+                        modifiers.scalaFieldDeclaration = ([("", False, False)], "", "", Nothing) : [] -- ToDo
 
                         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
                         modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
@@ -593,7 +598,7 @@ sem ClassBodyDeclaration
                         lhs.scalaNTab = @lhs.scalaNTab
 
     | ClassBodyDeclClassMemberDeclInterfaceDeclarationNormalInterfaceD
-                        lhs.scalaFieldDeclaration = [] -- ToDO modifiers :: Modifiers
+                        --lhs.scalaFieldDeclaration = [] -- ToDO modifiers :: Modifiers
                         modifiers.scalaFieldDeclaration = [] -- ToDo ?
 
                         modifiers.scalaNormalClassDeclaration = ("", False, False)
@@ -611,7 +616,8 @@ sem ClassBodyDeclaration
                             "\n" ++ @lhs.scalaNTab ++ "}\n\n"
 
     | ClassBodyDeclClassMemberDeclInterfaceDeclarationAnnotationTypeD
-                        lhs.scalaFieldDeclaration = [] -- ToDO modifiers :: Modifiers
+                        --lhs.scalaFieldDeclaration = [] -- ToDO modifiers :: Modifiers
+                        modifiers.scalaFieldDeclaration = ([("", False, False)], "", "", Nothing) : [] -- ToDo
                         lhs.scalaTypeDeclaration = ""
 
                         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
@@ -621,24 +627,25 @@ sem ClassBodyDeclaration
                         lhs.scalaNTab = @lhs.scalaNTab
 
     | ClassBodyDeclClassMemberDeclSemiColon
-                        lhs.scalaFieldDeclaration = [] -- ToDO
+                        -- lhs.scalaFieldDeclaration = [] -- ToDO
                         lhs.scalaTypeDeclaration = ""
                         lhs.scalaNTab = @lhs.scalaNTab
 
     | ClassBodyInstanceInitializer
-                        lhs.scalaFieldDeclaration = [] -- ToDO  blockStatements :: BlockStatements {- Block -- InstanceInitializer -}
+                        -- lhs.scalaFieldDeclaration = [] -- ToDO  blockStatements :: BlockStatements {- Block -- InstanceInitializer -}
                         lhs.scalaTypeDeclaration = ""
                         blockStatements.scalaNTab = @lhs.scalaNTab
                         lhs.scalaNTab = @lhs.scalaNTab
 
     | ClassBodyStaticInitializer
-                        lhs.scalaFieldDeclaration = [] -- ToDO  blockStatements :: BlockStatements {- StaticInitializer -}
+                        -- lhs.scalaFieldDeclaration = [] -- ToDO  blockStatements :: BlockStatements {- StaticInitializer -}
                         lhs.scalaTypeDeclaration = ""
                         blockStatements.scalaNTab = @lhs.scalaNTab
                         lhs.scalaNTab = @lhs.scalaNTab
 
     | ClassBodyConstructorDeclaration
-                        lhs.scalaFieldDeclaration = [] -- ToDO  modifiers :: Modifiers
+                        --lhs.scalaFieldDeclaration = [] -- ToDO  modifiers :: Modifiers
+                        modifiers.scalaFieldDeclaration = ([("", False, False)], "", "", Nothing) : [] -- ToDo
                         lhs.scalaTypeDeclaration = ""
 
                         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
@@ -648,7 +655,8 @@ sem ClassBodyDeclaration
                         lhs.scalaNTab = @lhs.scalaNTab
 
     | ClassBodyConstructorDeclarationNoFormalParList
-                        lhs.scalaFieldDeclaration = [] -- ToDO  modifiers :: Modifiers
+                        --lhs.scalaFieldDeclaration = [] -- ToDO  modifiers :: Modifiers
+                        modifiers.scalaFieldDeclaration = ([("", False, False)], "", "", Nothing) : [] -- ToDo
                         lhs.scalaTypeDeclaration = ""
 
                         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
@@ -658,6 +666,7 @@ sem ClassBodyDeclaration
 
 sem Type  -- ToDo check
     | TypePrimitiveType lhs.scalaFieldDeclaration = @primitiveOrReferenceType.scalaFieldDeclaration
+                        lhs.scalaFieldDeclInitialization = @primitiveOrReferenceType.scalaFieldDeclInitialization
 
 {
 addTypeToModifiers :: String -> TypeFieldDeclaration -> TypeFieldDeclaration
@@ -667,22 +676,31 @@ addTypeToModifiers type_ (modifiers, t, variableDeclarators, ti)  = (modifiers, 
 sem PrimitiveOrReferenceType
     | TypePrimitiveNumericType_TypeIntegral_Byte
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Byte") @lhs.scalaFieldDeclaration
+                                lhs.scalaFieldDeclInitialization = "Byte"
     | TypePrimitiveNumericType_TypeIntegral_Short
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Short") @lhs.scalaFieldDeclaration -- ToDo
+                                lhs.scalaFieldDeclInitialization = "Short"
     | TypePrimitiveNumericType_TypeIntegral_Int
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Int") @lhs.scalaFieldDeclaration -- ToDo
+                                lhs.scalaFieldDeclInitialization = "Int"
     | TypePrimitiveNumericType_TypeIntegral_Long
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Long") @lhs.scalaFieldDeclaration -- ToDo
+                                lhs.scalaFieldDeclInitialization = "Long"
     | TypePrimitiveNumericType_TypeIntegral_Char
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Char") @lhs.scalaFieldDeclaration -- ToDo
+                                lhs.scalaFieldDeclInitialization = "Char"
     | TypePrimitiveNumericType_TypeFloating_Float
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Float") @lhs.scalaFieldDeclaration -- ToDo
+                                lhs.scalaFieldDeclInitialization = "Float"
     | TypePrimitiveNumericType_TypeFloating_Double
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Double") @lhs.scalaFieldDeclaration -- ToDo
+                                lhs.scalaFieldDeclInitialization = "Double"
     | TypePrimitivePrimitivetypeBoolean
                                 lhs.scalaFieldDeclaration = map (addTypeToModifiers "Boolean") @lhs.scalaFieldDeclaration -- ToDo
+                                lhs.scalaFieldDeclInitialization = "Boolean"
     | TypeReference
                                 lhs.scalaFieldDeclaration = @referenceType.scalaFieldDeclaration -- ToDo
+                                lhs.scalaFieldDeclInitialization = "" -- ToDo
 
 sem ReferenceType
     | ReferenceTypeClassOrInterfaceType  lhs.scalaFieldDeclaration =  map (addTypeToModifiers @identifier) @lhs.scalaFieldDeclaration -- ToDo
@@ -716,6 +734,17 @@ sem VariableInitializer
     | VariableInitializerArr
             lhs.scalaFieldDeclInitialization = ""
             -- attayInitializer :: ArrayInitializer ToDo
+
+sem ArgumentList
+    | Cons
+        lhs.scalaFieldDeclInitialization = {
+            if @tl.scalaFieldDeclInitialization == "" then
+                @hd.scalaFieldDeclInitialization
+            else
+                @hd.scalaFieldDeclInitialization ++ "," ++ @tl.scalaFieldDeclInitialization
+        } -- ToDo
+    | Nil
+        lhs.scalaFieldDeclInitialization = ""
 
 sem Expression
     | ExpressionConditionalExpr
@@ -880,7 +909,7 @@ sem PrimaryNNA
                         -- expression :: Expression unaryExpression :: UnaryExpression {- ANTES Type        UnaryExpression  -- CONTROLAR COND CONTEXTO -}
 
     | PrimNNAClassInstanceCreationExpression
-                        lhs.scalaFieldDeclInitialization = "" -- ToDo
+                        lhs.scalaFieldDeclInitialization = " new " ++ @classOrInterfaceType.scalaFieldDeclInitialization ++ "(" ++ @argumentList.scalaFieldDeclInitialization ++ ")"  -- ToDo
                         -- typeArguments :: TypeArguments classOrInterfaceType :: ClassOrInterfaceType argumentList :: ArgumentList  {- Antes ->                           | PrimNNAClassIns ClassInstanceCreationExpression -}
     | ArrayCreationExpressionPrimitiveType
                         lhs.scalaFieldDeclInitialization = "" -- ToDo
