@@ -22,17 +22,17 @@ class ClaseA {
 		var tipo7: Double = 0.009
 		var tipo8: Boolean = False
 		var tipo9: String = ""
-		var tipo10: code.java.ClaseB =  new codejavaClaseB(var1,var1)
+		var tipo10: code.java.ClaseB =  new code.java.ClaseB(var1,var1)
 		var tipo11: Int = 0
 		var tipo12: Int = 0
 		var tipo13: Int = 0
 		var exp1: String = ""
 		var exp2: String = exp1
 		var exp3: Integer = 2
-		var exp4: Integer = exp3 4
-		var exp5: Boolean = tipo8 False
-		var exp6: Int = 1 2 50
+		var exp4: Integer = exp3 + 4
+		var exp5: Boolean = tipo8 && False
+		var exp6: Int = (1 + 2) * 50
 		var exp7: ClaseB =  new ClaseB(var1,var1)
-		var d: Boolean = }
+		var d: Boolean = met1()}
 
 
