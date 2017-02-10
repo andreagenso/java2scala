@@ -42,15 +42,15 @@ class ClaseA {
     String exp2 = exp1;
 
     Integer exp3 = 2;
-    Integer exp4 = exp3 + 4; // ****
+    Integer exp4 = exp3 + 4;
 
-    boolean exp5 = tipo8 && false; // ****
+    boolean exp5 = tipo8 && false;
 
-    int exp6 = (1 +2) * 50; // ****
+    int exp6 = (1 +2) * 50;
 
     ClaseB exp7 = new ClaseB(var1, var1);
 
-    boolean d = met1(); // ***
+    boolean d = met1();
 
     boolean met1(){  // ****
         /*int a = 0;
@@ -59,6 +59,24 @@ class ClaseA {
         }*/
 
         return  true;
+    }
+
+
+    private boolean met2(){  // ****
+        /*int a = 0;
+        for(int i=0; i<10; i++){
+            a = a + 5;
+        }*/
+
+        return  true;
+    }
+
+    private code.java.ClaseB met3(int a, int b){  // ****
+        /*int a = 0;
+        for(int i=0; i<10; i++){
+            a = a + 5;
+        }*/
+        return  (new ClaseB(a, b));
     }
 
 
