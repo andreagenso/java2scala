@@ -1,16 +1,22 @@
 package code.java;
 
-class ClaseB {
 
-    public  ClaseB(int a, int b) { // *****
-
+class ClaseC {
+    public  static void main() {
+        System.out.println(" AAAA");
     }
+}
+
+
+
+class ClaseB {
+    ClaseB(int a, int b){}
 }
 
 class ClaseA {
 
     // modificadores
-    private int var1 = 1;
+    private static  int var1 = 1;
     protected String var2 = "";
     protected String var3;
     static final double VAR4 = 0.9;
@@ -19,7 +25,7 @@ class ClaseA {
 
     static volatile int var6 = 0;
 
-    public ClaseB var7 = new ClaseB(var1, var1);
+    public static final ClaseB var7 = new ClaseB(var1, var1);
 
     // Type
     byte tipo1;
@@ -52,34 +58,19 @@ class ClaseA {
 
     boolean d = met1();
 
-    boolean met1(){  // ****
-        /*int a = 0;
-        for(int i=0; i<10; i++){
-            a = a + 5;
-        }*/
-
+    boolean met1() {
         return  true;
     }
 
-
-    private boolean met2(){  // ****
-        /*int a = 0;
-        for(int i=0; i<10; i++){
-            a = a + 5;
-        }*/
-
-        return  true;
+    private int met2(){
+        return  2;
     }
 
-    private code.java.ClaseB met3(int a, int b){  // ****
-        /*int a = 0;
-        for(int i=0; i<10; i++){
-            a = a + 5;
-        }*/
-        return  (new ClaseB(a, b));
+    protected  code.java.ClaseB met3(int a, int b) {
+        return (new  ClaseB(a, b));
     }
 
-
-
+    /*for(int i=0; i<10; i++){
+    }*/
 }
 
