@@ -1,23 +1,12 @@
 package code.java;
 
-
-/*
-class ClaseC {
-    public  static void main() {
-        System.out.println(" AAAA");
-    }
-}
-
-
-
 class ClaseB {
     ClaseB(int a, int b){}
 }
-*/
+
 
 class ClaseA {
 
-/*
     // modificadores
     private static  int var1 = 1;
     protected String var2 = "";
@@ -60,14 +49,17 @@ class ClaseA {
     ClaseB exp7 = new ClaseB(var1, var1);
 
     boolean d = met1();
-*/
 
     boolean met1() {
         return  true;
     }
 
     private int met2(){
-        return  2;
+        int b = 5;
+        int a = 5;
+
+        return  (a+b);
+
     }
 
     protected  code.java.ClaseB met3(int a, int b) {
@@ -77,4 +69,3 @@ class ClaseA {
     /*for(int i=0; i<10; i++){
     }*/
 }
-
