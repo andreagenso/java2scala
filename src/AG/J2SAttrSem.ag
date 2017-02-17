@@ -19,7 +19,7 @@ attr ImportDeclaration ImportDeclarations
 sem TypeName
     | TypeName
             lhs.importDeclarationList = @identifier : @typeName.importDeclarationList
-            lhs.scalaFieldDeclInitialization = @identifier ++ @typeName.scalaFieldDeclInitialization
+            lhs.scalaFieldDeclInitialization = pointStr @identifier @typeName.scalaFieldDeclInitialization
     | NilTypeName
             lhs.scalaFieldDeclInitialization = ""
             lhs.importDeclarationList = []
@@ -576,6 +576,10 @@ sem TypeParameters
 commaTypeParameters :: String -> String -> String
 commaTypeParameters hd "" = hd
 commaTypeParameters hd tl = hd ++ ", " ++ tl
+
+pointStr :: String -> String -> String
+pointStr hd "" = hd
+pointStr hd tl = hd ++ "." ++ tl
 }
 
 sem TypeParameterList
@@ -1492,9 +1496,7 @@ sem Statement
                             if (@lhs.scalaStatement == "") then
                                 ""
                             else
-                                @lhs.scalaNTab ++ "{\n" ++
-                                @lhs.scalaNTab ++  @blockStatement.scalaStatement ++
-                                "\n" ++ @lhs.scalaNTab ++ "}"
+                                @lhs.scalaNTab ++  @blockStatement.scalaStatement
                     }
 
     | SWTSEmptyStatement
@@ -1503,8 +1505,8 @@ sem Statement
 
     | SWTSExpressionStatement
                     lhs.scalaNTab = @lhs.scalaNTab
-                    expression.scalaStatement = @lhs.scalaStatement -- ToDo
-                    lhs.scalaStatement = @expression.scalaStatement
+                    expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaStatement = @expression.scalaExpression
 
     | SWTSAssertStatementCond
                     lhs.scalaNTab = @lhs.scalaNTab
