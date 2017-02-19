@@ -1,58 +1,69 @@
 package code.java;
 
-class ClaseB {
-    ClaseB(int a, int b){}
-}
-
-abstract class  ClaseC {
-    protected abstract int met5();
-}
-
 class ClaseA {
 
-    boolean d = met1();
+    int currentSpeed = 100;
+    boolean isMoving = true;
 
-    // metodos
-    public boolean met1() {
-        return  true;
-    }
-
-    private int met2(){
-        int b = 5;
-        int a = 5;
-
-        return  (a+b);
-    }
-
-    protected  code.java.ClaseB met3(int a, int b) {
-        return (new  ClaseB(a, 3));
-    }
-
-    protected final int met4(int a, int b) {
-        int res = a*b;
-        return res;
-    }
-
-    public synchronized String met6(String a) {
-        return "sinch";
-    }
-
-    native private int met7();
-
-    private  strictfp int met8() {
-        return 10;
-    }
-
-    private  void met9() {
-
-    }
-
-    private boolean met10() {
-        boolean var1 = true;
-        boolean var2 = false;
-        {
-            System.out.println("metodo 10");
+    void applyBrakes() {
+        if (isMoving){
+            currentSpeed--;
         }
-        return (var1 && var2);
+    }
+
+    void applyBrakes2() {
+        if (isMoving) {
+            currentSpeed--;
+        } else {
+            System.err.println("The bicycle has already stopped!");
+        }
+    }
+
+    public void edad() {
+        int age=20;
+        if(age>18){
+            System.out.print("Age is greater than 18");
+        }
+    }
+}
+
+class IfElseDemo {
+    public void main(String[] args) {
+
+        int testscore = 76;
+        char grade;
+
+        if (testscore >= 90) {
+            grade = 'A';
+        } else if (testscore >= 80) {
+            grade = 'B';
+        } else if (testscore >= 70) {
+            grade = 'C';
+        } else if (testscore >= 60) {
+            grade = 'D';
+        } else {
+            grade = 'F';
+        }
+        System.out.println("Grade = " + grade);
+    }
+}
+
+class WhileDemo {
+    public void main(String[] args) {
+        int count = 1;
+        while (count < 11) {
+            System.out.println("Count is: " + count);
+            count++;
+        }
+    }
+}
+
+class DoWhileDemo {
+    public static void main(String[] args){
+        int count = 1;
+        do {
+            System.out.println("Count is: " + count);
+            count++;
+        } while (count < 11);
     }
 }
