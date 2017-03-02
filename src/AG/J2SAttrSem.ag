@@ -156,9 +156,14 @@ set ScalaStatement = Statement
 set ScalaExpression = Expression
                       ConditionalOrExpression
                       UnaryExpression
+                      AssignmentOperator
+                      ZPostfixExpression
+                      ZPostfixExp
                       PrimaryNoNewArray
                       PrimaryNNA
                       Primary
+
+set ScalaIfElseStatement = Statement
 
 attr ScalaMethodDeclaration
      chn scalaMethodDeclaration :: String
@@ -186,6 +191,9 @@ attr ScalaStatement
 
 attr ScalaExpression
     syn scalaExpression :: String
+
+attr ScalaIfElseStatement
+    syn scalaIfElseStatement :: Bool
 
 -- ------------------------------------------------
 -- ConstructorDeclaration
@@ -1024,7 +1032,9 @@ sem Expression
                                   @expression.scalaExpression
 
     | ExpressionAssignment
-            lhs.scalaExpression = "" -- ToDo
+            lhs.scalaExpression = @conditionalOrExpression.scalaExpression ++
+                                  @assignmentOperator.scalaExpression ++
+                                  @expression.scalaExpression
 
 sem ConditionalOrExpression
     | Mod -- :%:
@@ -1118,8 +1128,7 @@ sem UnaryExpression
     | UnExpMenos
             lhs.scalaExpression =  @unaryExpression.scalaExpression --ToDo
     | PostExpPrimaryPostfixZ
-            lhs.scalaExpression =  @primary.scalaExpression --ToDo
-            -- zpostfixExpression :: ZPostfixExpression
+            lhs.scalaExpression =  @primary.scalaExpression ++ @zpostfixExpression.scalaExpression
     | PostfixExpressionPrimary
             lhs.scalaExpression = @primary.scalaExpression
     | Pestan
@@ -1226,7 +1235,7 @@ sem VariableDeclaratorId
         lhs.scalaFieldDeclaration = {
             foldl (\x (fs, tp, _, _) -> ((fs, tp, @identifier, Nothing): x))
             ([]::[TypeFieldDeclaration]) @lhs.scalaFieldDeclaration }
-        lhs.scalaNTab= @lhs.scalaNTab ++ "\t" -- ToDo Check
+        lhs.scalaNTab= @lhs.scalaNTab   -- ++ "\t" -- ToDo Check
         lhs.scalaVariableDeclaratorId = @identifier
     | VarDeclaratorIdVDZ
         lhs.scalaFieldDeclaration = {
@@ -1234,7 +1243,7 @@ sem VariableDeclaratorId
             ([]::[TypeFieldDeclaration]) @lhs.scalaFieldDeclaration) ++
             @variableDeclaratorIdZ.scalaFieldDeclaration
         }
-        lhs.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo Check
+        lhs.scalaNTab = @lhs.scalaNTab -- ++ "\t" -- ToDo Check
         lhs.scalaVariableDeclaratorId = @identifier ++ @variableDeclaratorIdZ.scalaVariableDeclaratorId
 
 sem VariableDeclaratorIdZ
@@ -1455,45 +1464,63 @@ sem Statement
                        lhs.scalaNTab = @statement.scalaNTab
                        statement.scalaStatement = @lhs.scalaStatement
                        lhs.scalaStatement = @statement.scalaStatement -- ToDO no considerar label
+                       lhs.scalaIfElseStatement = False
     | StatementIf
-                    statement.scalaNTab = @lhs.scalaNTab
-                    lhs.scalaNTab = @statement.scalaNTab
-                    expression.scalaStatement = @lhs.scalaStatement -- ToDo Check
-                    statement.scalaStatement = @expression.scalaStatement --- ToDO Check
-                    lhs.scalaStatement = "if (" ++ @expression.scalaStatement ++ ")" ++ @statement.scalaStatement -- ToDo
-                    -- expression :: Expression statement :: Statement {- IfThenStatement -}
-
+                    statement.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    statement.scalaStatement = @expression.scalaStatement
+                    lhs.scalaStatement = "if (" ++ @expression.scalaExpression ++ ") {" ++
+                                         @statement.scalaNTab ++ @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+                    lhs.scalaIfElseStatement = True
 
     | StatementIfElse
-                      statement1.scalaNTab = @lhs.scalaNTab
-                      statement2.scalaNTab = @lhs.scalaNTab
-                      lhs.scalaNTab = @statement2.scalaNTab
-                      expression.scalaStatement = @lhs.scalaStatement -- ToDo Check
-                      statement1.scalaStatement = @expression.scalaStatement --- ToDO Check
-                      statement2.scalaStatement = @statement1.scalaStatement --- ToDO Check
-                      lhs.scalaStatement = "if (" ++ @expression.scalaStatement ++ ") " ++
-                                            @statement1.scalaStatement ++
-                                            @statement2.scalaStatement -- ToDo {- IfThenElseStatement -}
+                      -- *** tabs organizados para IfElse anidados ***
+                      statement1.scalaNTab = @lhs.scalaNTab ++ "\t"
+                      statement2.scalaNTab = { if (@statement2.scalaIfElseStatement) then
+                                                @lhs.scalaNTab
+                                             else
+                                                @lhs.scalaNTab ++ "\t"
+                                             }
+                      lhs.scalaNTab = @lhs.scalaNTab
 
+                      expression.scalaStatement = @lhs.scalaStatement
+                      statement1.scalaStatement = @expression.scalaStatement
+                      statement2.scalaStatement = @statement1.scalaStatement
+                      lhs.scalaIfElseStatement = True
+
+                      lhs.scalaStatement = { if (@statement2.scalaIfElseStatement) then
+                        "if (" ++ @expression.scalaExpression ++ ") {"
+                        ++ @statement1.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "} " ++
+                        "else "
+                        ++ @statement2.scalaStatement
+                      else
+                        "if (" ++ @expression.scalaExpression ++ ") {" ++
+                        @statement1.scalaNTab ++ @statement1.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "} " ++
+                        "else {" ++ @statement2.scalaNTab ++ @statement2.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+                      }
     | StatementWhile
-                     statement.scalaNTab = @lhs.scalaNTab
-                     lhs.scalaNTab = @statement.scalaNTab
-                     expression.scalaStatement = @lhs.scalaStatement -- ToDo Check
-                     lhs.scalaStatement = " while ( " ++ @expression.scalaStatement  ++ " )" ++
-                                          @statement.scalaStatement  -- ToDo {- WhileStatement -}
+                     statement.scalaNTab = @lhs.scalaNTab ++ "\t"
+                     lhs.scalaNTab = @lhs.scalaNTab -- @statement.scalaNTab
+                     expression.scalaStatement = @lhs.scalaStatement
+                     lhs.scalaIfElseStatement = False
+                     lhs.scalaStatement = " while ( " ++ @expression.scalaExpression  ++ " ) {\n" ++
+                                          @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
 
     | StatementFor
                     forStatement.scalaNTab = @lhs.scalaNTab -- ToDo
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaStatement = "" -- ToDo  forStatement
+                    lhs.scalaIfElseStatement = False
 
     | SWTSBlock
                     blockStatement.scalaNTab = @lhs.scalaNTab
                     lhs.scalaNTab = @blockStatement.scalaNTab
+                    lhs.scalaIfElseStatement = False
 
                     blockStatement.scalaStatement = @lhs.scalaStatement
                     lhs.scalaStatement = {
-                            if (@lhs.scalaStatement == "") then
+                            if (@blockStatement.scalaStatement == "") then
                                 ""
                             else
                                 @lhs.scalaNTab ++  @blockStatement.scalaStatement
@@ -1501,27 +1528,32 @@ sem Statement
 
     | SWTSEmptyStatement
                     lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = ""
 
     | SWTSExpressionStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = @expression.scalaExpression
 
     | SWTSAssertStatementCond
                     lhs.scalaNTab = @lhs.scalaNTab
                     -- expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
 
     | SWTSAssertStatementCondEx
                     lhs.scalaNTab = @lhs.scalaNTab
                     -- expression.scalaStatement = @lhs.scalaStatement -- ToDo
                     lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
                     -- conditionalExpression :: ConditionalExpression
 
     | SWTSSwitchStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = @expression.scalaStatement -- ToDo -- expression :: Expression
                     -- switchBlock :: SwitchBlock
 
@@ -1529,31 +1561,38 @@ sem Statement
                     lhs.scalaNTab = @lhs.scalaNTab
                     statement.scalaStatement = @lhs.scalaStatement -- ToDo
                     expression.scalaStatement = @statement.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = @statement.scalaStatement ++ @expression.scalaStatement -- ToDo statement :: Statement
 
     | SWTSBreakStatement
                     lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = "" --ToDo
 
     | SWTSBreakStatementId
                     lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = "" -- ToDo identifier :: Identifier
 
     | SWTSNilContinueStatement
                     lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = "" -- ToDo
 
     | SWTSContinueStatement
                     lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = "" -- ToDo identifier
 
     | SWTSReturnStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = @expression.scalaExpression
 
     | SWTSNilReturnStatement
                     lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = "()" -- ToDo
 
     | SWTSynchronizedStatement
@@ -1561,11 +1600,13 @@ sem Statement
                     lhs.scalaNTab = @blockStatements.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement -- ToDo
                     blockStatements.scalaStatement = @expression.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = "" -- ToDo  @expression.scalaStatement ++  @blockStatements.scalaStatement -- ToDo
 
     | SWTTrhowStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = "" -- @expression.scalaStatement ToDo
 
     | SWTTryStatement
@@ -1574,6 +1615,7 @@ sem Statement
                     lhs.scalaNTab = @blockStatements.scalaNTab
                     blockStatements.scalaStatement = @lhs.scalaStatement -- ToDo
                     catches.scalaStatement = @blockStatements.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = "" -- @blockStatements.scalaStatement ++ @catches.scalaStatement
 
     | SWTTryStatementFinally
@@ -1581,6 +1623,7 @@ sem Statement
                     catches.scalaNTab = @blockStatements1.scalaNTab
                     blockStatements2.scalaNTab = @catches.scalaNTab
                     lhs.scalaNTab = @blockStatements2.scalaNTab
+                    lhs.scalaIfElseStatement = False
                     lhs.scalaStatement = "" -- ToDo
 
 sem SwitchBlock
@@ -1784,6 +1827,44 @@ sem ZPrimaryOrExpression
     | ZPOEExpressionDeArrayAccess
                     expression.scalaStatement = "" -- ToDo
 --    | ZPOEZPrimary zPrimary :: ZPrimary
+
+sem ZPostfixExpression
+    | Cons
+        lhs.scalaExpression = @hd.scalaExpression ++ @tl.scalaExpression
+    | Nil
+        lhs.scalaExpression = ""
+
+sem ZPostfixExp
+    | PostIncrement
+            lhs.scalaExpression = " += 1"
+    | PostDecrement
+            lhs.scalaExpression = " -= 1"
+
+sem AssignmentOperator
+    | AssignmentOp {- = -}
+            lhs.scalaExpression = "="
+    | AssignmentPlus {- *= -}
+            lhs.scalaExpression = "*="
+    | AssignmentDiv {- /= -}
+            lhs.scalaExpression = "/="
+    | AssignmentMod {- %= -}
+            lhs.scalaExpression = "%="
+    | AssignmentAdd {- += -}
+            lhs.scalaExpression = "+="
+    | AssignmentMin {- -= -}
+            lhs.scalaExpression = "-="
+    | AssignmentMinShifShift  {- <<= -}
+            lhs.scalaExpression = "<<="
+    | AssignmentMayShitfShift {- >>= -}
+            lhs.scalaExpression = ">>="
+    | AssignmentMayShiftShiftShift {- >>>= -}
+            lhs.scalaExpression = ">>>="
+    | AssignmentAndSingle {- &= -}
+            lhs.scalaExpression = "&="
+    | AssignmentCincun {- ^= -}
+            lhs.scalaExpression = "^="
+    | AssignmentOrSingle {- |= -}
+            lhs.scalaExpression = "|="
 
 -- ------------------------------------------------
 -- J2S scala code

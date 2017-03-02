@@ -57,8 +57,8 @@ pZ  =   (\e ce z -> AGS.sem_ConditionalExpression_ConditionalExprComb z e ce) <$
 pConditionalOrExpression =  foldr pGen pFactor [ orExp, andExp, orIncl, orExcl, andSingle, eqs,rels, shift, adss, muls ]
 
 pGen ops p  =  pChainl (foldr1 (<|>) (map f ops)) p
-   where f (s,c)     = const c  <$> pOperator s
-                                    <|> const c  <$> pTokMayor s 
+   where f (s,c)     = const c  <$> pTokMayor s
+                                    <|> const c  <$> pOperator s
          
 orExp  = [("||",AGS.sem_ConditionalOrExpression_Or)]
 andExp = [("&&",AGS.sem_ConditionalOrExpression_And)]
@@ -66,10 +66,10 @@ orIncl = [("|",AGS.sem_ConditionalOrExpression_BitwiseOr)]
 andSingle = [("&",AGS.sem_ConditionalOrExpression_BitwiseAnd)]
 orExcl = [("^",AGS.sem_ConditionalOrExpression_BitwiseXor)]
 eqs = [("==",AGS.sem_ConditionalOrExpression_EqualTo),("!=",AGS.sem_ConditionalOrExpression_NotEqualTo)]
-rels = [("<",AGS.sem_ConditionalOrExpression_LessThan),("<=",AGS.sem_ConditionalOrExpression_LessThanOrEqualTo),(">=", AGS.sem_ConditionalOrExpression_GreaterThanOrEqualTo), (">",AGS.sem_ConditionalOrExpression_GreaterThan)]
+rels = [("<",AGS.sem_ConditionalOrExpression_LessThan),("<=",AGS.sem_ConditionalOrExpression_LessThanOrEqualTo),(">=", AGS.sem_ConditionalOrExpression_GreaterThanOrEqualTo)]
 shift = [(">>>",AGS.sem_ConditionalOrExpression_ZeroFillRightShift),(">>",AGS.sem_ConditionalOrExpression_RightShift),("<<",AGS.sem_ConditionalOrExpression_LeftShift)]
 adss = [("+", AGS.sem_ConditionalOrExpression_Add),("-", AGS.sem_ConditionalOrExpression_Sub)]
-muls = [("*", AGS.sem_ConditionalOrExpression_Mult),("/",AGS.sem_ConditionalOrExpression_Div),("%",AGS.sem_ConditionalOrExpression_Mod)]
+muls = [("*", AGS.sem_ConditionalOrExpression_Mult),("/",AGS.sem_ConditionalOrExpression_Div),("%",AGS.sem_ConditionalOrExpression_Mod),(">", AGS.sem_ConditionalOrExpression_GreaterThan)]
 
 
 

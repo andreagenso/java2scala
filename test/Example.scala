@@ -1,51 +1,76 @@
 package code.java
 
-class ClaseB(a: Int, b: Int) { 
+class laseA {
 
+	var currentSpeed: Int = 100
+	var isMoving: Boolean = true
+	def applyBrakes(): Unit = {
+		if (isMoving) {						
+			currentSpeed -= 1
+		}
+	}
+	def applyBrakes2(): Unit = {
+		if (isMoving) {						
+			currentSpeed -= 1
+		} else {						
+			System.err.println("The bicycle has already stopped!")
+		}
+	}
+	def edad(): Unit = {
+		var age: Int = 20
+		if (age > 18 + 2) {						
+			System.out.print("Age is greater than 18")
+		}
+		if (age % 18 == 0) {						
+			System.out.print("Age is greater than 18")
+		}
+	}
 }
 
 
-abstract class ClaseC { 
+class IfElseDemo { 
 
-	protected def met5(): Int
+	def main(args: String): Unit = {
+		var testscore: Int = 76
+		var grade: Char = '\u0000'
+		if (testscore >= 90) {			
+			grade='A'
+		} else if (testscore >= 80) {			
+			grade='B'
+		} else if (testscore >= 70) {			
+			grade='C'
+		} else if (testscore >= 60) {						
+			grade='D'
+		} else {						
+			grade='F'
+		}
+		System.out.println("Grade = " + grade)
+	}
 }
 
 
-class ClaseA { 
+class WhileDemo { 
 
-		var d: Boolean = met1()
-	def met1(): Boolean = {
-		true
+	def main(args: String): Unit = {
+		var count: Int = 1
+		 while ( count < 11 ) {
+			
+			System.out.println("Count is: " + count)
+			count += 1
+		}
 	}
-	private def met2(): Int = {
-			var b: Int = 5
-			var a: Int = 5
-		(a + b)
-	}
-	protected def met3(a: Int, b: Int): code.java.ClaseB = {
-		( new ClaseB(a,3))
-	}
-	final protected def met4(a: Int, b: Int): Int = {
-			var res: Int = a * b
-		res
-	}
-	def met6(a: String): String = {
-		"sinch"
-	}
-	@native
-	def met7(): Int
-	@scala.annotation.strictfp
-	private def met8(): Int = {
-		10
-	}
-	private def met9(): Unit = {
-	}
-	private def met10(): Boolean = {
-			var var1: Boolean = true
-			var var2: Boolean = false
+}
+
+
+class DoWhileDemo { 
+
+	def main(args: String): Unit = {
+		var count: Int = 1
 				
-		System.out.println("metodo 10")
-		(var1 && var2)
+		System.out.println("Count is: " + count)
+		count += 1		
+		System.out.println("Count is: " + count)
+		count += 1
 	}
 }
 
