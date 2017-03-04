@@ -1470,7 +1470,7 @@ sem Statement
                     lhs.scalaNTab = @lhs.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement
                     statement.scalaStatement = @expression.scalaStatement
-                    lhs.scalaStatement = "if (" ++ @expression.scalaExpression ++ ") {" ++
+                    lhs.scalaStatement = "if (" ++ @expression.scalaExpression ++ ") {\n" ++
                                          @statement.scalaNTab ++ @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
                     lhs.scalaIfElseStatement = True
 
@@ -1501,10 +1501,10 @@ sem Statement
                       }
     | StatementWhile
                      statement.scalaNTab = @lhs.scalaNTab ++ "\t"
-                     lhs.scalaNTab = @lhs.scalaNTab -- @statement.scalaNTab
+                     lhs.scalaNTab = @lhs.scalaNTab
                      expression.scalaStatement = @lhs.scalaStatement
                      lhs.scalaIfElseStatement = False
-                     lhs.scalaStatement = " while ( " ++ @expression.scalaExpression  ++ " ) {\n" ++
+                     lhs.scalaStatement = "while ( " ++ @expression.scalaExpression  ++ " ) {" ++
                                           @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
 
     | StatementFor
@@ -1558,11 +1558,16 @@ sem Statement
                     -- switchBlock :: SwitchBlock
 
     | SWTSDoStatement
+                    statement.scalaNTab = @lhs.scalaNTab ++ "\t"
                     lhs.scalaNTab = @lhs.scalaNTab
-                    statement.scalaStatement = @lhs.scalaStatement -- ToDo
-                    expression.scalaStatement = @statement.scalaStatement -- ToDo
+
+                    statement.scalaStatement = @lhs.scalaStatement
+                    expression.scalaStatement = @statement.scalaStatement
+
                     lhs.scalaIfElseStatement = False
-                    lhs.scalaStatement = @statement.scalaStatement ++ @expression.scalaStatement -- ToDo statement :: Statement
+                    lhs.scalaStatement = "do {" ++
+                                         @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}\n" ++
+                                         @lhs.scalaNTab ++ "while ( " ++ @expression.scalaExpression  ++ " )"
 
     | SWTSBreakStatement
                     lhs.scalaNTab = @lhs.scalaNTab

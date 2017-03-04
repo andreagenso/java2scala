@@ -707,7 +707,7 @@ data BlockStatement
 deriving BlockStatement : Show
 
 data Statement
-    | StatementLabeled identifier :: Identifier
+| StatementLabeled identifier :: Identifier
                        statement :: Statement  {- LabeledStatement -}
     | StatementIf expression :: Expression
                   statement :: Statement {- IfThenStatement -}
