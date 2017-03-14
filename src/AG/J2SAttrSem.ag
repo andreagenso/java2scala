@@ -75,7 +75,7 @@ set ScalaAllNTab = TypeDeclarations TypeDeclaration
                 ClassBodyDeclarations ClassBodyDeclaration ConstructorBody
                 BlockStatements BlockStatement
                 MethodBody
-                Statement ForStatement
+                Statement ForStatement ForInit ForUpdate
                 Catches CatchClause
                 SwitchBlock SwitchBlockStatementGroups SwitchBlockStatementGroup
                 ListInterfaceMemberDeclaration InterfaceMemberDeclaration
@@ -152,6 +152,8 @@ set ScalaStatement = Statement
                      BlockStatement
                      Catches
                      CatchClause
+                     ForStatement
+                     StatementExpressionList
 
 set ScalaExpression = Expression
                       ConditionalOrExpression
@@ -194,6 +196,22 @@ attr ScalaExpression
 
 attr ScalaIfElseStatement
     syn scalaIfElseStatement :: Bool
+
+-- ------------------------------------------------
+-- ForInit
+-- ------------------------------------------------
+set ScalaForInit = ForInit
+
+attr ScalaForInit
+    syn scalaForInit :: String
+
+-- ------------------------------------------------
+-- ForUpdate
+-- ------------------------------------------------
+set ScalaForUpdate = ForUpdate
+
+attr ScalaForUpdate
+    syn scalaForUpdate :: String
 
 -- ------------------------------------------------
 -- ConstructorDeclaration
@@ -1286,8 +1304,26 @@ sem ForStatement
 
 sem ForInit
     | ForInitLocalVar
-        type_.scalaFieldDeclaration = []
-        variableDeclarators.scalaNTab = ""
+        variableDeclarators.scalaNTab = @lhs.scalaNTab
+        lhs.scalaNTab = @lhs.scalaNTab
+
+        type_.scalaFieldDeclaration = ([(@variableModifiers.scalaMethodFormalParameters, False, False)], "", "", Nothing) : []
+        variableDeclarators.scalaFieldDeclaration = @type_.scalaFieldDeclaration
+
+        lhs.scalaForInit = { checkVariableDeclarators @variableDeclarators.scalaFieldDeclaration @variableDeclarators.scalaNTab }
+    | NilForInit
+        lhs.scalaForInit = ""
+    | ForInitStaExp
+        statementExpressionList.scalaStatement = "" -- ToDo
+        lhs.scalaForInit = "" -- ToDo
+
+sem ForUpdate
+    | ForUpdate
+        lhs.scalaNTab = @lhs.scalaNTab
+        statemebtExpressionList.scalaStatement = ""
+        lhs.scalaForUpdate = @lhs.scalaNTab ++ "\t" ++ @statemebtExpressionList.scalaStatement
+    | NilForUpdate
+        lhs.scalaForUpdate = ""
 
 sem WildcardBounds
     | WilcardBoundsExtendsReferenceType type_.scalaFieldDeclaration = []
@@ -1510,7 +1546,8 @@ sem Statement
     | StatementFor
                     forStatement.scalaNTab = @lhs.scalaNTab -- ToDo
                     lhs.scalaNTab = @lhs.scalaNTab
-                    lhs.scalaStatement = "" -- ToDo  forStatement
+                    forStatement.scalaStatement = ""
+                    lhs.scalaStatement = @forStatement.scalaStatement
                     lhs.scalaIfElseStatement = False
 
     | SWTSBlock
@@ -1760,23 +1797,37 @@ sem ConstructorBody
                       lhs.scalaNTab = @blockStatements.scalaNTab
 
 sem ForStatement
-    | ForStatementBasicForStatementAll      statement.scalaNTab = @lhs.scalaNTab
-                                            expression.scalaStatement = "" -- ToDo
+    | ForStatementBasicForStatementAll      statement.scalaNTab = @lhs.scalaNTab ++ "\t"
                                             lhs.scalaNTab = @statement.scalaNTab
+                                            expression.scalaStatement = ""
+                                            statement.scalaStatement = ""
+
+                                            lhs.scalaStatement = @forInit.scalaForInit ++ "\n" ++
+                                                                 @lhs.scalaNTab ++ "while(" ++ @expression.scalaExpression ++") {" ++
+                                                                    @statement.scalaStatement ++ "\n" ++
+                                                                    @forUpdate.scalaForUpdate ++
+                                                                    "\n" ++
+                                                                    @lhs.scalaNTab ++ "}"
 
     | ForStatementBasicForStatementNoExp    statement.scalaNTab = @lhs.scalaNTab
                                             statement.scalaStatement = "" -- ToDo
                                             lhs.scalaNTab = @statement.scalaNTab
 
-    | ForStatementEnhancedForStatement      statement.scalaNTab = @lhs.scalaNTab
-                                            expression.scalaStatement = "" -- ToDo
+
+    | ForStatementEnhancedForStatement      statement.scalaNTab = @lhs.scalaNTab ++ "\t"
                                             lhs.scalaNTab = @statement.scalaNTab
+                                            expression.scalaStatement = "" -- ToDo
+
 
     | ForStatementEnhancedForStatementNoVarModif
-                                            statement.scalaNTab = @lhs.scalaNTab
-                                            expression.scalaStatement = "" -- ToDo
+                                            statement.scalaNTab = @lhs.scalaNTab ++ "\t"
                                             lhs.scalaNTab = @statement.scalaNTab
 
+                                            expression.scalaStatement = ""
+                                            statement.scalaStatement = ""
+                                            lhs.scalaStatement = "for (" ++ @identifier ++ " <- " ++ @expression.scalaExpression ++ ") {" ++
+                                                                 @statement.scalaStatement ++
+                                                                 "\n" ++ @lhs.scalaNTab ++"}"
 sem MethodDeclarator
     | MethodDeclaratorFormalPL
                 lhs.scalaMethodDeclaration = @identifier ++ "(" ++
@@ -1796,7 +1847,7 @@ sem VariableModifier
                 lhs.scalaMethodFormalParameters = "final"
     | VariableModifierAnnotation
                 lhs.scalaMethodFormalParameters = "" -- ToDo
-        -- annotation :: Annotation
+                -- annotation :: Annotation
 
 sem ArrayAccess
     | ArrayAccessExpName  -- identifiers :: Identifiers
@@ -1819,9 +1870,11 @@ sem DimExprs
 
 sem StatementExpressionList
     | StatementExpressionList
-                            expression.scalaStatement = "" -- ToDo
-   --                           statementExpressionList :: StatementExpressionList
-   -- | NilStatementExpressionList
+                            --expression.scalaStatement = "" -- ToDo
+                            lhs.scalaStatement = @expression.scalaExpression ++ @statementExpressionList.scalaStatement
+    --                          statementExpressionList :: StatementExpressionList
+    | NilStatementExpressionList
+                            lhs.scalaStatement = @lhs.scalaStatement
 
 sem SwitchLabel
     | SwitchLabelConstant expression.scalaStatement = "" -- ToDo
