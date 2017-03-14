@@ -26,3 +26,18 @@ class ClaseA {
         return number * 2;
     }
 }
+
+
+class ExampleStatic {
+    int a = 0;
+    static int b = 9;
+
+    public static void main(String[] args) {
+        char grade = 'a';
+        System.out.println("Grade = " + grade);
+    }
+
+    public int getNum() {
+        return 2;
+    }
+}
