@@ -1,4 +1,4 @@
-module {AG.J2SAttrSem}
+    module {AG.J2SAttrSem}
 {} -- Exports of this module, empty for none
 {
 import Data.List
@@ -214,6 +214,26 @@ attr ScalaForUpdate
     syn scalaForUpdate :: String
 
 -- ------------------------------------------------
+-- has for each ?
+-- ------------------------------------------------
+set ScalaHasForEach = ForStatement
+                      Statement
+                      BlockStatements BlockStatement
+                      TypeDeclaration TypeDeclarations
+                      Catches CatchClause
+                      ClassBodyDeclaration ClassBodyDeclarations ConstructorBody
+                      EnumBodyDeclarations EnumBody
+                      EnumConstants EnumConstant
+                      InterfaceMemberDeclaration
+                      ListInterfaceMemberDeclaration
+                      AnnotationTypeElementDeclaration
+                      ListAnnotationTypeElementDeclaration
+                      SwitchBlockStatementGroup SwitchBlockStatementGroups SwitchBlock
+
+attr ScalaHasForEach
+    syn scalaHasForEach :: Bool
+
+-- ------------------------------------------------
 -- ConstructorDeclaration
 -- ------------------------------------------------
 set ScalaConstructorModifier = Modifiers
@@ -349,8 +369,11 @@ sem TypeDeclarations
            hd.scalaNTab = @lhs.scalaNTab
            tl.scalaNTab = @hd.scalaNTab
            lhs.scalaNTab = @tl.scalaNTab
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
+
     | Nil  lhs.scalaTypeDeclaration = ""
            lhs.scalaNTab = @lhs.scalaNTab
+           lhs.scalaHasForEach = False
 
 sem TypeDeclaration
     | TypeDeclarationClassDeclarationNormalCD
@@ -360,6 +383,7 @@ sem TypeDeclaration
                               modifiers.scalaMethodDeclaration = "" -- ToDo
                               classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
                               lhs.scalaNTab = @lhs.scalaNTab
+                              lhs.scalaHasForEach = @classBodyDeclarations.scalaHasForEach
 
                               lhs.scalaTypeDeclaration =
                                   @lhs.scalaNTab ++
@@ -382,6 +406,7 @@ sem TypeDeclaration
 
                                 enumBody.scalaNTab = @lhs.scalaNTab ++ "\t"
                                 lhs.scalaNTab = @lhs.scalaNTab
+                                lhs.scalaHasForEach = @enumBody.scalaHasForEach
 
     | TypeDeclarationInterfaceDeclarationNormalInterfaceD
                                 modifiers.scalaFieldDeclaration = []
@@ -391,6 +416,8 @@ sem TypeDeclaration
                                 modifiers.scalaMethodDeclaration = "" -- ToDo
                                 listInterfaceMemberDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
                                 lhs.scalaNTab = @lhs.scalaNTab
+                                lhs.scalaHasForEach = @listInterfaceMemberDeclarations.scalaHasForEach
+
 
                                 lhs.scalaTypeDeclaration =
                                     @lhs.scalaNTab ++
@@ -408,11 +435,13 @@ sem TypeDeclaration
                                 modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
                                 listAnnotationTypeElementDeclaration.scalaNTab = @lhs.scalaNTab
                                 lhs.scalaNTab = @lhs.scalaNTab
+                                lhs.scalaHasForEach = @listAnnotationTypeElementDeclaration.scalaHasForEach
 
                                 modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
                                 modifiers.scalaMethodDeclaration = "" -- ToDo
     | TypeDeclarationSemiColon  lhs.scalaTypeDeclaration = "" -- ToDO review how to convert this case to Scala
                                 lhs.scalaNTab = @lhs.scalaNTab
+                                lhs.scalaHasForEach = False
 
 sem ExtendsInterfaces
     | ExtendsInterfaceType
@@ -639,9 +668,11 @@ sem ListInterfaceMemberDeclaration
            hd.scalaNTab = @lhs.scalaNTab
            tl.scalaNTab = @hd.scalaNTab
            lhs.scalaNTab = @tl.scalaNTab
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
     | Nil lhs.scalaExtendClassBodyNormalCD = ""
           lhs.scalaBodyNormalInterface = ""
           lhs.scalaNTab = @lhs.scalaNTab
+          lhs.scalaHasForEach = False
 
 
 sem ZClassOrInterfaceType
@@ -689,6 +720,7 @@ sem ClassBodyDeclarations
             hd.scalaNTab = @lhs.scalaNTab
             tl.scalaNTab = @hd.scalaNTab
             lhs.scalaNTab = @tl.scalaNTab
+            lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
 
             lhs.scalaConstructorDeclarationParams = @hd.scalaConstructorDeclarationParams ++ @tl.scalaConstructorDeclarationParams
             lhs.scalaConstructorDeclarationBody = @hd.scalaConstructorDeclarationBody ++ @tl.scalaConstructorDeclarationBody
@@ -698,6 +730,7 @@ sem ClassBodyDeclarations
             lhs.scalaNTab = @lhs.scalaNTab
             lhs.scalaConstructorDeclarationParams = ""
             lhs.scalaConstructorDeclarationBody = ""
+            lhs.scalaHasForEach = False
 
 
 sem ReferenceTypeList
@@ -771,6 +804,7 @@ sem ClassBodyDeclaration
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaHasForEach = False
     | ClassBodyDeclClassMemberDeclMethodDeclaration
                         modifiers.scalaFieldDeclaration = ([("", False, False)], "", "", Nothing) : [] -- ToDo
                         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
@@ -806,6 +840,7 @@ sem ClassBodyDeclaration
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaHasForEach = False
 
     | ClassBodyDeclClassMemberDeclClassDeclarationNormalCD
                         -- lhs.scalaFieldDeclaration = []  -- ToDO              modifiers :: Modifiers
@@ -832,6 +867,7 @@ sem ClassBodyDeclaration
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaHasForEach = @classBodyDeclarations.scalaHasForEach
 
     | ClassBodyDeclClassMemberDeclClassDeclarationEnumD
                         --lhs.scalaFieldDeclaration = [] -- ToDO                 modifiers :: Modifiers
@@ -844,6 +880,7 @@ sem ClassBodyDeclaration
 
                         enumBody.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo, check
                         lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = @enumBody.scalaHasForEach
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
@@ -870,6 +907,7 @@ sem ClassBodyDeclaration
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaHasForEach = @listInterfaceMemberDeclaration.scalaHasForEach
 
     | ClassBodyDeclClassMemberDeclInterfaceDeclarationAnnotationTypeD
                         --lhs.scalaFieldDeclaration = [] -- ToDO modifiers :: Modifiers
@@ -885,11 +923,13 @@ sem ClassBodyDeclaration
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaHasForEach = @listAnnotationTypeElementDeclaration.scalaHasForEach
 
     | ClassBodyDeclClassMemberDeclSemiColon
                         -- lhs.scalaFieldDeclaration = [] -- ToDO
                         lhs.scalaTypeDeclaration = ""
                         lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = False
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
@@ -900,6 +940,7 @@ sem ClassBodyDeclaration
                         blockStatements.scalaNTab = @lhs.scalaNTab
                         blockStatements.scalaStatement = ""
                         lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = @blockStatements.scalaHasForEach
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
@@ -910,6 +951,7 @@ sem ClassBodyDeclaration
                         blockStatements.scalaNTab = @lhs.scalaNTab
                         blockStatements.scalaStatement = ""
                         lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = @blockStatements.scalaHasForEach
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
@@ -923,6 +965,7 @@ sem ClassBodyDeclaration
                         modifiers.scalaMethodDeclaration = "" -- ToDo
                         constructorBody.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo, check if is correct
                         lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = @constructorBody.scalaHasForEach
 
                         lhs.scalaTypeDeclaration = ""
 
@@ -944,6 +987,7 @@ sem ClassBodyDeclaration
                         modifiers.scalaMethodDeclaration = "" -- ToDo
                         constructorBody.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo , check if is correct.
                         lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = @constructorBody.scalaHasForEach
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
@@ -1344,6 +1388,7 @@ sem InterfaceMemberDeclaration
         lhs.scalaExtendClassBodyNormalCD = ""
 
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
     | InterfaceMemberDeclarationAbstract
         modifiers.scalaFieldDeclaration = []
 
@@ -1353,6 +1398,7 @@ sem InterfaceMemberDeclaration
         lhs.scalaTypeDeclaration = ""
         lhs.scalaBodyNormalInterface = ""
         lhs.scalaExtendClassBodyNormalCD = ""
+        lhs.scalaHasForEach = False
 
         lhs.scalaNTab = @lhs.scalaNTab
     | InterfaceMemberDeclTypeDeclarationClassDeclarationNormalCD
@@ -1362,6 +1408,7 @@ sem InterfaceMemberDeclaration
         modifiers.scalaMethodDeclaration = "" -- ToDo
         classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = @classBodyDeclarations.scalaHasForEach
 
         lhs.scalaTypeDeclaration =
             @lhs.scalaNTab ++
@@ -1385,6 +1432,7 @@ sem InterfaceMemberDeclaration
         lhs.scalaExtendClassBodyNormalCD = ""
         lhs.scalaNTab = @lhs.scalaNTab
         enumBody.scalaNTab = @lhs.scalaNTab ++ "\t"
+        lhs.scalaHasForEach = @enumBody.scalaHasForEach
 
     | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD
         modifiers.scalaFieldDeclaration = []
@@ -1404,6 +1452,7 @@ sem InterfaceMemberDeclaration
         lhs.scalaTypeDeclaration = ""
         lhs.scalaExtendClassBodyNormalCD = ""
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = @listInterfaceMemberDeclaration.scalaHasForEach
     | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD
         modifiers.scalaFieldDeclaration = []
         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
@@ -1414,11 +1463,13 @@ sem InterfaceMemberDeclaration
         lhs.scalaExtendClassBodyNormalCD = ""
         listAnnotationTypeElementDeclaration.scalaNTab = @lhs.scalaNTab
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = @listAnnotationTypeElementDeclaration.scalaHasForEach
     | InterfaceMemberDeclTypeDeclarationSemiColon
         lhs.scalaTypeDeclaration = ""
         lhs.scalaBodyNormalInterface = ""
         lhs.scalaExtendClassBodyNormalCD = ""
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
 
 sem ConditionalOrExpression
     | ConditionalOrExpressionIntanceOf
@@ -1430,8 +1481,10 @@ sem Catches
            tl.scalaNTab = @hd.scalaNTab
            lhs.scalaNTab = @tl.scalaNTab
            lhs.scalaStatement = @hd.scalaStatement ++ @tl.scalaStatement -- ToDo
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
     | Nil  lhs.scalaNTab = @lhs.scalaNTab
            lhs.scalaStatement = ""
+           lhs.scalaHasForEach = False
 
 sem CatchClause
     | CatchClause
@@ -1440,14 +1493,17 @@ sem CatchClause
         blockStatements.scalaNTab = @lhs.scalaNTab
         lhs.scalaNTab = @lhs.scalaNTab
         lhs.scalaStatement = "" -- ToDo
+        lhs.scalaHasForEach = @blockStatements.scalaHasForEach
 
 sem BlockStatements
     | Cons hd.scalaNTab = @lhs.scalaNTab
            tl.scalaNTab = @hd.scalaNTab
            lhs.scalaNTab = @tl.scalaNTab
            lhs.scalaStatement = @hd.scalaStatement ++ @tl.scalaStatement -- ToDO
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
     | Nil lhs.scalaNTab = @lhs.scalaNTab
           lhs.scalaStatement = ""
+          lhs.scalaHasForEach = False
 
 sem BlockStatement
     | BlockStatementLocalVariableDeclarationStatement
@@ -1460,6 +1516,7 @@ sem BlockStatement
         modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
 
         lhs.scalaStatement = {checkVariableDeclarators @variableDeclarators.scalaFieldDeclaration @variableDeclarators.scalaNTab}
     | BlockStatementClassDeclarationNormalClassDeclaration
@@ -1469,6 +1526,7 @@ sem BlockStatement
         modifiers.scalaMethodDeclaration = "" -- ToDo
         classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False -- ToDo
 
         lhs.scalaStatement =
           @lhs.scalaNTab ++
@@ -1481,17 +1539,19 @@ sem BlockStatement
           "\n}\n\n"
 
     | BlockStatementClassDeclarationEnumDeclaration
-        modifiers.scalaFieldDeclaration = [] -- ToDo
+            modifiers.scalaFieldDeclaration = [] -- ToDo
 
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaMethodDeclaration = "" -- ToDo
-        enumBody.scalaNTab = @lhs.scalaNTab ++ "\t"
-        lhs.scalaNTab = @lhs.scalaNTab
-        lhs.scalaStatement = ""
+            modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
+            modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+            modifiers.scalaMethodDeclaration = "" -- ToDo
+            enumBody.scalaNTab = @lhs.scalaNTab ++ "\t"
+            lhs.scalaNTab = @lhs.scalaNTab
+            lhs.scalaHasForEach = False
+            lhs.scalaStatement = ""
     | BlockStatementStatement
             lhs.scalaNTab = @lhs.scalaNTab
             statement.scalaStatement = @lhs.scalaStatement
+            lhs.scalaHasForEach = @statement.scalaHasForEach
             lhs.scalaStatement = "\n" ++ @lhs.scalaNTab ++ @statement.scalaStatement
 
 sem Statement
@@ -1501,6 +1561,7 @@ sem Statement
                        statement.scalaStatement = @lhs.scalaStatement
                        lhs.scalaStatement = @statement.scalaStatement -- ToDO no considerar label
                        lhs.scalaIfElseStatement = False
+                       lhs.scalaHasForEach =  @statement.scalaHasForEach
     | StatementIf
                     statement.scalaNTab = @lhs.scalaNTab ++ "\t"
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1509,9 +1570,11 @@ sem Statement
                     lhs.scalaStatement = "if (" ++ @expression.scalaExpression ++ ") {\n" ++
                                          @statement.scalaNTab ++ @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
                     lhs.scalaIfElseStatement = True
+                    lhs.scalaHasForEach =  @statement.scalaHasForEach
 
     | StatementIfElse
                       -- *** tabs organizados para IfElse anidados ***
+                      lhs.scalaHasForEach =  @statement1.scalaHasForEach || @statement2.scalaHasForEach
                       statement1.scalaNTab = @lhs.scalaNTab ++ "\t"
                       statement2.scalaNTab = { if (@statement2.scalaIfElseStatement) then
                                                 @lhs.scalaNTab
@@ -1540,6 +1603,7 @@ sem Statement
                      lhs.scalaNTab = @lhs.scalaNTab
                      expression.scalaStatement = @lhs.scalaStatement
                      lhs.scalaIfElseStatement = False
+                     lhs.scalaHasForEach =  @statement.scalaHasForEach
                      lhs.scalaStatement = "while ( " ++ @expression.scalaExpression  ++ " ) {" ++
                                           @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
 
@@ -1549,11 +1613,13 @@ sem Statement
                     forStatement.scalaStatement = ""
                     lhs.scalaStatement = @forStatement.scalaStatement
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @forStatement.scalaHasForEach
 
     | SWTSBlock
                     blockStatement.scalaNTab = @lhs.scalaNTab
                     lhs.scalaNTab = @blockStatement.scalaNTab
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatement.scalaHasForEach
 
                     blockStatement.scalaStatement = @lhs.scalaStatement
                     lhs.scalaStatement = {
@@ -1566,18 +1632,21 @@ sem Statement
     | SWTSEmptyStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     lhs.scalaStatement = ""
 
     | SWTSExpressionStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     lhs.scalaStatement = @expression.scalaExpression
 
     | SWTSAssertStatementCond
                     lhs.scalaNTab = @lhs.scalaNTab
                     -- expression.scalaStatement = @lhs.scalaStatement -- ToDo
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
 
     | SWTSAssertStatementCondEx
@@ -1585,12 +1654,14 @@ sem Statement
                     -- expression.scalaStatement = @lhs.scalaStatement -- ToDo
                     lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     -- conditionalExpression :: ConditionalExpression
 
     | SWTSSwitchStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement -- ToDo
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @switchBlock.scalaHasForEach
                     lhs.scalaStatement = @expression.scalaStatement -- ToDo -- expression :: Expression
                     -- switchBlock :: SwitchBlock
 
@@ -1602,6 +1673,7 @@ sem Statement
                     expression.scalaStatement = @statement.scalaStatement
 
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "do {" ++
                                          @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}\n" ++
                                          @lhs.scalaNTab ++ "while ( " ++ @expression.scalaExpression  ++ " )"
@@ -1609,32 +1681,38 @@ sem Statement
     | SWTSBreakStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" --ToDo
 
     | SWTSBreakStatementId
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- ToDo identifier :: Identifier
 
     | SWTSNilContinueStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- ToDo
 
     | SWTSContinueStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- ToDo identifier
 
     | SWTSReturnStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     lhs.scalaStatement = @expression.scalaExpression
 
     | SWTSNilReturnStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "()" -- ToDo
 
     | SWTSynchronizedStatement
@@ -1643,12 +1721,14 @@ sem Statement
                     expression.scalaStatement = @lhs.scalaStatement -- ToDo
                     blockStatements.scalaStatement = @expression.scalaStatement -- ToDo
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements.scalaHasForEach
                     lhs.scalaStatement = "" -- ToDo  @expression.scalaStatement ++  @blockStatements.scalaStatement -- ToDo
 
     | SWTTrhowStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- @expression.scalaStatement ToDo
 
     | SWTTryStatement
@@ -1658,6 +1738,7 @@ sem Statement
                     blockStatements.scalaStatement = @lhs.scalaStatement -- ToDo
                     catches.scalaStatement = @blockStatements.scalaStatement -- ToDo
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements.scalaHasForEach || @catches.scalaHasForEach
                     lhs.scalaStatement = "" -- @blockStatements.scalaStatement ++ @catches.scalaStatement
 
     | SWTTryStatementFinally
@@ -1666,29 +1747,37 @@ sem Statement
                     blockStatements2.scalaNTab = @catches.scalaNTab
                     lhs.scalaNTab = @blockStatements2.scalaNTab
                     lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements1.scalaHasForEach || @catches.scalaHasForEach || @blockStatements2.scalaHasForEach
                     lhs.scalaStatement = "" -- ToDo
 
 sem SwitchBlock
     | SwitchBlockAll
                     switchBlockStatementGrooups.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo , check if is correct.
                     lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaHasForEach = @switchBlockStatementGrooups.scalaHasForEach
     | SwitchBlockLabels
                     lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaHasForEach = False
     | SwitchBlockGroups
                     switchBlockStatementGroups.scalaNTab = @lhs.scalaNTab ++ "\t" --ToDo check if is correct.
                     lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaHasForEach = @switchBlockStatementGroups.scalaHasForEach
     | NilSwitchBlock
                     lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaHasForEach = False
 
 sem SwitchBlockStatementGroups
     | Cons hd.scalaNTab = @lhs.scalaNTab
            tl.scalaNTab = @hd.scalaNTab
            lhs.scalaNTab = @tl.scalaNTab
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
     | Nil lhs.scalaNTab = @lhs.scalaNTab
+          lhs.scalaHasForEach = False
 
 sem SwitchBlockStatementGroup
     | SwitchBlockStatementGroup blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
                                 blockStatements.scalaStatement = "" -- ToDo
+                                lhs.scalaHasForEach = @blockStatements.scalaHasForEach
 
 sem ArrayInitializer
     | ArrayInitializer
@@ -1699,7 +1788,9 @@ sem ListAnnotationTypeElementDeclaration
     | Cons hd.scalaNTab = @lhs.scalaNTab
            tl.scalaNTab = @hd.scalaNTab
            lhs.scalaNTab = @tl.scalaNTab
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
     | Nil lhs.scalaNTab = @lhs.scalaNTab
+          lhs.scalaHasForEach = False
 
 sem AnnotationTypeElementDeclaration
     | AnnTypeElemDeclAbstract
@@ -1710,6 +1801,7 @@ sem AnnotationTypeElementDeclaration
         modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
 
     | AnnTypeElemDeclConstant
         modifiers.scalaFieldDeclaration = [] -- ToDo
@@ -1720,6 +1812,7 @@ sem AnnotationTypeElementDeclaration
         modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
     | AnnTypeElemDeclTypeDeclarationClassDeclarationNormalCD
         modifiers.scalaFieldDeclaration = [] -- ToDo
         modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
@@ -1727,6 +1820,7 @@ sem AnnotationTypeElementDeclaration
         modifiers.scalaMethodDeclaration = "" -- ToDo
         classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo, check
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
 
     | AnnTypeElemDeclTypeDeclarationClassDeclarationEnumD
         modifiers.scalaFieldDeclaration = [] -- ToDo
@@ -1736,6 +1830,7 @@ sem AnnotationTypeElementDeclaration
         modifiers.scalaMethodDeclaration = "" -- ToDo
         enumBody.scalaNTab = @lhs.scalaNTab --ToDo
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = @enumBody.scalaHasForEach
     | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD
         modifiers.scalaFieldDeclaration = [] -- ToDo
 
@@ -1745,6 +1840,7 @@ sem AnnotationTypeElementDeclaration
 
         listInterfaceMemberDeclaration.scalaNTab = @lhs.scalaNTab -- ToDo
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = @listInterfaceMemberDeclaration.scalaHasForEach
     | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD
         modifiers.scalaFieldDeclaration = [] -- ToDo
 
@@ -1754,6 +1850,9 @@ sem AnnotationTypeElementDeclaration
 
         listAnnotationsTypeElementDeclaration.scalaNTab = @lhs.scalaNTab
         lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
+    | AnnTypeElemDeclTypeDeclarationSemiColon
+        lhs.scalaHasForEach = False
 
 sem ActualTypeArgument
     | ActualTypeReferenceType type_.scalaFieldDeclaration = [] -- ToDo
@@ -1762,22 +1861,33 @@ sem EnumBody
     | EnumBody enumConstants.scalaNTab = @lhs.scalaNTab
                enumBodyDeclarations.scalaNTab = @enumConstants.scalaNTab
                lhs.scalaNTab = @enumBodyDeclarations.scalaNTab
+               lhs.scalaHasForEach = @enumConstants.scalaHasForEach || @enumBodyDeclarations.scalaHasForEach
 
 sem EnumBodyDeclarations
     | EnumBodyDeclarations classBodyDeclarations.scalaNTab = @lhs.scalaNTab -- ToDo check
                            lhs.scalaNTab = @lhs.scalaNTab
+                           lhs.scalaHasForEach = @classBodyDeclarations.scalaHasForEach
+    | NilEnumBodyDeclarations
+                           lhs.scalaHasForEach = False
 
 sem EnumConstants
     | EnumConstants enumConstant.scalaNTab = @lhs.scalaNTab
                     enumConstants.scalaNTab = @enumConstant.scalaNTab
                     lhs.scalaNTab = @enumConstants.scalaNTab
+                    lhs.scalaHasForEach = @enumConstant.scalaHasForEach || @enumConstants.scalaHasForEach
     | NilEnumConstants lhs.scalaNTab = @lhs.scalaNTab
+                       lhs.scalaHasForEach = False
 
 sem EnumConstant
     | EnumConstantAll classBodyDeclarations.scalaNTab = @lhs.scalaNTab
                       lhs.scalaNTab = @lhs.scalaNTab
+                      lhs.scalaHasForEach = @classBodyDeclarations.scalaHasForEach
+
     | EnumConstantClasB classBodyDeclaratiosn.scalaNTab = @lhs.scalaNTab
                          lhs.scalaNTab = @lhs.scalaNTab
+                         lhs.scalaHasForEach = @classBodyDeclaratiosn.scalaHasForEach
+    | EnumConstantArgL  lhs.scalaHasForEach = False -- ToDo
+    | EnumConstantNothing lhs.scalaHasForEach = False -- ToDo
 
 sem MethodBody
     | MethodBodyBlock
@@ -1795,12 +1905,14 @@ sem ConstructorBody
                       blockStatements.scalaStatement = ""
                       lhs.scalaMethodBody = @blockStatements.scalaStatement
                       lhs.scalaNTab = @blockStatements.scalaNTab
+                      lhs.scalaHasForEach = @blockStatements.scalaHasForEach
 
 sem ForStatement
     | ForStatementBasicForStatementAll      statement.scalaNTab = @lhs.scalaNTab ++ "\t"
                                             lhs.scalaNTab = @statement.scalaNTab
                                             expression.scalaStatement = ""
                                             statement.scalaStatement = ""
+                                            lhs.scalaHasForEach = False
 
                                             lhs.scalaStatement = @forInit.scalaForInit ++ "\n" ++
                                                                  @lhs.scalaNTab ++ "while(" ++ @expression.scalaExpression ++") {" ++
@@ -1809,22 +1921,34 @@ sem ForStatement
                                                                     "\n" ++
                                                                     @lhs.scalaNTab ++ "}"
 
-    | ForStatementBasicForStatementNoExp    statement.scalaNTab = @lhs.scalaNTab
-                                            statement.scalaStatement = "" -- ToDo
+    | ForStatementBasicForStatementNoExp    statement.scalaNTab = @lhs.scalaNTab ++ "\t"
                                             lhs.scalaNTab = @statement.scalaNTab
+                                            statement.scalaStatement = ""
+                                            lhs.scalaHasForEach = False
 
+                                            lhs.scalaStatement = @forInit.scalaForInit ++ "\n" ++
+                                                                 @lhs.scalaNTab ++ "while(true) {" ++
+                                                                 @statement.scalaStatement ++ "\n" ++
+                                                                 @forUpdate.scalaForUpdate ++
+                                                                 "\n" ++
+                                                                 @lhs.scalaNTab ++ "}"
 
     | ForStatementEnhancedForStatement      statement.scalaNTab = @lhs.scalaNTab ++ "\t"
                                             lhs.scalaNTab = @statement.scalaNTab
-                                            expression.scalaStatement = "" -- ToDo
-
+                                            expression.scalaStatement = ""
+                                            lhs.scalaHasForEach = True
+                                            lhs.scalaStatement = "for (" ++ -- no se considera variableModifiers
+                                                                 @identifier ++ " <- " ++ @expression.scalaExpression ++ ") {" ++
+                                                                 @statement.scalaStatement ++
+                                                                 "\n" ++ @lhs.scalaNTab ++"}"
 
     | ForStatementEnhancedForStatementNoVarModif
                                             statement.scalaNTab = @lhs.scalaNTab ++ "\t"
                                             lhs.scalaNTab = @statement.scalaNTab
-
                                             expression.scalaStatement = ""
                                             statement.scalaStatement = ""
+                                            lhs.scalaHasForEach = True
+
                                             lhs.scalaStatement = "for (" ++ @identifier ++ " <- " ++ @expression.scalaExpression ++ ") {" ++
                                                                  @statement.scalaStatement ++
                                                                  "\n" ++ @lhs.scalaNTab ++"}"

@@ -11,13 +11,26 @@ class ClaseA {
         List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
         List<Integer> l2 = new ArrayList<Integer>();
 
-        for (int n : numbers) {
+        for (final int n : numbers) {
+            l2.add(doubleIt(n));
+        }
+    }
+
+    void transformar2() {
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
+        List<Integer> l2 = new ArrayList<Integer>();
+
+        for (final int n : numbers) {
             l2.add(doubleIt(n));
         }
     }
 
     void forClasico() {
-        for(int i=0; i<1; i++) {
+        /*for(int i=0; i<1; i++) {
+            System.out.println(" i es " + i);
+        }*/
+
+        for(int i=0;; i++) {
             System.out.println(" i es " + i);
         }
     }
