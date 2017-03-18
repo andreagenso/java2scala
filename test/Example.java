@@ -25,32 +25,5 @@ class ClaseA {
         }
     }
 
-    void forClasico() {
-        /*for(int i=0; i<1; i++) {
-            System.out.println(" i es " + i);
-        }*/
-
-        for(int i=0;; i++) {
-            System.out.println(" i es " + i);
-        }
-    }
-
-    public int doubleIt(int number) {
-        return number * 2;
-    }
 }
 
-
-class ExampleStatic {
-    int a = 0;
-    static int b = 9;
-
-    public static void main(String[] args) {
-        char grade = 'a';
-        System.out.println("Grade = " + grade);
-    }
-
-    public int getNum() {
-        return 2;
-    }
-}
