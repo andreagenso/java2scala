@@ -795,7 +795,7 @@ data Statement = StatementLabeled Identifier StatementNested  -- LabeledStatemen
                            | SWTSAssertStatementCond  Expression
                            | SWTSAssertStatementCondEx  Expression ConditionalExpression
                            | SWTSSwitchStatement Expression SwitchBlock
-                           | SWTSDoStatement Statement Expression
+                           | SWTSDoStatement StatementNested Expression
                            | SWTSBreakStatement
                            | SWTSBreakStatementId Identifier
                            | SWTSNilContinueStatement

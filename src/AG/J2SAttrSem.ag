@@ -75,7 +75,7 @@ set ScalaAllNTab = TypeDeclarations TypeDeclaration
                 ClassBodyDeclarations ClassBodyDeclaration ConstructorBody
                 BlockStatements BlockStatement
                 MethodBody
-                Statement ForStatement ForInit ForUpdate
+                Statement StatementNested ForStatement ForInit ForUpdate
                 Catches CatchClause
                 SwitchBlock SwitchBlockStatementGroups SwitchBlockStatementGroup
                 ListInterfaceMemberDeclaration InterfaceMemberDeclaration
@@ -146,8 +146,8 @@ set ScalaVariableDeclaratorId = VariableDeclaratorId
 set ScalaMethodBody = MethodBody
                       ConstructorBody
 
-set ScalaStatement = Statement
-                     Expression
+set ScalaStatement = Statement StatementNested
+                     Expression ExpressionAssignment
                      BlockStatements
                      BlockStatement
                      Catches
@@ -155,7 +155,7 @@ set ScalaStatement = Statement
                      ForStatement
                      StatementExpressionList
 
-set ScalaExpression = Expression
+set ScalaExpression = Expression ExpressionAssignment
                       ConditionalOrExpression
                       UnaryExpression
                       AssignmentOperator
@@ -165,7 +165,7 @@ set ScalaExpression = Expression
                       PrimaryNNA
                       Primary
 
-set ScalaIfElseStatement = Statement
+set ScalaIfElseStatement = Statement StatementNested
 
 attr ScalaMethodDeclaration
      chn scalaMethodDeclaration :: String
@@ -217,7 +217,7 @@ attr ScalaForUpdate
 -- has for each ?
 -- ------------------------------------------------
 set ScalaHasForEach = ForStatement
-                      Statement
+                      Statement StatementNested
                       MethodBody BlockStatements BlockStatement
                       TypeDeclaration TypeDeclarations
                       Catches CatchClause
@@ -1637,10 +1637,10 @@ sem Statement
 
     | SWTSExpressionStatement
                     lhs.scalaNTab = @lhs.scalaNTab
-                    expression.scalaStatement = @lhs.scalaStatement
+                    expressionAssignment.scalaStatement = @lhs.scalaStatement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
-                    lhs.scalaStatement = @expression.scalaExpression
+                    lhs.scalaStatement = @expressionAssignment.scalaExpression
 
     | SWTSAssertStatementCond
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1749,6 +1749,215 @@ sem Statement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @blockStatements1.scalaHasForEach || @catches.scalaHasForEach || @blockStatements2.scalaHasForEach
                     lhs.scalaStatement = "" -- ToDo
+
+sem ExpressionAssignment
+    | ExpressionAssignment1
+            lhs.scalaExpression = @unaryExpression.scalaExpression -- ToDo
+    | ExpressionAssignment2
+            lhs.scalaExpression = @unaryExpression.scalaExpression ++
+                                  @expression.scalaExpression
+    | ExpressionAssignment3
+            lhs.scalaExpression = @unaryExpression.scalaExpression ++
+                                  @assignmentOperator.scalaExpression ++
+                                  @expression.scalaExpression
+
+sem StatementNested
+    | StatementLabeledNested
+                       statementNested.scalaNTab = @lhs.scalaNTab
+                       lhs.scalaNTab = @statementNested.scalaNTab
+                       statementNested.scalaStatement = @lhs.scalaStatement
+                       lhs.scalaStatement = @statementNested.scalaStatement -- ToDO no considerar label
+                       lhs.scalaIfElseStatement = False
+                       lhs.scalaHasForEach =  @statementNested.scalaHasForEach
+    | StatementIfNested
+                    statementNested.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    statementNested.scalaStatement = @expression.scalaStatement
+                    lhs.scalaStatement = "if (" ++ @expression.scalaExpression ++ ") {\n" ++
+                                         @statementNested.scalaNTab ++ @statementNested.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+                    lhs.scalaIfElseStatement = True
+                    lhs.scalaHasForEach =  @statementNested.scalaHasForEach
+
+    | StatementIfElseNested
+                      -- *** tabs organizados para IfElse anidados ***
+                      lhs.scalaHasForEach =  @statementNested1.scalaHasForEach || @statementNested2.scalaHasForEach
+                      statementNested1.scalaNTab = @lhs.scalaNTab ++ "\t"
+                      statementNested2.scalaNTab = { if (@statementNested2.scalaIfElseStatement) then
+                                                @lhs.scalaNTab
+                                             else
+                                                @lhs.scalaNTab ++ "\t"
+                                             }
+                      lhs.scalaNTab = @lhs.scalaNTab
+
+                      expression.scalaStatement = @lhs.scalaStatement
+                      statementNested1.scalaStatement = @expression.scalaStatement
+                      statementNested2.scalaStatement = @statementNested1.scalaStatement
+                      lhs.scalaIfElseStatement = True
+
+                      lhs.scalaStatement = { if (@statementNested2.scalaIfElseStatement) then
+                        "if (" ++ @expression.scalaExpression ++ ") {"
+                        ++ @statementNested1.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "} " ++
+                        "else "
+                        ++ @statementNested2.scalaStatement
+                      else
+                        "if (" ++ @expression.scalaExpression ++ ") {" ++
+                        @statementNested1.scalaNTab ++ @statementNested1.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "} " ++
+                        "else {" ++ @statementNested2.scalaNTab ++ @statementNested2.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+                      }
+    | StatementWhileNested
+                     statementNested.scalaNTab = @lhs.scalaNTab ++ "\t"
+                     lhs.scalaNTab = @lhs.scalaNTab
+                     expression.scalaStatement = @lhs.scalaStatement
+                     lhs.scalaIfElseStatement = False
+                     lhs.scalaHasForEach =  @statementNested.scalaHasForEach
+                     lhs.scalaStatement = "while ( " ++ @expression.scalaExpression  ++ " ) {" ++
+                                          @statementNested.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+
+    | StatementForNested
+                    forStatement.scalaNTab = @lhs.scalaNTab -- ToDo
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    forStatement.scalaStatement = ""
+                    lhs.scalaStatement = @forStatement.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @forStatement.scalaHasForEach
+
+    | SWTSBlockNested
+                    blockStatements.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaNTab = @blockStatements.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements.scalaHasForEach
+
+                    blockStatements.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaStatement = {
+                            if (@blockStatements.scalaStatement == "") then
+                                ""
+                            else
+                                @lhs.scalaNTab ++  @blockStatements.scalaStatement
+                    }
+
+    | SWTSEmptyStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = ""
+
+    | SWTSExpressionStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = @expression.scalaExpression
+
+    | SWTSAssertStatementCondNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    -- expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
+
+    | SWTSAssertStatementCondExNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    -- expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    -- conditionalExpression :: ConditionalExpression
+
+    | SWTSSwitchStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @switchBlock.scalaHasForEach
+                    lhs.scalaStatement = @expression.scalaStatement -- ToDo -- expression :: Expression
+                    -- switchBlock :: SwitchBlock
+
+    | SWTSDoStatementNested
+                    statementNested.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @lhs.scalaNTab
+
+                    statementNested.scalaStatement = @lhs.scalaStatement
+                    expression.scalaStatement = @statementNested.scalaStatement
+
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "do {" ++
+                                         @statementNested.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}\n" ++
+                                         @lhs.scalaNTab ++ "while ( " ++ @expression.scalaExpression  ++ " )"
+
+    | SWTSBreakStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" --ToDo
+
+    | SWTSBreakStatementIdNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- ToDo identifier :: Identifier
+
+    | SWTSNilContinueStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- ToDo
+
+    | SWTSContinueStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- ToDo identifier
+
+    | SWTSReturnStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = @expression.scalaExpression
+
+    | SWTSNilReturnStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "()" -- ToDo
+
+    | SWTSynchronizedStatementNested
+                    blockStatements.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaNTab = @blockStatements.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    blockStatements.scalaStatement = @expression.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements.scalaHasForEach
+                    lhs.scalaStatement = "" -- ToDo  @expression.scalaStatement ++  @blockStatements.scalaStatement -- ToDo
+
+    | SWTTrhowStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- @expression.scalaStatement ToDo
+
+    | SWTTryStatementNested
+                    blockStatements.scalaNTab = @lhs.scalaNTab
+                    catches.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaNTab = @blockStatements.scalaNTab
+                    blockStatements.scalaStatement = @lhs.scalaStatement -- ToDo
+                    catches.scalaStatement = @blockStatements.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements.scalaHasForEach || @catches.scalaHasForEach
+                    lhs.scalaStatement = "" -- @blockStatements.scalaStatement ++ @catches.scalaStatement
+
+    | SWTTryStatementFinallyNested
+                    blockStatements1.scalaNTab = @lhs.scalaNTab
+                    catches.scalaNTab = @blockStatements1.scalaNTab
+                    blockStatements2.scalaNTab = @catches.scalaNTab
+                    lhs.scalaNTab = @blockStatements2.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements1.scalaHasForEach || @catches.scalaHasForEach || @blockStatements2.scalaHasForEach
+                    lhs.scalaStatement = "" -- ToDo
+
+
 
 sem SwitchBlock
     | SwitchBlockAll
