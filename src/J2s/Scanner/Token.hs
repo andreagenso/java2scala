@@ -24,7 +24,7 @@ data J2sSc = Identifier
            | DecimalFloatingPointLiteral
            | HexadecimalFloatingPointLiteral
            | NullLiteral
-           | TokMayor
+           -- | TokMayor
            | Error
            deriving (Eq,Ord)
 

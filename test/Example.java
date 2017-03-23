@@ -1,29 +1,27 @@
 package code.java;
 
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
+class WhileDemo {
+    public void main(String[] args) {
 
-class ClaseA {
+        int count = 1;
+        while (count < 11) {
+            System.out.println("Count is: " + count);
+            count++;
+        }
 
-    // Caso 3
-    void transformar() {
-        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
-        List<Integer> l2 = new ArrayList<Integer>();
+        boolean shouldContinue = true;
+        while(shouldContinue == true) {
 
-        for (final int n : numbers) {
-            l2.add(doubleIt(n));
+            System.out.println("running");
+
+            double random = Math.random() * 10D;
+
+            if(random > 5) {
+                shouldContinue = true;
+            } else {
+                shouldContinue = false;
+            }
+
         }
     }
-
-    void transformar2() {
-        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
-        List<Integer> l2 = new ArrayList<Integer>();
-
-        for (final int n : numbers) {
-            l2.add(doubleIt(n));
-        }
-    }
-
 }
-

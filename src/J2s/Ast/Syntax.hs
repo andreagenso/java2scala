@@ -353,9 +353,9 @@ sem_ZCOITTypeDeclSpecifier_ZCOITTypeDeclSpecifier = ZCOITTypeDeclSpecifier
 --                                         deriving Show
                                            
 data TypeArguments = TypeArgumentsC1 ActualTypeArgumentList
-                                   | TypeArgumentsC2 ActualTypeArgumentList
+                                   {-| TypeArgumentsC2 ActualTypeArgumentList
                                    | TypeArgumentsC3 ActualTypeArgumentList
-                                   | TypeArgumentsC0 ActualTypeArgumentList
+                                   | TypeArgumentsC0 ActualTypeArgumentList-}
                                    | NilTypeArguments
                                         deriving Show
                                         
@@ -397,9 +397,14 @@ data WildcardBounds =  WilcardBoundsExtendsReferenceType Type
 
 -- 47
 data Expression = ExpressionConditionalExpr     ConditionalOrExpression
-                                | ExpressionConditionalExprComb ConditionalOrExpression Expression ConditionalExpression
-                                | ExpressionAssignment          ConditionalOrExpression AssignmentOperator Expression
+                | ExpressionConditionalExprComb ConditionalOrExpression Expression ConditionalExpression
+                | ExpressionAssignment          ConditionalOrExpression AssignmentOperator Expression
                                 deriving Show
+
+data ExpressionAssignment = ExpressionAssignment1 UnaryExpression
+                          | ExpressionAssignment2 UnaryExpression Expression ConditionalExpression
+                          | ExpressionAssignment3 UnaryExpression AssignmentOperator Expression
+                            deriving Show
                                 
 -- data Expression = Expression AssignmentExpression
 --                              deriving Show
@@ -779,14 +784,14 @@ data BlockStatement = BlockStatementLocalVariableDeclarationStatement      Modif
                                     | BlockStatementStatement Statement
                                     deriving Show
                                                                                           
-data Statement = StatementLabeled Identifier Statement  -- LabeledStatement
-                           | StatementIf Expression Statement -- IfThenStatement
-                           | StatementIfElse Expression Statement Statement -- IfThenElseStatement
-                           | StatementWhile Expression Statement   -- WhileStatement
+data Statement = StatementLabeled Identifier StatementNested  -- LabeledStatement
+                           | StatementIf Expression StatementNested -- IfThenStatement
+                           | StatementIfElse Expression StatementNested StatementNested -- IfThenElseStatement
+                           | StatementWhile Expression StatementNested   -- WhileStatement
                            | StatementFor ForStatement
                            | SWTSBlock BlockStatements
                            | SWTSEmptyStatement
-                           | SWTSExpressionStatement Expression
+                           | SWTSExpressionStatement ExpressionAssignment --Expression
                            | SWTSAssertStatementCond  Expression
                            | SWTSAssertStatementCondEx  Expression ConditionalExpression
                            | SWTSSwitchStatement Expression SwitchBlock
@@ -802,6 +807,31 @@ data Statement = StatementLabeled Identifier Statement  -- LabeledStatement
                            | SWTTryStatement BlockStatements Catches
                            | SWTTryStatementFinally  BlockStatements Catches BlockStatements -- el ultimo Block es FinallyBlock
                            deriving Show
+
+data StatementNested = StatementLabeledNested Identifier StatementNested  -- LabeledStatement
+                   | StatementIfNested Expression StatementNested -- IfThenStatement
+                   | StatementIfElseNested Expression StatementNested StatementNested -- IfThenElseStatement
+                   | StatementWhileNested Expression StatementNested   -- WhileStatement
+                   | StatementForNested ForStatement
+                   | SWTSBlockNested BlockStatements
+                   | SWTSEmptyStatementNested
+                   | SWTSExpressionStatementNested Expression
+                   | SWTSAssertStatementCondNested  Expression
+                   | SWTSAssertStatementCondExNested  Expression ConditionalExpression
+                   | SWTSSwitchStatementNested Expression SwitchBlock
+                   | SWTSDoStatementNested StatementNested Expression
+                   | SWTSBreakStatementNested
+                   | SWTSBreakStatementIdNested Identifier
+                   | SWTSNilContinueStatementNested
+                   | SWTSContinueStatementNested Identifier
+                   | SWTSReturnStatementNested Expression
+                   | SWTSNilReturnStatementNested
+                   | SWTSynchronizedStatementNested Expression BlockStatements
+                   | SWTTrhowStatementNested Expression
+                   | SWTTryStatementNested BlockStatements Catches
+                   | SWTTryStatementFinallyNested  BlockStatements Catches BlockStatements -- el ultimo Block es FinallyBlock
+                   deriving Show
+
                            
 -- data StatementExpression = StatExpressionAssign Assignment
 --                                               | StatExpressionConditionalExpression ConditionalExpression 
