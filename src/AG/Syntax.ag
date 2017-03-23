@@ -312,9 +312,9 @@ deriving ZCOITTypeDeclSpecifier : Show
 
 data TypeArguments
     | TypeArgumentsC1 actualTypeArgumentList :: ActualTypeArgumentList
-    | TypeArgumentsC2 actualTypeArgumentList :: ActualTypeArgumentList
+    {-| TypeArgumentsC2 actualTypeArgumentList :: ActualTypeArgumentList
     | TypeArgumentsC3 actualTypeArgumentList :: ActualTypeArgumentList
-    | TypeArgumentsC0 actualTypeArgumentList :: ActualTypeArgumentList
+    | TypeArgumentsC0 actualTypeArgumentList :: ActualTypeArgumentList-}
     | NilTypeArguments
 
 deriving TypeArguments : Show
@@ -384,9 +384,9 @@ type ArgumentList = [Expression]
 
 data NonWildTypeArguments
     | NonWildTypeArgumentsC1 referenceTypList :: ReferenceTypeList
-    | NonWildTypeArgumentsC2 referenceTypList :: ReferenceTypeList
+    {-| NonWildTypeArgumentsC2 referenceTypList :: ReferenceTypeList
     | NonWildTypeArgumentsC3 referenceTypList :: ReferenceTypeList
-    | NonWildTypeArgumentsC0 referenceTypList :: ReferenceTypeList
+    | NonWildTypeArgumentsC0 referenceTypList :: ReferenceTypeList-}
     | NilNonWildTypeArguments
 
 deriving NonWildTypeArguments : Show
@@ -707,7 +707,7 @@ data BlockStatement
 deriving BlockStatement : Show
 
 data Statement
-    | StatementLabeled identifier :: Identifier
+| StatementLabeled identifier :: Identifier
                        statement :: Statement  {- LabeledStatement -}
     | StatementIf expression :: Expression
                   statement :: Statement {- IfThenStatement -}

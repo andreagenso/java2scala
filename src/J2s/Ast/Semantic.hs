@@ -100,9 +100,11 @@ sem_ReferenceType_ReferenceTypeClassOrInterfaceType = ReferenceTypeClassOrInterf
 
                                           
 sem_TypeArguments_TypeArgumentsC1 = TypeArgumentsC1
+{-
 sem_TypeArguments_TypeArgumentsC2 = TypeArgumentsC2
 sem_TypeArguments_TypeArgumentsC3 = TypeArgumentsC3
 sem_TypeArguments_TypeArgumentsC0 = TypeArgumentsC0
+-}
 sem_TypeArguments_NilTypeArguments = NilTypeArguments
                                         
 sem_ActualTypeArgument_ActualTypeArgumentWildCard = ActualTypeArgumentWildCard
@@ -123,7 +125,11 @@ sem_WildcardBounds_NilwildcardBounds                 = NilwildcardBounds
 
 sem_Expression_ExpressionConditionalExpr     = ExpressionConditionalExpr 
 sem_Expression_ExpressionConditionalExprComb = ExpressionConditionalExprComb 
-sem_Expression_ExpressionAssignment                      = ExpressionAssignment 
+sem_Expression_ExpressionAssignment                      = ExpressionAssignment
+
+sem_ExpressionAssignment_ExpressionAssignment1 = ExpressionAssignment1
+sem_ExpressionAssignment_ExpressionAssignment2 = ExpressionAssignment2
+sem_ExpressionAssignment_ExpressionAssignment3 = ExpressionAssignment3
 
                                 
 -- sem_Assignment_Assignment = Assignment --  LeftHandSide AssignmentOperator AssignmentExpression
@@ -299,6 +305,30 @@ sem_Statement_SWTSynchronizedStatement             = SWTSynchronizedStatement
 sem_Statement_SWTTrhowStatement                    = SWTTrhowStatement
 sem_Statement_SWTTryStatement                      = SWTTryStatement
 sem_Statement_SWTTryStatementFinally               = SWTTryStatementFinally
+
+
+sem_StatementNested_StatementLabeledNested = StatementLabeledNested
+sem_StatementNested_StatementIfNested = StatementIfNested
+sem_StatementNested_StatementIfElseNested = StatementIfElseNested
+sem_StatementNested_StatementWhileNested = StatementWhileNested
+sem_StatementNested_StatementForNested = StatementForNested
+sem_StatementNested_SWTSBlockNested = SWTSBlockNested
+sem_StatementNested_SWTSEmptyStatementNested = SWTSEmptyStatementNested
+sem_StatementNested_SWTSExpressionStatementNested = SWTSExpressionStatementNested
+sem_StatementNested_SWTSAssertStatementCondNested = SWTSAssertStatementCondNested
+sem_StatementNested_SWTSAssertStatementCondExNested = SWTSAssertStatementCondExNested
+sem_StatementNested_SWTSSwitchStatementNested = SWTSSwitchStatementNested
+sem_StatementNested_SWTSDoStatementNested = SWTSDoStatementNested
+sem_StatementNested_SWTSBreakStatementNested = SWTSBreakStatementNested
+sem_StatementNested_SWTSBreakStatementIdNested = SWTSBreakStatementIdNested
+sem_StatementNested_SWTSNilContinueStatementNested = SWTSNilContinueStatementNested
+sem_StatementNested_SWTSContinueStatementNested = SWTSContinueStatementNested
+sem_StatementNested_SWTSReturnStatementNested = SWTSReturnStatementNested
+sem_StatementNested_SWTSNilReturnStatementNested = SWTSNilReturnStatementNested
+sem_StatementNested_SWTSynchronizedStatementNested = SWTSynchronizedStatementNested
+sem_StatementNested_SWTTrhowStatementNested = SWTTrhowStatementNested
+sem_StatementNested_SWTTryStatementNested = SWTTryStatementNested
+sem_StatementNested_SWTTryStatementFinallyNested = SWTTryStatementFinallyNested
 
 sem_SwitchBlock_SwitchBlockAll    = SwitchBlockAll
 sem_SwitchBlock_SwitchBlockLabels = SwitchBlockLabels

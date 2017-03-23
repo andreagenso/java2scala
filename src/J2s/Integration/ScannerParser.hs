@@ -19,7 +19,7 @@ instance Eq J2sSc => Eq Token where
                          j2s1 == LineComment ||
                          j2s1 == BlockComment ||
                          j2s1 == NullLiteral ||
-                         j2s1 == TokMayor ||
+                         -- j2s1 == TokMayor ||
                          j2s1 == Error
                          )) = True
     | (j2s1 == j2s2 && cad1 == cad2 && (j2s1 == KeyWord ||
@@ -50,9 +50,7 @@ pError                           = tSym Error        ""
 pBooleanLiteral cb               =  (sem_Bool ) <$> tSym BooleanLiteral cb  
 pCharacterLiteral                = tSym CharacterLiteral ""
 pStringLiteral                   = tSym StringLiteral ""
-pTokMayor      op                = tSym TokMayor op
-
-
+-- pTokMayor      op                = tSym TokMayor op
 
 pDecimalIntegerLiteral           =  tSym DecimalIntegerLiteral ""
 pHexIntegerLiteral               =  tSym HexIntegerLiteral ""

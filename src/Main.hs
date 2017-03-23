@@ -8,7 +8,7 @@ import J2s.Scanner
 import UU.Scanner.Position
 import Data.String.Utils
 
-
+-- AST generation
 main  :: IO()
 main = do
        g <- readJavaFile
@@ -23,6 +23,7 @@ readJavaFile = do
     return scalaCode
 
 {-
+-- AG Generation
 main  :: IO()
 main = do
        g <- readJavaFile

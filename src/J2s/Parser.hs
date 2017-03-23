@@ -7,8 +7,8 @@ import UU.Scanner.Position
 
 import J2s.Ast.Syntax  as AGS
 import J2s.Ast.Semantic as AGS
---import qualified AG.Sintax as AGS
---import qualified AG.ImportDeclarationSem as AGS
+-- -- import qualified AG.Syntax as AGS
+--import qualified AG.J2SAttrSem as AGS
 -- 1
 pJ2s =  AGS.sem_J2s_J2s <$> pPackageDeclaration <*> pImportDeclarations <*> pTypeDeclarations
 -- -----------------------------------------------------------------------------------
@@ -55,20 +55,25 @@ pZ  =   (\e ce z -> AGS.sem_ConditionalExpression_ConditionalExprComb z e ce) <$
 -- 11 AQUI REVISAR EL INSTANCEOF
 pConditionalOrExpression =  foldr pGen pFactor [ orExp, andExp, orIncl, orExcl, andSingle, eqs,rels, shift, adss, muls ]
 
+{-
+pGen ops p  =  pChainl (foldr1 (<|>) (map f ops)) p
+   where f (s,c)     = const c  <$> pTokMayor s
+                                    <|> const c  <$> pOperator s
+-}
 pGen ops p  =  pChainl (foldr1 (<|>) (map f ops)) p
    where f (s,c)     = const c  <$> pOperator s
-                                    <|> const c  <$> pTokMayor s 
-         
+
 orExp  = [("||",AGS.sem_ConditionalOrExpression_Or)]
 andExp = [("&&",AGS.sem_ConditionalOrExpression_And)]
 orIncl = [("|",AGS.sem_ConditionalOrExpression_BitwiseOr)]
 andSingle = [("&",AGS.sem_ConditionalOrExpression_BitwiseAnd)]
 orExcl = [("^",AGS.sem_ConditionalOrExpression_BitwiseXor)]
 eqs = [("==",AGS.sem_ConditionalOrExpression_EqualTo),("!=",AGS.sem_ConditionalOrExpression_NotEqualTo)]
-rels = [("<",AGS.sem_ConditionalOrExpression_LessThan),("<=",AGS.sem_ConditionalOrExpression_LessThanOrEqualTo),(">=", AGS.sem_ConditionalOrExpression_GreaterThanOrEqualTo), (">",AGS.sem_ConditionalOrExpression_GreaterThan)]
+rels = [("<",AGS.sem_ConditionalOrExpression_LessThan),("<=",AGS.sem_ConditionalOrExpression_LessThanOrEqualTo),(">=", AGS.sem_ConditionalOrExpression_GreaterThanOrEqualTo)]
+--rels = [("<=",AGS.sem_ConditionalOrExpression_LessThanOrEqualTo),(">=", AGS.sem_ConditionalOrExpression_GreaterThanOrEqualTo)]
 shift = [(">>>",AGS.sem_ConditionalOrExpression_ZeroFillRightShift),(">>",AGS.sem_ConditionalOrExpression_RightShift),("<<",AGS.sem_ConditionalOrExpression_LeftShift)]
 adss = [("+", AGS.sem_ConditionalOrExpression_Add),("-", AGS.sem_ConditionalOrExpression_Sub)]
-muls = [("*", AGS.sem_ConditionalOrExpression_Mult),("/",AGS.sem_ConditionalOrExpression_Div),("%",AGS.sem_ConditionalOrExpression_Mod)]
+muls = [("*", AGS.sem_ConditionalOrExpression_Mult),("/",AGS.sem_ConditionalOrExpression_Div),("%",AGS.sem_ConditionalOrExpression_Mod),(">", AGS.sem_ConditionalOrExpression_GreaterThan)]
 
 
 
@@ -261,9 +266,13 @@ pZCOITTypeDeclSpecifier    = AGS.sem_ZCOITTypeDeclSpecifier_ZCOITTypeDeclSpecifi
 pTypeArguments = (\al f -> f al) <$ pOperator "<" <*> pActualTypeArgumentList <*> pTypeArguments'
                           <|> pSucceed AGS.sem_TypeArguments_NilTypeArguments
 
-pTypeArguments' =  (\al -> AGS.sem_TypeArguments_TypeArgumentsC3 al) <$ pTokMayor ">>>"
-                           <|> (\al -> AGS.sem_TypeArguments_TypeArgumentsC2 al) <$ pTokMayor ">>"
-                           <|> (\al -> AGS.sem_TypeArguments_TypeArgumentsC1 al) <$ pTokMayor ">"
+{-
+pTypeArguments' =  (\al -> AGS.sem_TypeArguments_TypeArgumentsC3 al) <$ pOperator ">>>"
+                           <|> (\al -> AGS.sem_TypeArguments_TypeArgumentsC2 al) <$ pOperator ">>"
+                           <|> (\al -> AGS.sem_TypeArguments_TypeArgumentsC1 al) <$ pOperator ">"
+-}
+
+pTypeArguments' =  (\al -> AGS.sem_TypeArguments_TypeArgumentsC1 al) <$ pOperator ">"
 --                         <|>  pSucceed (\al ->AGS.sem_TypeArguments_TypeArgumentsC0 al)
 
 pActualTypeArgumentList = pFoldr1Sep (AGS.sem_ActualTypeArgumentList_Cons,AGS.sem_ActualTypeArgumentList_Nil) (pSpecialSimbol ",") pActualTypeArgument
@@ -315,18 +324,18 @@ pArgumentList = pFoldrSep (AGS.sem_ArgumentList_Cons, AGS.sem_ArgumentList_Nil) 
 pNonWildTypeArguments = (\tl f -> f tl ) <$ pOperator "<" <*> pReferenceTypeList <*> pNonWildTypeArguments'
                                           <|> pSucceed AGS.sem_NonWildTypeArguments_NilNonWildTypeArguments
 
-pNonWildTypeArguments' =  (\tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC3 tl) <$ pTokMayor ">>>"
-                                          <|> (\tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC2 tl) <$ pTokMayor ">>"
-                                          <|> (\tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC1 tl)  <$ pTokMayor ">"
+pNonWildTypeArguments' =  (\tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC3 tl) <$ pOperator ">>>"
+                                          <|> (\tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC2 tl) <$ pOperator ">>"
+                                          <|> (\tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC1 tl)  <$ pOperator ">"
 --                                        <|> pSucceed (\tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC0 tl)
 
 -- Al menos 1
 -- pNonWildTypeArguments1 = AGS.sem_NonWildTypeArguments_NonWildTypeArguments <$ pOperator "<" <*> pReferenceTypeList <* pOperator ">"
 pNonWildTypeArguments1 = (\tl f -> f tl) <$ pOperator "<" <*> pReferenceTypeList <*> pNonWildTypeArguments1'
 
-pNonWildTypeArguments1' = (\ tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC3 tl) <$ pTokMayor ">>>"
-                                          <|> (\ tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC2 tl) <$ pTokMayor ">>"
-                                          <|>  (\ tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC1 tl) <$ pTokMayor ">"
+pNonWildTypeArguments1' = (\ tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC3 tl) <$ pOperator ">>>"
+                                          <|> (\ tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC2 tl) <$ pOperator ">>"
+                                          <|>  (\ tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC1 tl) <$ pOperator ">"
 --                                        <|>  pSucceed (\ tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC0 tl)
 -- OJO OPTIMIZAR ESTO
 pReferenceTypeList = pFoldr1Sep (AGS.sem_ReferenceTypeList_Cons,AGS.sem_ReferenceTypeList_Nil) (pSpecialSimbol ",") pType
@@ -421,9 +430,9 @@ pModifier =  AGS.sem_Modifier_ModifierPublic    <$ pKeyWord "public"
 pTypeParameters = (\pl f -> f pl) <$ pOperator "<" <*>  pTypeParameterList <*> pTypeParameters'
                            <|> pSucceed AGS.sem_TypeParameters_NilTypeParameters
 
-pTypeParameters' = (\ pl  -> AGS.sem_TypeParameters_TypeParametersC3 pl ) <$ pTokMayor ">>>"
-                           <|> (\ pl  -> AGS.sem_TypeParameters_TypeParametersC2 pl ) <$ pTokMayor ">>"
-                           <|> (\ pl  -> AGS.sem_TypeParameters_TypeParametersC1 pl ) <$ pTokMayor ">"
+pTypeParameters' = (\ pl  -> AGS.sem_TypeParameters_TypeParametersC3 pl ) <$ pOperator ">>>"
+                           <|> (\ pl  -> AGS.sem_TypeParameters_TypeParametersC2 pl ) <$ pOperator ">>"
+                           <|> (\ pl  -> AGS.sem_TypeParameters_TypeParametersC1 pl ) <$ pOperator ">"
 --                         <|>  pSucceed (\ pl  -> AGS.sem_TypeParameters_TypeParametersC1 pl )
                                                    
 pTypeParameterList = pFoldr1Sep (AGS.sem_TypeParameterList_Cons, AGS.sem_TypeParameterList_Nil) (pSpecialSimbol ",")  pTypeParameter
@@ -520,45 +529,91 @@ pBlockStatement' =  (\a b c d e f   -> AGS.sem_BlockStatement_BlockStatementClas
                                 <|> (\a b c f       -> AGS.sem_BlockStatement_BlockStatementClassDeclarationEnumDeclaration f a b c)             <$ pKeyWord "enum" <*> pIdentifier <*> pInterfaces <*> pEnumBody
                                 <|> (\t vd f        -> AGS.sem_BlockStatement_BlockStatementLocalVariableDeclarationStatement f t vd )          <$>  pType <*> pVariableDeclarators <* pSpecialSimbol ";"
 
-pStatement =  AGS.sem_Statement_StatementLabeled                     <$> pIdentifier <* pOperator ":" <*> pStatement  -- LabeledStatement
-                  <|> (\e s f -> f e s)                                  <$ pKeyWord "if" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <*> pStatement <*> pElse
-                  <|> AGS.sem_Statement_StatementWhile                       <$ pKeyWord "while" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <*> pStatement  -- pWhileStatement
-                  <|> AGS.sem_Statement_SWTSBlock                            <$ pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}" -- pBlock
-                  <|> AGS.sem_Statement_SWTSEmptyStatement                   <$ pSpecialSimbol ";"
-                  <|> (\e f -> f e)                                      <$ pKeyWord "assert" <*> pExpression <*> pZAssertStatement
-                  <|> AGS.sem_Statement_SWTSSwitchStatement                  <$ pKeyWord "switch" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <*> pSwitchBlock
-                  <|> AGS.sem_Statement_SWTSDoStatement                      <$ pKeyWord "do" <*> pStatement <* pKeyWord "while" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <* pSpecialSimbol ";"
-                  <|> (\fb -> fb)                                        <$ pKeyWord "break" <*> pZBreakStatement
-                  <|> (\f -> f)                                          <$ pKeyWord "continue" <*> pZContinueStatement
-                  <|> (\f -> f)                                          <$ pKeyWord "return" <*> pZReturnStatement
-                  <|> AGS.sem_Statement_SWTSynchronizedStatement             <$ pKeyWord "synchronized" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
-                  <|> AGS.sem_Statement_SWTTrhowStatement                    <$ pKeyWord "throw" <*> pExpression <* pSpecialSimbol ";"
-                  <|> (\b fts -> fts b )                                 <$ pKeyWord "try" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  <*> pZTryStatement
-                  <|> AGS.sem_Statement_StatementFor                         <$> pForStatement
-                  <|> AGS.sem_Statement_SWTSExpressionStatement              <$> pExpression <*  pSpecialSimbol ";"
+pStatement =  AGS.sem_Statement_StatementLabeled                     <$> pIdentifier <* pOperator ":" <*> pStatementNested  -- LabeledStatement
+                  <|> (\e s f -> f e s)                              <$ pKeyWord "if" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <*> pStatementNested <*> pElse
+                  <|> AGS.sem_Statement_StatementWhile               <$ pKeyWord "while" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <*> pStatementNested  -- pWhileStatement
+                  <|> AGS.sem_Statement_SWTSBlock                    <$ pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}" -- pBlock
+                  <|> AGS.sem_Statement_SWTSEmptyStatement           <$ pSpecialSimbol ";"
+                  <|> (\e f -> f e)                                  <$ pKeyWord "assert" <*> pExpression <*> pZAssertStatement
+                  <|> AGS.sem_Statement_SWTSSwitchStatement          <$ pKeyWord "switch" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <*> pSwitchBlock
+                  <|> AGS.sem_Statement_SWTSDoStatement              <$ pKeyWord "do" <*> pStatement <* pKeyWord "while" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <* pSpecialSimbol ";"
+                  <|> (\fb -> fb)                                    <$ pKeyWord "break" <*> pZBreakStatement
+                  <|> (\f -> f)                                      <$ pKeyWord "continue" <*> pZContinueStatement
+                  <|> (\f -> f)                                      <$ pKeyWord "return" <*> pZReturnStatement
+                  <|> AGS.sem_Statement_SWTSynchronizedStatement     <$ pKeyWord "synchronized" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
+                  <|> AGS.sem_Statement_SWTTrhowStatement            <$ pKeyWord "throw" <*> pExpression <* pSpecialSimbol ";"
+                  <|> (\b fts -> fts b )                             <$ pKeyWord "try" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  <*> pZTryStatement
+                  <|> AGS.sem_Statement_StatementFor                 <$> pForStatement
+                  <|> AGS.sem_Statement_SWTSExpressionStatement      <$> pExpressionAssignment <*  pSpecialSimbol ";"
                   --  reemplazado  <|> AGS.sem_StatementWithoutTrailingSubstatement_SWTSExpressionStatement  <$> pExpressionStatement
 
+pStatementNested =  AGS.sem_StatementNested_StatementLabeledNested                       <$> pIdentifier <* pOperator ":" <*> pStatementNested  -- LabeledStatement
+                  <|> (\e s f -> f e s)                                                  <$ pKeyWord "if" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <*> pStatementNested <*> pElseNested
+                  <|> AGS.sem_StatementNested_StatementWhileNested                       <$ pKeyWord "while" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <*> pStatementNested  -- pWhileStatement
+                  <|> AGS.sem_StatementNested_SWTSBlockNested                            <$ pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}" -- pBlock
+                  <|> AGS.sem_StatementNested_SWTSEmptyStatementNested                   <$ pSpecialSimbol ";"
+                  <|> (\e f -> f e)                                                      <$ pKeyWord "assert" <*> pExpression <*> pZAssertStatementNested
+                  <|> AGS.sem_StatementNested_SWTSSwitchStatementNested                  <$ pKeyWord "switch" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <*> pSwitchBlock
+                  <|> AGS.sem_StatementNested_SWTSDoStatementNested                      <$ pKeyWord "do" <*> pStatementNested <* pKeyWord "while" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <* pSpecialSimbol ";"
+                  <|> (\fb -> fb)                                                        <$ pKeyWord "break" <*> pZBreakStatementNested
+                  <|> (\f -> f)                                                          <$ pKeyWord "continue" <*> pZContinueStatementNested
+                  <|> (\f -> f)                                                          <$ pKeyWord "return" <*> pZReturnStatementNested
+                  <|> AGS.sem_StatementNested_SWTSynchronizedStatementNested             <$ pKeyWord "synchronized" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
+                  <|> AGS.sem_StatementNested_SWTTrhowStatementNested                    <$ pKeyWord "throw" <*> pExpression <* pSpecialSimbol ";"
+                  <|> (\b fts -> fts b )                                                 <$ pKeyWord "try" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  <*> pZTryStatementNested
+                  <|> AGS.sem_StatementNested_StatementForNested                         <$> pForStatement
+                  <|> AGS.sem_StatementNested_SWTSExpressionStatementNested              <$> pExpression <*  pSpecialSimbol ";"
+
+-- pExpressionAssignment = AGS.sem_ExpressionAssignment_ExpressionAssignmentE <$> pUnaryExpression <*> pAssignmentOperator <*> pExpression
+
+pExpressionAssignment =  (\ce f -> f ce) <$> pUnaryExpression <*> pExpressionAssignment'
+pExpressionAssignment' = (\e ce z -> AGS.sem_ExpressionAssignment_ExpressionAssignment2 z e ce) <$ pOperator "?" <*> pExpression <* pOperator ":" <*> pConditionalExpression
+                        <|> (\op e z -> AGS.sem_ExpressionAssignment_ExpressionAssignment3 z op e)         <$> pAssignmentOperator <*> pExpression
+                        <|> pSucceed (\ce -> AGS.sem_ExpressionAssignment_ExpressionAssignment1 ce)
+
+
 pElse = pSucceed  AGS.sem_Statement_StatementIf             -- IfThenStatement
-         <|> (\selse e sthen ->   AGS.sem_Statement_StatementIfElse e sthen selse) <$ pKeyWord "else" <*> pStatement   -- pIfThenElseStatement
+         <|> (\selse e sthen ->   AGS.sem_Statement_StatementIfElse e sthen selse) <$ pKeyWord "else" <*> pStatementNested   -- pIfThenElseStatement
                   
 pZAssertStatement = (\ ce e -> AGS.sem_Statement_SWTSAssertStatementCondEx e ce) <$  pOperator ":" <*> pConditionalExpression <* pSpecialSimbol ";"
                                 <|> (\e     -> AGS.sem_Statement_SWTSAssertStatementCond e )     <$  pSpecialSimbol ";"
                                 
 pZContinueStatement = (\i -> AGS.sem_Statement_SWTSContinueStatement i ) <$> pIdentifier <* pSpecialSimbol ";"
                                   <|> AGS.sem_Statement_SWTSNilContinueStatement <$ pSpecialSimbol ";"
-                                  
-{-pZTryStatement =  (\l b -> AGS.sem_Statement_SWTTryStatement b l) <$> pCatchClause
-              <|> (\l f b -> AGS.sem_Statement_SWTTryStatementFinally b l f) <$> pCatchClause <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock-}
+
+
+pElseNested = pSucceed  AGS.sem_StatementNested_StatementIfNested             -- IfThenStatement
+       <|> (\selse e sthen ->   AGS.sem_StatementNested_StatementIfElseNested e sthen selse) <$ pKeyWord "else" <*> pStatementNested   -- pIfThenElseStatement
+
+pZAssertStatementNested = (\ ce e -> AGS.sem_StatementNested_SWTSAssertStatementCondExNested e ce) <$  pOperator ":" <*> pConditionalExpression <* pSpecialSimbol ";"
+                              <|> (\e     -> AGS.sem_StatementNested_SWTSAssertStatementCondNested e )     <$  pSpecialSimbol ";"
+
+pZContinueStatementNested = (\i -> AGS.sem_StatementNested_SWTSContinueStatementNested i ) <$> pIdentifier <* pSpecialSimbol ";"
+                                <|> AGS.sem_StatementNested_SWTSNilContinueStatementNested <$ pSpecialSimbol ";"
+
+{-
+-- AG
+pZTryStatement =  (\l b -> AGS.sem_Statement_SWTTryStatement b l) <$> pCatchClause
+              <|> (\l f b -> AGS.sem_Statement_SWTTryStatementFinally b l f) <$> pCatchClause <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
+-}
+-- AST
 pZTryStatement =  (\l b -> AGS.sem_Statement_SWTTryStatement b l) <$> pCatchClauses1
               <|> (\l f b -> AGS.sem_Statement_SWTTryStatementFinally b l f) <$> pCatchClauses <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
 
--- ToDO Check in grammar
+pZTryStatementNested =  (\l b -> AGS.sem_StatementNested_SWTTryStatementNested b l) <$> pCatchClauses1
+              <|> (\l f b -> AGS.sem_StatementNested_SWTTryStatementFinallyNested b l f) <$> pCatchClauses <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
 
+-- ToDO Check in grammar
+-- AST
 pCatchClauses1 = pList1 pCatchClause
 pCatchClauses = pList pCatchClause
 
 pZReturnStatement  = (\e -> AGS.sem_Statement_SWTSReturnStatement e)    <$> pExpression <* pSpecialSimbol ";"
                                  <|> AGS.sem_Statement_SWTSNilReturnStatement <$ pSpecialSimbol ";"
+
+pZReturnStatementNested  = (\e -> AGS.sem_StatementNested_SWTSReturnStatementNested e)    <$> pExpression <* pSpecialSimbol ";"
+                                 <|> AGS.sem_StatementNested_SWTSNilReturnStatementNested <$ pSpecialSimbol ";"
+
 
 -- pStatementExpression = AGS.sem_StatementExpression_StatExpressionAssign <$> pAssignment -- <* pSpecialSimbol ";"
 --                                      <|> AGS.sem_StatementExpression_StatExpressionConditionalExpression <$> pConditionalExpression -- <* pSpecialSimbol ";"
@@ -580,6 +635,10 @@ pZSwitchLabel = (\e -> AGS.sem_SwitchLabel_SwitchLabelConstant e) <$> pExpressio
                     
 pZBreakStatement = (AGS.sem_Statement_SWTSBreakStatement) <$  pSpecialSimbol ";"
                 <|> (\i -> AGS.sem_Statement_SWTSBreakStatementId i) <$> pIdentifier <* pSpecialSimbol ";"
+
+pZBreakStatementNested = (AGS.sem_StatementNested_SWTSBreakStatementNested) <$  pSpecialSimbol ";"
+                <|> (\i -> AGS.sem_StatementNested_SWTSBreakStatementIdNested i) <$> pIdentifier <* pSpecialSimbol ";"
+
                            
 pForInit = AGS.sem_ForInit_ForInitStaExp <$> pStatementExpressionList
         <|> AGS.sem_ForInit_ForInitLocalVar <$> pVariableModifiers <*> pType <*> pVariableDeclarators -- <* pSpecialSimbol ";" --pLocalVariableDeclaration

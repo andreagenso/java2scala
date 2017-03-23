@@ -1,17 +1,24 @@
 package code.java
 
-class ClaseB { 
-}
-
+import scala.collection.JavaConvertions._
+import java.util.List
+import java.util.Arrays
+import java.util.ArrayList
 
 class ClaseA { 
 
-		private var var1: Int = 0
-		protected var var2: String = null
-		protected var var3: String = null
-		val VAR4: Double = 0.0
-		@transient var var5: Float = 0
-		@volatile var var6: Int = 0
-		val var7: ClaseB = null}
+	def transformar(): Unit = {
+		List < Integer > numbers=Arrays.asList(1,2,3,4,5,6)
+		for (n <- numbers) {			
+			l2.add(doubleIt(n))
+		}
+	}
 
+	def transformar2(): Unit = {
+		List < Integer > numbers=Arrays.asList(1,2,3,4,5,6)
+		for (n <- numbers) {			
+			l2.add(doubleIt(n))
+		}
+	}
 
+}

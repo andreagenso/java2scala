@@ -1,0 +1,430 @@
+package code.java;
+
+class ClaseB {}
+
+class ClaseA {
+
+    // modificadores
+    private int var1 = 1;
+    protected String var2 = "";
+    protected String var3;
+    static final double VAR4 = 0.9;
+
+    transient float var5;
+
+    static volatile int var6 = 0;
+
+    public static final ClaseB var7 = new ClaseB();
+
+    // Type
+    byte tipo1;
+    short tipo2 = 1;
+    char tipo3 = 'a';
+    int tipo4 = 3;
+    long tipo5 = 100000000;
+    float tipo6 = .2f;
+    double tipo7 = 0.009;
+    boolean tipo8 = false;
+
+    String tipo9 = "";
+
+    code.java.ClaseB tipo10 = new code.java.ClaseB();
+
+    int tipo11, tipo12, tipo13;
+
+    // expresiones de asignacion
+    String exp1 = "";
+    String exp2 = exp1;
+
+    Integer exp3 = 2;
+    Integer exp4 = exp3 + 4;
+
+    boolean exp5 = tipo8 && false;
+
+    int exp6 = (1 +2) * 50;
+
+    ClaseB exp7 = new ClaseB();
+
+    boolean d = met1();
+
+    boolean met1(){
+        return  true;
+    }
+
+    /*for(int i=0; i<10; i++){
+    }*/
+}
+
+========================================
+AST es :
+========================================
+
+J2s 
+	(PackageDeclaration [] ["code","java"]) 
+	NilImportDeclarations 
+	[TypeDeclarationClassDeclarationNormalCD NilModifiers "ClaseB" NilTypeParameters NilSuper NilInterfaces [],
+	 TypeDeclarationClassDeclarationNormalCD NilModifiers "ClaseA" NilTypeParameters NilSuper NilInterfaces 
+		[ClassBodyDeclClassMemberDeclFieldDeclaration 
+			(Modifiers ModifierPrivate NilModifiers) 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeIntegral_Int []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "var1") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+						(ConditionalOrExpressionUnaryExpression 
+						(PostfixExpressionPrimary 
+						(PrimNoNewArray 
+						(PrimaryNoNewArray 
+						(PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "1") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			(Modifiers ModifierProtected NilModifiers) 
+			(TypePrimitiveType (TypeReferece (ReferenceTypeClassOrInterfaceType "String" NilTypeArguments [])) [])
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "var2") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray (PrimNNALiteral_StringLiteral "\"\"") []))))))],
+		
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			(Modifiers ModifierProtected NilModifiers) 
+			(TypePrimitiveType (TypeReferece (ReferenceTypeClassOrInterfaceType "String" NilTypeArguments [])) []) 
+			[VariableDeclaratorId (VarDeclaratorId "var3")],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			(Modifiers ModifiersStatic (Modifiers ModifierFinal NilModifiers)) 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeFloating_Double []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "VAR4") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray (PrimNNALiteral_FloatingPointLiteral_DecimalFloatingPointLiteral "0.9") []))))))],
+		
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			(Modifiers FieldModifierTransient NilModifiers) 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeFloating_Float []) 
+			[VariableDeclaratorId 
+				(VarDeclaratorId "var5")],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			(Modifiers ModifiersStatic (Modifiers FieldModifierVolatile NilModifiers)) 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeIntegral_Int []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "var6") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "0") []))))))],
+		
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			(Modifiers ModifierPublic (Modifiers ModifiersStatic (Modifiers ModifierFinal NilModifiers))) 
+			(TypePrimitiveType (TypeReferece (ReferenceTypeClassOrInterfaceType "ClaseB" NilTypeArguments [])) [])
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "var7") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					** (PrimNNAClassInstanceCreationExpression NilTypeArguments 
+						(ClassOrInterfaceType "ClaseB" NilTypeArguments []) []) []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeIntegral_Byte []) 
+			[VariableDeclaratorId 
+				(VarDeclaratorId "tipo1")],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeIntegral_Short []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "tipo2") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "1") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeIntegral_Char []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "tipo3") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray (PrimNNALiteral_CharacterLiteral "'a'") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeIntegral_Int []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "tipo4") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "3") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeIntegral_Long []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "tipo5") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "100000000") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeFloating_Float []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "tipo6") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_FloatingPointLiteral_DecimalFloatingPointLiteral ".2f") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeFloating_Double []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "tipo7") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_FloatingPointLiteral_DecimalFloatingPointLiteral "0.009") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType TypePrimitivePrimitivetypeBoolean []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "tipo8") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_BooleanLiteral False) []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType (TypeReferece (ReferenceTypeClassOrInterfaceType "String" NilTypeArguments [])) []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "tipo9") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_StringLiteral "\"\"") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+**			(TypePrimitiveType (TypeReferece 
+				(ReferenceTypeClassOrInterfaceType "code" NilTypeArguments 
+					[ZCOITTypeDeclSpecifier "java" NilTypeArguments,
+					 ZCOITTypeDeclSpecifier "ClaseB" NilTypeArguments])) []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "tipo10") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNAClassInstanceCreationExpression 
+					NilTypeArguments 
+						(ClassOrInterfaceType "code" NilTypeArguments 
+							[ZCOITTypeDeclSpecifier "java" NilTypeArguments,
+							 ZCOITTypeDeclSpecifier "ClaseB" NilTypeArguments]) []) []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeIntegral_Int []) 
+			[VariableDeclaratorId (VarDeclaratorId "tipo11"),
+			 VariableDeclaratorId (VarDeclaratorId "tipo12"),
+			 VariableDeclaratorId (VarDeclaratorId "tipo13")],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType (TypeReferece (ReferenceTypeClassOrInterfaceType "String" NilTypeArguments [])) []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "exp1") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_StringLiteral "\"\"") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType (TypeReferece (ReferenceTypeClassOrInterfaceType "String" NilTypeArguments [])) []) 		
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "exp2") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PostfixExpressionExpressionName 
+					(TypeName "exp1" NilTypeName)) []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType (TypeReferece (ReferenceTypeClassOrInterfaceType "Integer" NilTypeArguments [])) []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "exp3") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "2") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType (TypeReferece (ReferenceTypeClassOrInterfaceType "Integer" NilTypeArguments [])) []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "exp4") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+						(PostfixExpressionExpressionName (TypeName "exp3" NilTypeName)) []))) 
+						:+: 
+						ConditionalOrExpressionUnaryExpression 
+						(PostfixExpressionPrimary 
+						(PrimNoNewArray 
+						(PrimaryNoNewArray 
+						(PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "4") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration
+			NilModifiers 
+			(TypePrimitiveType TypePrimitivePrimitivetypeBoolean []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "exp5") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+						(PostfixExpressionExpressionName (TypeName "tipo8" NilTypeName)) []))) 
+						:&&: 
+						ConditionalOrExpressionUnaryExpression 
+						(PostfixExpressionPrimary 
+						(PrimNoNewArray 
+						(PrimaryNoNewArray 
+						(PrimNNALiteral_BooleanLiteral False) []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType TypePrimitiveNumericType_TypeIntegral_Int []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "exp6") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNAParExp 
+						(ExpressionConditionalExpr 
+						(ConditionalOrExpressionUnaryExpression 
+						(PostfixExpressionPrimary 
+						(PrimNoNewArray 
+						(PrimaryNoNewArray 
+						(PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "1") []))) 
+						:+: 
+						ConditionalOrExpressionUnaryExpression 
+							(PostfixExpressionPrimary 
+							(PrimNoNewArray 
+							(PrimaryNoNewArray 
+							(PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "2") [])))))) []))) 
+
+						:*: 
+						ConditionalOrExpressionUnaryExpression 
+							(PostfixExpressionPrimary 
+							(PrimNoNewArray 
+							(PrimaryNoNewArray 
+							(PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "50") []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType (TypeReferece (ReferenceTypeClassOrInterfaceType "ClaseB" NilTypeArguments [])) []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "exp7") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+					(ConditionalOrExpressionUnaryExpression 
+					(PostfixExpressionPrimary 
+					(PrimNoNewArray 
+					(PrimaryNoNewArray 
+					(PrimNNAClassInstanceCreationExpression NilTypeArguments 
+						(ClassOrInterfaceType "ClaseB" NilTypeArguments []) []) []))))))],
+
+		ClassBodyDeclClassMemberDeclFieldDeclaration 
+			NilModifiers 
+			(TypePrimitiveType TypePrimitivePrimitivetypeBoolean []) 
+			[VariableDeclaratorIdAsig 
+				(VarDeclaratorId "d") 
+				(VariableInitializerExp 
+					(ExpressionConditionalExpr 
+						(ConditionalOrExpressionUnaryExpression 
+						(PostfixExpressionPrimary 
+						(PrimNoNewArray 
+						(PrimaryNoNewArray 
+						(PrimNNAMethodInvocationMN 
+						(TypeName "met1" NilTypeName) []) []))))))],
+
+		ClassBodyDeclClassMemberDeclMethodDeclaration 
+			NilModifiers 
+			NilTypeParameters (ResultTypeType (TypePrimitiveType TypePrimitivePrimitivetypeBoolean [])) 
+			(MethodDeclaratorFormalPL "met1" FormalParameterListNil) 
+			NilThrows 
+			(MethodBodyBlock 
+				[BlockStatementStatement 
+					(SWTSReturnStatement 
+						(ExpressionConditionalExpr 
+						(ConditionalOrExpressionUnaryExpression 
+						(PostfixExpressionPrimary 
+						(PrimNoNewArray 
+						(PrimaryNoNewArray 
+						(PrimNNALiteral_BooleanLiteral True) []))))))])]]
+

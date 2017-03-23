@@ -23,5 +23,5 @@ instance Show J2sSc where
         show DecimalFloatingPointLiteral     = "Floating Literal Decimal     : "
         show HexadecimalFloatingPointLiteral = "Floating Literal Hexadecimal: "
         show NullLiteral                     = "Null Literal      : "
-        show TokMayor                        = "TOK MAYOR         : "
+        -- show TokMayor                        = "TOK MAYOR         : "
         show Error                           = "Error             : "
