@@ -1,4 +1,4 @@
-    module {AG.J2SAttrSem}
+module {AG.J2SAttrSem}
 {} -- Exports of this module, empty for none
 {
 import Data.List
@@ -2264,9 +2264,9 @@ sem AssignmentOperator
 -- ------------------------------------------------
 {
 hasForEach :: Bool -> String -> String
-hasForEach True importCode = if T.isInfixOf (T.pack("JavaConvertions")) (T.pack(importCode))
+hasForEach True importCode = if T.isInfixOf (T.pack("JavaConversions")) (T.pack(importCode))
                                 then importCode
-                                else "import scala.collection.JavaConvertions._\n" ++ importCode
+                                else "import scala.collection.JavaConversions._\n" ++ importCode
 
 hasForEach _ importCode = importCode
 }
