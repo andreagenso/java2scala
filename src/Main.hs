@@ -9,7 +9,6 @@ import UU.Scanner.Position
 import Data.String.Utils
 
 -- AST generation
-{-
 main  :: IO()
 main = do
        g <- readJavaFile
@@ -22,9 +21,9 @@ readJavaFile = do
         nameScalaFile =  replace ".java" ".scala" path
     scalaCode <- parseIO pJ2s tokens
     return scalaCode
--}
 
 -- AG Generation
+{-
 main  :: IO()
 main = do
        g <- readJavaFile
@@ -40,4 +39,4 @@ readJavaFile = do
 
 writeScalaFile nameFile content = do
     writeFile nameFile content
-    putStrLn (" Writing scala file " ++ nameFile ++ "..... ")
+    putStrLn (" Writing scala file " ++ nameFile ++ "..... ")-}

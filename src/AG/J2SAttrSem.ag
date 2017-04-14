@@ -135,6 +135,10 @@ set ScalaResultType = ResultType
                       ReferenceType
                       ZClassOrInterfaceType
                       ZCOITTypeDeclSpecifier
+                      TypeArguments
+                      ActualTypeArgument
+                      ActualTypeArgumentList
+                      WildcardBounds
 
 set ScalaMethodFormalParameters = FormalParameterList
                                   VariableModifiers
@@ -1042,6 +1046,25 @@ sem ReferenceType
     | ReferenceTypeClassOrInterfaceType  lhs.scalaFieldDeclaration =  map (addTypeToModifiers (@identifier ++ @zClassOrInterfaceType.scalaFieldDeclInitialization)) @lhs.scalaFieldDeclaration -- ToDo
                                         -- ToDO typeArguments :: TypeArguments
                                         lhs.scalaResultType = @identifier ++ @zClassOrInterfaceType.scalaResultType -- ToDo
+
+sem TypeArguments
+    | TypeArgumentsC1
+            lhs.scalaResultType = @actualTypeArgumentList.scalaResultType
+    | NilTypeArguments
+            lhs.scalaResultType = ""
+
+sem ActualTypeArgumentList
+    | Cons lhs.scalaResultType = "["++ @hd.scalaResultType ++ "]" ++ @tl.scalaResultType
+    | Nil lhs.scalaResultType = ""
+
+
+sem ActualTypeArgument
+    | ActualTypeArgumentWildCard
+            lhs.scalaResultType =  @wildcardBound.scalaResultType
+    | ActualTypeReferenceType
+            type_.scalaFieldDeclaration = [] -- ToDo
+            lhs.scalaResultType = @type_.scalaResultType
+
 sem VariableDeclarators
     | Cons lhs.scalaFieldDeclaration = @hd.scalaFieldDeclaration ++ @tl.scalaFieldDeclaration
            hd.scalaNTab = @lhs.scalaNTab
@@ -1370,8 +1393,14 @@ sem ForUpdate
         lhs.scalaForUpdate = ""
 
 sem WildcardBounds
-    | WilcardBoundsExtendsReferenceType type_.scalaFieldDeclaration = []
-    | WilcardBoundsSuperReferenceType type_.scalaFieldDeclaration = []
+    | WilcardBoundsExtendsReferenceType
+            type_.scalaFieldDeclaration = []
+            lhs.scalaResultType = @type_.scalaResultType
+    | WilcardBoundsSuperReferenceType
+            type_.scalaFieldDeclaration = []
+            lhs.scalaResultType = @type_.scalaResultType
+    | NilwildcardBounds
+            lhs.scalaResultType = ""
 
 sem InterfaceMemberDeclaration
     | InterfaceMemberDeclarationConstant
@@ -2063,8 +2092,6 @@ sem AnnotationTypeElementDeclaration
     | AnnTypeElemDeclTypeDeclarationSemiColon
         lhs.scalaHasForEach = False
 
-sem ActualTypeArgument
-    | ActualTypeReferenceType type_.scalaFieldDeclaration = [] -- ToDo
 
 sem EnumBody
     | EnumBody enumConstants.scalaNTab = @lhs.scalaNTab
