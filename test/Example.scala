@@ -1,24 +1,27 @@
 package code.java
 
-import scala.collection.JavaConvertions._
+import scala.collection.JavaConversions._
 import java.util.List
 import java.util.Arrays
 import java.util.ArrayList
-
 class ClaseA { 
 
-	def transformar(): Unit = {
-		List < Integer > numbers=Arrays.asList(1,2,3,4,5,6)
-		for (n <- numbers) {			
-			l2.add(doubleIt(n))
+	def filtrar(inv: ArrayList): List = {
+		var sub: List =  new ArrayList()
+		for (numero <- inv) {			
+			if (numero > 5) {
+								
+				sub.add(numero)
+			}
+		}
+		sub
+	}
+	def nombres(): Unit = {
+		var players: String = 
+		for (player <- players) {			
+			System.out.print(player + "; ")
 		}
 	}
-
-	def transformar2(): Unit = {
-		List < Integer > numbers=Arrays.asList(1,2,3,4,5,6)
-		for (n <- numbers) {			
-			l2.add(doubleIt(n))
-		}
-	}
-
 }
+
+

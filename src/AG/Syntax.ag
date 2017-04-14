@@ -343,8 +343,13 @@ data Expression
     | ExpressionAssignment          conditionalOrExpression :: ConditionalOrExpression
                                     assignmentOperator :: AssignmentOperator
                                     expression :: Expression
-
 deriving Expression : Show
+
+data ExpressionAssignment | ExpressionAssignment1 unaryExpression :: UnaryExpression
+                          | ExpressionAssignment2 unaryExpression :: UnaryExpression expression :: Expression conditionalExpression :: ConditionalExpression
+                          | ExpressionAssignment3 unaryExpression :: UnaryExpression assignmentOperator :: AssignmentOperator expression :: Expression
+
+deriving ExpressionAssignment : Show
 
 data AssignmentOperator
     | AssignmentOp {- = -}
@@ -384,9 +389,9 @@ type ArgumentList = [Expression]
 
 data NonWildTypeArguments
     | NonWildTypeArgumentsC1 referenceTypList :: ReferenceTypeList
-    {-| NonWildTypeArgumentsC2 referenceTypList :: ReferenceTypeList
+    | NonWildTypeArgumentsC2 referenceTypList :: ReferenceTypeList
     | NonWildTypeArgumentsC3 referenceTypList :: ReferenceTypeList
-    | NonWildTypeArgumentsC0 referenceTypList :: ReferenceTypeList-}
+    | NonWildTypeArgumentsC0 referenceTypList :: ReferenceTypeList
     | NilNonWildTypeArguments
 
 deriving NonWildTypeArguments : Show
@@ -708,24 +713,24 @@ deriving BlockStatement : Show
 
 data Statement
 | StatementLabeled identifier :: Identifier
-                       statement :: Statement  {- LabeledStatement -}
+                       statement :: StatementNested  {- LabeledStatement -}
     | StatementIf expression :: Expression
-                  statement :: Statement {- IfThenStatement -}
+                  statement :: StatementNested {- IfThenStatement -}
     | StatementIfElse expression :: Expression
-                      statement1 :: Statement
-                      statement2 :: Statement {- IfThenElseStatement -}
+                      statement1 :: StatementNested
+                      statement2 :: StatementNested {- IfThenElseStatement -}
     | StatementWhile expression :: Expression
-                     statement :: Statement   {- WhileStatement -}
+                     statement :: StatementNested   {- WhileStatement -}
     | StatementFor  forStatement :: ForStatement
     | SWTSBlock blockStatement :: BlockStatements
     | SWTSEmptyStatement
-    | SWTSExpressionStatement expression :: Expression
+    | SWTSExpressionStatement expressionAssignment :: ExpressionAssignment -- expression :: Expression
     | SWTSAssertStatementCond  expression :: Expression
     | SWTSAssertStatementCondEx  expression :: Expression
                                  conditionalExpression :: ConditionalExpression
     | SWTSSwitchStatement expression :: Expression
                           switchBlock :: SwitchBlock
-    | SWTSDoStatement statement :: Statement
+    | SWTSDoStatement statement :: StatementNested
                       expression :: Expression
     | SWTSBreakStatement
     | SWTSBreakStatementId identifier :: Identifier
@@ -742,8 +747,33 @@ data Statement
                              catches :: Catches
                              blockStatements2 :: BlockStatements {-- el ultimo Block es FinallyBlock -}
 
-
 deriving Statement : Show
+
+data StatementNested
+ | StatementLabeledNested identifier :: Identifier statementNested :: StatementNested  -- LabeledStatement
+ | StatementIfNested expression :: Expression statementNested :: StatementNested -- IfThenStatement
+ | StatementIfElseNested expression :: Expression statementNested1 :: StatementNested statementNested2 :: StatementNested -- IfThenElseStatement
+ | StatementWhileNested expression :: Expression statementNested :: StatementNested   -- WhileStatement
+ | StatementForNested forStatement :: ForStatement
+ | SWTSBlockNested blockStatements :: BlockStatements
+ | SWTSEmptyStatementNested
+ | SWTSExpressionStatementNested expression :: Expression
+ | SWTSAssertStatementCondNested  expression :: Expression
+ | SWTSAssertStatementCondExNested  expression :: Expression conditionalExpression :: ConditionalExpression
+ | SWTSSwitchStatementNested expression :: Expression switchBlock :: SwitchBlock
+ | SWTSDoStatementNested statementNested :: StatementNested expression :: Expression
+ | SWTSBreakStatementNested
+ | SWTSBreakStatementIdNested identifier :: Identifier
+ | SWTSNilContinueStatementNested
+ | SWTSContinueStatementNested identifier :: Identifier
+ | SWTSReturnStatementNested expression :: Expression
+ | SWTSNilReturnStatementNested
+ | SWTSynchronizedStatementNested expression ::  Expression  blockStatements :: BlockStatements
+ | SWTTrhowStatementNested expression :: Expression
+ | SWTTryStatementNested blockStatements :: BlockStatements catches :: Catches
+ | SWTTryStatementFinallyNested  blockStatements1 :: BlockStatements catches :: Catches blockStatements2 :: BlockStatements -- el ultimo Block es FinallyBlock
+
+deriving StatementNested : Show
 
 data SwitchBlock
     | SwitchBlockAll switchBlockStatementGrooups :: SwitchBlockStatementGroups

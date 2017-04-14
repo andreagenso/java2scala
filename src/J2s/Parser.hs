@@ -7,8 +7,8 @@ import UU.Scanner.Position
 
 import J2s.Ast.Syntax  as AGS
 import J2s.Ast.Semantic as AGS
--- -- import qualified AG.Syntax as AGS
---import qualified AG.J2SAttrSem as AGS
+-- import qualified AG.Syntax as AGS
+-- import qualified AG.J2SAttrSem as AGS
 -- 1
 pJ2s =  AGS.sem_J2s_J2s <$> pPackageDeclaration <*> pImportDeclarations <*> pTypeDeclarations
 -- -----------------------------------------------------------------------------------
@@ -536,7 +536,7 @@ pStatement =  AGS.sem_Statement_StatementLabeled                     <$> pIdenti
                   <|> AGS.sem_Statement_SWTSEmptyStatement           <$ pSpecialSimbol ";"
                   <|> (\e f -> f e)                                  <$ pKeyWord "assert" <*> pExpression <*> pZAssertStatement
                   <|> AGS.sem_Statement_SWTSSwitchStatement          <$ pKeyWord "switch" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <*> pSwitchBlock
-                  <|> AGS.sem_Statement_SWTSDoStatement              <$ pKeyWord "do" <*> pStatement <* pKeyWord "while" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <* pSpecialSimbol ";"
+                  <|> AGS.sem_Statement_SWTSDoStatement              <$ pKeyWord "do" <*> pStatementNested <* pKeyWord "while" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <* pSpecialSimbol ";"
                   <|> (\fb -> fb)                                    <$ pKeyWord "break" <*> pZBreakStatement
                   <|> (\f -> f)                                      <$ pKeyWord "continue" <*> pZContinueStatement
                   <|> (\f -> f)                                      <$ pKeyWord "return" <*> pZReturnStatement
@@ -591,11 +591,12 @@ pZAssertStatementNested = (\ ce e -> AGS.sem_StatementNested_SWTSAssertStatement
 pZContinueStatementNested = (\i -> AGS.sem_StatementNested_SWTSContinueStatementNested i ) <$> pIdentifier <* pSpecialSimbol ";"
                                 <|> AGS.sem_StatementNested_SWTSNilContinueStatementNested <$ pSpecialSimbol ";"
 
-{-
 -- AG
-pZTryStatement =  (\l b -> AGS.sem_Statement_SWTTryStatement b l) <$> pCatchClause
+{-pZTryStatement =  (\l b -> AGS.sem_Statement_SWTTryStatement b l) <$> pCatchClause
               <|> (\l f b -> AGS.sem_Statement_SWTTryStatementFinally b l f) <$> pCatchClause <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock
--}
+
+pZTryStatementNested =  (\l b -> AGS.sem_StatementNested_SWTTryStatementNested b l) <$> pCatchClause
+              <|> (\l f b -> AGS.sem_StatementNested_SWTTryStatementFinallyNested b l f) <$> pCatchClause <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock-}
 -- AST
 pZTryStatement =  (\l b -> AGS.sem_Statement_SWTTryStatement b l) <$> pCatchClauses1
               <|> (\l f b -> AGS.sem_Statement_SWTTryStatementFinally b l f) <$> pCatchClauses <* pKeyWord "finally" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  -- pBlock

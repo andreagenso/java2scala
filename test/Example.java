@@ -1,27 +1,32 @@
 package code.java;
 
-class WhileDemo {
-    public void main(String[] args) {
+import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
 
-        int count = 1;
-        while (count < 11) {
-            System.out.println("Count is: " + count);
-            count++;
+
+class ClaseA {
+
+    // Caso 1
+    List<Integer> filtrar(ArrayList<Integer> inv) {
+        List<Integer> sub = new ArrayList<Integer>();
+
+        for(Integer numero:  inv) {
+            if( numero > 5) {
+                sub.add(numero);
+            }
         }
 
-        boolean shouldContinue = true;
-        while(shouldContinue == true) {
+        return sub;
+    }
 
-            System.out.println("running");
+    // Caso 2
+    void nombres() {
+        String[] players = {"Rafael", "Ana", "David", "Roger", "Andy", "Tomas", "Juan"};
 
-            double random = Math.random() * 10D;
-
-            if(random > 5) {
-                shouldContinue = true;
-            } else {
-                shouldContinue = false;
-            }
-
+        for (String player: players) {
+            System.out.print(player + "; ");
         }
     }
+
 }
