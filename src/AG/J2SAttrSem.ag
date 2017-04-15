@@ -706,12 +706,12 @@ sem TypeBound
     | NilAdditionalBoundList lhs.scalaTypeDeclaration = ""
 
 sem ClassOrInterfaceType
-    | ClassOrInterfaceType lhs.scalaTypeDeclaration =  @identifier ++ @zClassOrInterfaceType.scalaTypeDeclaration -- used in typeArguments of normal class ToDo @typeArguments.scalaTypeDeclaration ++
-                           lhs.scalaSuperTypeDeclaration = " extends " ++ @identifier ++ @zClassOrInterfaceType.scalaSuperTypeDeclaration -- used in Super
-                           lhs.scalaImplementsInterfaceTypeDeclaration = @identifier ++ @zClassOrInterfaceType.scalaImplementsInterfaceTypeDeclaration
-                           lhs.scalaExtendInterface = " extends " ++ @identifier ++ @zClassOrInterfaceType.scalaExtendInterface
-                           lhs.scalaExtendClassBodyNormalCD = " extends " ++ @identifier ++ @zClassOrInterfaceType.scalaExtendClassBodyNormalCD
-                           lhs.scalaFieldDeclInitialization = @identifier ++ @zClassOrInterfaceType.scalaFieldDeclInitialization
+    | ClassOrInterfaceType lhs.scalaTypeDeclaration =  @identifier ++ @typeArguments.scalaResultType ++ " " ++ @zClassOrInterfaceType.scalaTypeDeclaration -- used in typeArguments of normal class ToDo @typeArguments.scalaTypeDeclaration ++
+                           lhs.scalaSuperTypeDeclaration = " extends " ++ @identifier ++ @typeArguments.scalaResultType ++ " "  ++ @zClassOrInterfaceType.scalaSuperTypeDeclaration -- used in Super
+                           lhs.scalaImplementsInterfaceTypeDeclaration = @identifier ++ @typeArguments.scalaResultType ++ " "  ++ @zClassOrInterfaceType.scalaImplementsInterfaceTypeDeclaration
+                           lhs.scalaExtendInterface = " extends " ++ @identifier ++ @typeArguments.scalaResultType ++ " "  ++ @zClassOrInterfaceType.scalaExtendInterface
+                           lhs.scalaExtendClassBodyNormalCD = " extends " ++ @identifier ++ @typeArguments.scalaResultType ++ " "  ++ @zClassOrInterfaceType.scalaExtendClassBodyNormalCD
+                           lhs.scalaFieldDeclInitialization = @identifier ++ @typeArguments.scalaResultType ++ " " ++ @zClassOrInterfaceType.scalaFieldDeclInitialization
 
 sem ListInterfaceMemberDeclaration
     | Cons lhs.scalaExtendClassBodyNormalCD = @hd.scalaExtendClassBodyNormalCD ++ @tl.scalaExtendClassBodyNormalCD
@@ -744,8 +744,8 @@ sem ZClassOrInterfaceType
           lhs.scalaResultType = ""
 
 sem ZCOITTypeDeclSpecifier
-    | ZCOITTypeDeclSpecifier lhs.scalaTypeDeclaration = @identifier -- ToDo ++ @typeArguments.scalaTypeDeclaration
-                             lhs.scalaSuperTypeDeclaration = @identifier -- ToDo ++ @typeArguments.scalaTypeDeclaration
+    | ZCOITTypeDeclSpecifier lhs.scalaTypeDeclaration = @identifier ++ @typeArguments.scalaResultType -- ToDo ++ @typeArguments.scalaTypeDeclaration
+                             lhs.scalaSuperTypeDeclaration = @identifier ++ @typeArguments.scalaResultType  -- ToDo ++ @typeArguments.scalaTypeDeclaration
                              lhs.scalaImplementsInterfaceTypeDeclaration = @identifier
                              lhs.scalaExtendInterface = @identifier
                              lhs.scalaExtendClassBodyNormalCD = @identifier
@@ -1093,7 +1093,7 @@ sem VariableInitializer
             lhs.scalaFieldDeclInitialization = @expression.scalaExpression
             expression.scalaStatement = "" -- ToDo
     | VariableInitializerArr
-            lhs.scalaFieldDeclInitialization = ""
+            lhs.scalaFieldDeclInitialization = "XXXX" -- ToDO
 
 sem ArgumentList
     | Cons
@@ -1253,7 +1253,7 @@ sem PrimaryNNA
                         lhs.scalaExpression = "" -- ToDo analizar si caso entra.
                         -- primitiveType :: PrimitiveType typeZ :: TypeZ
     | PrimNNATypeClassReferenceTypeClassIOT
-                        lhs.scalaExpression = @identifier -- ToDo revisar y analizar caso.
+                        lhs.scalaExpression = @identifier ++ @typeArguments.scalaResultType  -- ToDo revisar y analizar caso.
                         -- identifier :: Identifier typeArguments :: TypeArguments primNNAClassOrInterfaceType :: PrimNNAClassOrInterfaceType
     | PrimNNATypeClassReferenceTypeTypeVariable
                         lhs.scalaExpression = @identifier -- ToDo revisar caso
@@ -1273,8 +1273,7 @@ sem PrimaryNNA
                         -- expression :: Expression unaryExpression :: UnaryExpression {- ANTES Type        UnaryExpression  -- CONTROLAR COND CONTEXTO -}
 
     | PrimNNAClassInstanceCreationExpression
-                        lhs.scalaExpression = " new " ++ @classOrInterfaceType.scalaFieldDeclInitialization ++ "(" ++ @argumentList.scalaFieldDeclInitialization ++ ")"  -- ToDo ?????
-                        -- typeArguments :: TypeArguments classOrInterfaceType :: ClassOrInterfaceType argumentList :: ArgumentList  {- Antes ->                           | PrimNNAClassIns ClassInstanceCreationExpression -}
+                        lhs.scalaExpression = " new " ++ @classOrInterfaceType.scalaFieldDeclInitialization ++ @typeArguments.scalaResultType ++ "(" ++ @argumentList.scalaFieldDeclInitialization ++ ")"
     | ArrayCreationExpressionPrimitiveType
                         lhs.scalaExpression = "" -- ToDo
                         -- primitiveType :: PrimitiveType dimExprs :: DimExprs                      {- Dims -- ARRAYCreationExpression Aplicar Cond Contexto -}

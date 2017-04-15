@@ -7,7 +7,7 @@ import java.util.ArrayList
 class ClaseA { 
 
 	def filtrar(inv: ArrayList[Integer]): List[Integer] = {
-		var sub: List[Integer] =  new ArrayList()
+		var sub: List[Integer] =  new ArrayList[Integer] ()
 		for (numero <- inv) {			
 			if (numero > 5) {
 								
@@ -16,12 +16,12 @@ class ClaseA {
 		}
 		sub
 	}
-	def nombres(): Unit = {
-		var players: String = 
+	/*def nombres(): Unit = {
+		var players: String = XXXX
 		for (player <- players) {			
 			System.out.print(player + "; ")
 		}
-	}
+	}*/
 }
 
 
