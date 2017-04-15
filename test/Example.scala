@@ -16,12 +16,12 @@ class ClaseA {
 		}
 		sub
 	}
-	/*def nombres(): Unit = {
-		var players: String = XXXX
+	def nombres(): Unit = {
+		var players: Array[String] = Array("Rafael", "Ana", "David", "Roger", "Andy", "Tomas", "Juan")
 		for (player <- players) {			
 			System.out.print(player + "; ")
 		}
-	}*/
+	}
 }
 
 
