@@ -7,7 +7,6 @@ import UU.Scanner.Position
 
 --import J2s.Ast.Syntax  as AGS
 --import J2s.Ast.Semantic as AGS
--- import qualified AG.Syntax as AGS
 import qualified AG.J2SAttrSem as AGS
 
 -- 1
