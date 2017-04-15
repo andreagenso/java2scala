@@ -6,8 +6,8 @@ import java.util.Arrays
 import java.util.ArrayList
 class ClaseA { 
 
-	def filtrar(inv: ArrayList): List = {
-		var sub: List =  new ArrayList()
+	def filtrar(inv: ArrayList[Integer]): List[Integer] = {
+		var sub: List[Integer] =  new ArrayList()
 		for (numero <- inv) {			
 			if (numero > 5) {
 								
