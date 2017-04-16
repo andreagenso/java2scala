@@ -219,7 +219,7 @@ attr ScalaForUpdate
     syn scalaForUpdate :: String
 
 -- ------------------------------------------------
--- has for each ?
+-- has for each ? - related to import collections
 -- ------------------------------------------------
 set ScalaHasForEach = ForStatement
                       Statement StatementNested
@@ -237,7 +237,54 @@ set ScalaHasForEach = ForStatement
 
 attr ScalaHasForEach
     syn scalaHasForEach :: Bool
+-- ------------------------------------------------
+-- For special cases
+-- ------------------------------------------------
+set ScalaSpecialCaseIsIncrementalPrimitive =
+        ForInit
+        Type
+        PrimitiveOrReferenceType
 
+set ScalaSpecialCaseIsSimpleIncrementDecrement =
+        ForUpdate
+        StatementExpressionList
+        Expression
+        ConditionalOrExpression
+        UnaryExpression
+        ZPostfixExpression
+        ZPostfixExp
+
+set ScalaSpecialCaseOneLine =
+        Statement
+        BlockStatements
+        BlockStatement
+
+set ScalaSpecialCaseForInitValue =
+        ForInit
+        VariableDeclarators
+        VariableDeclarator
+
+set ScalaSpecialCaseForEndValue =
+        Expression
+        ConditionalOrExpression
+
+attr ScalaSpecialCaseIsIncrementalPrimitive
+    syn scalaSpecialCaseIsIncrementalPrimitive :: Bool
+
+attr ScalaSpecialCaseIsSimpleIncrementDecrement
+    syn scalaSpecialCaseIsSimpleIncrementDecrement :: Bool
+
+attr ScalaSpecialCaseOneLine
+    syn scalaSpecialCaseOneLine :: Int
+
+attr ScalaSpecialCaseForInitValue
+    syn scalaSpecialCaseForInitValue :: String
+
+attr ScalaSpecialCaseForInitValue
+    syn scalaSpecialCaseForInitIdentifier :: String
+
+attr ScalaSpecialCaseForEndValue
+    syn scalaSpecialCaseForEndValue :: String
 -- ------------------------------------------------
 -- ConstructorDeclaration
 -- ------------------------------------------------
@@ -1044,6 +1091,7 @@ sem Type  -- ToDo check
                                     else
                                         @typeZ.scalaArrayType
             }
+            lhs.scalaSpecialCaseIsIncrementalPrimitive = @primitiveOrReferenceType.scalaSpecialCaseIsIncrementalPrimitive
 
 sem TypeZ
     | Cons
@@ -1058,30 +1106,39 @@ sem ArrayType
 sem PrimitiveOrReferenceType
     | TypePrimitiveNumericType_TypeIntegral_Byte
                                 lhs.scalaResultType = "Byte"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = True
 
     | TypePrimitiveNumericType_TypeIntegral_Short
                                 lhs.scalaResultType = "Short"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = True
 
     | TypePrimitiveNumericType_TypeIntegral_Int
                                 lhs.scalaResultType = "Int"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = True
 
     | TypePrimitiveNumericType_TypeIntegral_Long
                                 lhs.scalaResultType = "Long"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = True
 
     | TypePrimitiveNumericType_TypeIntegral_Char
                                 lhs.scalaResultType = "Char"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = False
 
     | TypePrimitiveNumericType_TypeFloating_Float
                                 lhs.scalaResultType = "Float"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = False
 
     | TypePrimitiveNumericType_TypeFloating_Double
                                 lhs.scalaResultType = "Double"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = False
 
     | TypePrimitivePrimitivetypeBoolean
                                 lhs.scalaResultType = "Boolean"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = False
 
     | TypeReference
                                 lhs.scalaResultType = @referenceType.scalaResultType
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = False
 
 sem ReferenceType
     | ReferenceTypeClassOrInterfaceType
@@ -1110,15 +1167,23 @@ sem VariableDeclarators
            hd.scalaNTab = @lhs.scalaNTab
            tl.scalaNTab = @lhs.scalaNTab
            lhs.scalaNTab = @hd.scalaNTab
+           lhs.scalaSpecialCaseForInitValue = @hd.scalaSpecialCaseForInitValue ++ @tl.scalaSpecialCaseForInitValue
+           lhs.scalaSpecialCaseForInitIdentifier = @hd.scalaSpecialCaseForInitIdentifier ++ @tl.scalaSpecialCaseForInitIdentifier
     | Nil  lhs.scalaVariableDeclarator  = []
            lhs.scalaNTab = @lhs.scalaNTab
+           lhs.scalaSpecialCaseForInitValue = ""
+           lhs.scalaSpecialCaseForInitIdentifier = ""
 
 
 sem VariableDeclarator
     | VariableDeclaratorId
             lhs.scalaVariableDeclarator = (@variableDeclaratorId.scalaVariableDeclaratorId, Nothing):[]
+            lhs.scalaSpecialCaseForInitValue = ""
+            lhs.scalaSpecialCaseForInitIdentifier = ""
     | VariableDeclaratorIdAsig
             lhs.scalaVariableDeclarator = (@variableDeclaratorId.scalaVariableDeclaratorId , (Just @variableInitializer.scalaFieldDeclInitialization)):[]
+            lhs.scalaSpecialCaseForInitValue = @variableInitializer.scalaFieldDeclInitialization
+            lhs.scalaSpecialCaseForInitIdentifier = @variableDeclaratorId.scalaVariableDeclaratorId
 
 sem VariableInitializers
     | Cons
@@ -1149,114 +1214,172 @@ sem ArgumentList
 sem Expression
     | ExpressionConditionalExpr
             lhs.scalaExpression = @conditionalOrExpression.scalaExpression -- ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @conditionalOrExpression.scalaSpecialCaseIsSimpleIncrementDecrement
+            lhs.scalaSpecialCaseForEndValue = @conditionalOrExpression.scalaSpecialCaseForEndValue
     | ExpressionConditionalExprComb
             lhs.scalaExpression = @conditionalOrExpression1.scalaExpression ++
                                   @expression.scalaExpression
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+            lhs.scalaSpecialCaseForEndValue = ""
 
     | ExpressionAssignment
             lhs.scalaExpression = @conditionalOrExpression.scalaExpression ++
                                   @assignmentOperator.scalaExpression ++
                                   @expression.scalaExpression
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+            lhs.scalaSpecialCaseForEndValue = ""
+
 
 sem ConditionalOrExpression
     | Mod -- :%:
         lhs.scalaExpression =
              @conditionalOrExpression1.scalaExpression ++ " % " ++
              @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | Or -- :||:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " || " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | And -- :&&:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " && " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | BitwiseOr  -- :|:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " | " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | BitwiseXor -- :^:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " ^ " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | BitwiseAnd -- :&:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " & " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | EqualTo -- :==:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " == " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = @conditionalOrExpression2.scalaExpression
     | NotEqualTo -- :!=:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " != " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = show ((read @conditionalOrExpression2.scalaExpression :: Int) - 1)
     | LessThan -- :<:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " < " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = show ((read @conditionalOrExpression2.scalaExpression :: Int) - 1)
     | GreaterThan -- :>:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " > " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = show ((read @conditionalOrExpression2.scalaExpression :: Int) + 1)
     | LessThanOrEqualTo -- :<=:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " <= " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = @conditionalOrExpression2.scalaExpression
     | GreaterThanOrEqualTo -- :>=:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " >= " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = @conditionalOrExpression2.scalaExpression
     | LeftShift -- :<<:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " << " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | RightShift -- :>>:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " >> " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | ZeroFillRightShift -- :>>>:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " >>> " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | Add -- :+:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " + " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | Sub -- :-:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " - " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | Mult -- :*:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " * " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | Div -- :/:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " / " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
     | ConditionalOrExpressionUnaryExpression
             lhs.scalaExpression = @unaryExpression.scalaExpression
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @unaryExpression.scalaSpecialCaseIsSimpleIncrementDecrement
+            lhs.scalaSpecialCaseForEndValue = ""
     | ConditionalOrExpressionIntanceOf
             lhs.scalaExpression = @unaryExpression.scalaExpression -- ToDo check  type_ :: Type
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+            lhs.scalaSpecialCaseForEndValue = ""
+
 
 sem UnaryExpression
     | UnaryExpressionPreIncrementExpression
             lhs.scalaExpression =  @unaryExpression.scalaExpression --ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
     | UnaryExpressionPreDecrementExpression
             lhs.scalaExpression =  @unaryExpression.scalaExpression --ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
     | UnExpMas
             lhs.scalaExpression =  @unaryExpression.scalaExpression --ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
     | UnExpMenos
             lhs.scalaExpression =  @unaryExpression.scalaExpression --ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
     | PostExpPrimaryPostfixZ
             lhs.scalaExpression =  @primary.scalaExpression ++ @zpostfixExpression.scalaExpression
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @zpostfixExpression.scalaSpecialCaseIsSimpleIncrementDecrement
     | PostfixExpressionPrimary
             lhs.scalaExpression = @primary.scalaExpression
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
     | Pestan
             lhs.scalaExpression =  @unaryExpression.scalaExpression -- ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
     | Admiracion
             lhs.scalaExpression =  @unaryExpression.scalaExpression -- ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
 
 sem Primary
     | PrimNoNewArray
@@ -1400,19 +1523,30 @@ sem ForInit
         lhs.scalaNTab = @lhs.scalaNTab
 
         lhs.scalaForInit = {checkVariableDeclarators [""] False False @type_.scalaResultType @variableDeclarators.scalaVariableDeclarator @variableDeclarators.scalaNTab}
+        lhs.scalaSpecialCaseIsIncrementalPrimitive = @type_.scalaSpecialCaseIsIncrementalPrimitive
+        lhs.scalaSpecialCaseForInitValue = @variableDeclarators.scalaSpecialCaseForInitValue
+        lhs.scalaSpecialCaseForInitIdentifier = @variableDeclarators.scalaSpecialCaseForInitIdentifier
     | NilForInit
         lhs.scalaForInit = ""
+        lhs.scalaSpecialCaseIsIncrementalPrimitive = False
+        lhs.scalaSpecialCaseForInitValue = ""
+        lhs.scalaSpecialCaseForInitIdentifier = ""
     | ForInitStaExp
         statementExpressionList.scalaStatement = "" -- ToDo
         lhs.scalaForInit = "" -- ToDo
+        lhs.scalaSpecialCaseIsIncrementalPrimitive = False
+        lhs.scalaSpecialCaseForInitValue = ""
+        lhs.scalaSpecialCaseForInitIdentifier = ""
 
 sem ForUpdate
     | ForUpdate
         lhs.scalaNTab = @lhs.scalaNTab
         statemebtExpressionList.scalaStatement = ""
         lhs.scalaForUpdate = @lhs.scalaNTab ++ "\t" ++ @statemebtExpressionList.scalaStatement
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @statemebtExpressionList.scalaSpecialCaseIsSimpleIncrementDecrement
     | NilForUpdate
         lhs.scalaForUpdate = ""
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
 
 sem WildcardBounds
     | WilcardBoundsExtendsReferenceType
@@ -1547,9 +1681,11 @@ sem BlockStatements
            lhs.scalaNTab = @tl.scalaNTab
            lhs.scalaStatement = @hd.scalaStatement ++ @tl.scalaStatement -- ToDO
            lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
+           lhs.scalaSpecialCaseOneLine = @hd.scalaSpecialCaseOneLine + @tl.scalaSpecialCaseOneLine
     | Nil lhs.scalaNTab = @lhs.scalaNTab
           lhs.scalaStatement = ""
           lhs.scalaHasForEach = False
+          lhs.scalaSpecialCaseOneLine = 0
 
 sem BlockStatement
     | BlockStatementLocalVariableDeclarationStatement
@@ -1561,6 +1697,7 @@ sem BlockStatement
         modifiers.scalaMethodDeclaration = "" -- ToDo
         lhs.scalaNTab = @lhs.scalaNTab
         lhs.scalaHasForEach = False
+        lhs.scalaSpecialCaseOneLine = 1
 
         lhs.scalaStatement = {checkVariableDeclarators @modifiers.scalaModifierFieldDeclaration @modifiers.scalaIsStaticFieldDeclaration @modifiers.scalaIsFinalFieldDeclaration @type_.scalaResultType @variableDeclarators.scalaVariableDeclarator @variableDeclarators.scalaNTab}
     | BlockStatementClassDeclarationNormalClassDeclaration
@@ -1571,6 +1708,7 @@ sem BlockStatement
         classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
         lhs.scalaNTab = @lhs.scalaNTab
         lhs.scalaHasForEach = False -- ToDo
+        lhs.scalaSpecialCaseOneLine = 2
 
         lhs.scalaStatement =
           @lhs.scalaNTab ++
@@ -1592,11 +1730,14 @@ sem BlockStatement
             lhs.scalaNTab = @lhs.scalaNTab
             lhs.scalaHasForEach = False
             lhs.scalaStatement = ""
+            lhs.scalaSpecialCaseOneLine = 2
+
     | BlockStatementStatement
             lhs.scalaNTab = @lhs.scalaNTab
             statement.scalaStatement = @lhs.scalaStatement
             lhs.scalaHasForEach = @statement.scalaHasForEach
             lhs.scalaStatement = "\n" ++ @lhs.scalaNTab ++ @statement.scalaStatement
+            lhs.scalaSpecialCaseOneLine = @statement.scalaSpecialCaseOneLine
 
 sem Statement
     | StatementLabeled
@@ -1606,6 +1747,7 @@ sem Statement
                        lhs.scalaStatement = @statement.scalaStatement -- ToDO no considerar label
                        lhs.scalaIfElseStatement = False
                        lhs.scalaHasForEach =  @statement.scalaHasForEach
+                       lhs.scalaSpecialCaseOneLine = 1
     | StatementIf
                     statement.scalaNTab = @lhs.scalaNTab ++ "\t"
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1615,6 +1757,7 @@ sem Statement
                                          @statement.scalaNTab ++ @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
                     lhs.scalaIfElseStatement = True
                     lhs.scalaHasForEach =  @statement.scalaHasForEach
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | StatementIfElse
                       -- *** tabs organizados para IfElse anidados ***
@@ -1631,6 +1774,7 @@ sem Statement
                       statement1.scalaStatement = @expression.scalaStatement
                       statement2.scalaStatement = @statement1.scalaStatement
                       lhs.scalaIfElseStatement = True
+                      lhs.scalaSpecialCaseOneLine = 2
 
                       lhs.scalaStatement = { if (@statement2.scalaIfElseStatement) then
                         "if (" ++ @expression.scalaExpression ++ ") {"
@@ -1650,6 +1794,7 @@ sem Statement
                      lhs.scalaHasForEach =  @statement.scalaHasForEach
                      lhs.scalaStatement = "while ( " ++ @expression.scalaExpression  ++ " ) {" ++
                                           @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+                     lhs.scalaSpecialCaseOneLine = 2
 
     | StatementFor
                     forStatement.scalaNTab = @lhs.scalaNTab -- ToDo
@@ -1658,12 +1803,14 @@ sem Statement
                     lhs.scalaStatement = @forStatement.scalaStatement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @forStatement.scalaHasForEach
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSBlock
                     blockStatement.scalaNTab = @lhs.scalaNTab
                     lhs.scalaNTab = @blockStatement.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @blockStatement.scalaHasForEach
+                    lhs.scalaSpecialCaseOneLine = @blockStatement.scalaSpecialCaseOneLine
 
                     blockStatement.scalaStatement = @lhs.scalaStatement
                     lhs.scalaStatement = {
@@ -1678,6 +1825,7 @@ sem Statement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = ""
+                    lhs.scalaSpecialCaseOneLine = 0
 
     | SWTSExpressionStatement
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1685,6 +1833,7 @@ sem Statement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = @expressionAssignment.scalaExpression
+                    lhs.scalaSpecialCaseOneLine = 1
 
     | SWTSAssertStatementCond
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1692,6 +1841,7 @@ sem Statement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSAssertStatementCondEx
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1699,6 +1849,7 @@ sem Statement
                     lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
+                    lhs.scalaSpecialCaseOneLine = 2
                     -- conditionalExpression :: ConditionalExpression
 
     | SWTSSwitchStatement
@@ -1707,6 +1858,7 @@ sem Statement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @switchBlock.scalaHasForEach
                     lhs.scalaStatement = @expression.scalaStatement -- ToDo -- expression :: Expression
+                    lhs.scalaSpecialCaseOneLine = 2
                     -- switchBlock :: SwitchBlock
 
     | SWTSDoStatement
@@ -1721,30 +1873,35 @@ sem Statement
                     lhs.scalaStatement = "do {" ++
                                          @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}\n" ++
                                          @lhs.scalaNTab ++ "while ( " ++ @expression.scalaExpression  ++ " )"
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSBreakStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" --ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSBreakStatementId
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- ToDo identifier :: Identifier
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSNilContinueStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSContinueStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- ToDo identifier
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSReturnStatement
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1752,12 +1909,14 @@ sem Statement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = @expression.scalaExpression
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSNilReturnStatement
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "()" -- ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSynchronizedStatement
                     blockStatements.scalaNTab = @lhs.scalaNTab
@@ -1767,6 +1926,7 @@ sem Statement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @blockStatements.scalaHasForEach
                     lhs.scalaStatement = "" -- ToDo  @expression.scalaStatement ++  @blockStatements.scalaStatement -- ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTTrhowStatement
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1774,6 +1934,7 @@ sem Statement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- @expression.scalaStatement ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTTryStatement
                     blockStatements.scalaNTab = @lhs.scalaNTab
@@ -1784,6 +1945,7 @@ sem Statement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @blockStatements.scalaHasForEach || @catches.scalaHasForEach
                     lhs.scalaStatement = "" -- @blockStatements.scalaStatement ++ @catches.scalaStatement
+                    lhs.scalaSpecialCaseOneLine = 2
 
     | SWTTryStatementFinally
                     blockStatements1.scalaNTab = @lhs.scalaNTab
@@ -1793,6 +1955,7 @@ sem Statement
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @blockStatements1.scalaHasForEach || @catches.scalaHasForEach || @blockStatements2.scalaHasForEach
                     lhs.scalaStatement = "" -- ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
 
 sem ExpressionAssignment
     | ExpressionAssignment1
@@ -1813,6 +1976,7 @@ sem StatementNested
                        lhs.scalaStatement = @statementNested.scalaStatement -- ToDO no considerar label
                        lhs.scalaIfElseStatement = False
                        lhs.scalaHasForEach =  @statementNested.scalaHasForEach
+                       -- lhs.scalaSpecialCaseOneLine = 1
     | StatementIfNested
                     statementNested.scalaNTab = @lhs.scalaNTab ++ "\t"
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1822,6 +1986,7 @@ sem StatementNested
                                          @statementNested.scalaNTab ++ @statementNested.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
                     lhs.scalaIfElseStatement = True
                     lhs.scalaHasForEach =  @statementNested.scalaHasForEach
+                    --lhs.scalaSpecialCaseOneLine = 2
 
     | StatementIfElseNested
                       -- *** tabs organizados para IfElse anidados ***
@@ -1838,6 +2003,7 @@ sem StatementNested
                       statementNested1.scalaStatement = @expression.scalaStatement
                       statementNested2.scalaStatement = @statementNested1.scalaStatement
                       lhs.scalaIfElseStatement = True
+                      --lhs.scalaSpecialCaseOneLine = 2
 
                       lhs.scalaStatement = { if (@statementNested2.scalaIfElseStatement) then
                         "if (" ++ @expression.scalaExpression ++ ") {"
@@ -1855,6 +2021,7 @@ sem StatementNested
                      expression.scalaStatement = @lhs.scalaStatement
                      lhs.scalaIfElseStatement = False
                      lhs.scalaHasForEach =  @statementNested.scalaHasForEach
+                     --lhs.scalaSpecialCaseOneLine = 2
                      lhs.scalaStatement = "while ( " ++ @expression.scalaExpression  ++ " ) {" ++
                                           @statementNested.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
 
@@ -1864,6 +2031,7 @@ sem StatementNested
                     forStatement.scalaStatement = ""
                     lhs.scalaStatement = @forStatement.scalaStatement
                     lhs.scalaIfElseStatement = False
+                    -- lhs.scalaSpecialCaseOneLine = 2
                     lhs.scalaHasForEach =  @forStatement.scalaHasForEach
 
     | SWTSBlockNested
@@ -1871,6 +2039,7 @@ sem StatementNested
                     lhs.scalaNTab = @blockStatements.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @blockStatements.scalaHasForEach
+                    --lhs.scalaSpecialCaseOneLine = 2
 
                     blockStatements.scalaStatement = @lhs.scalaStatement
                     lhs.scalaStatement = {
@@ -1885,6 +2054,7 @@ sem StatementNested
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = ""
+                    --lhs.scalaSpecialCaseOneLine = 0
 
     | SWTSExpressionStatementNested
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1892,6 +2062,7 @@ sem StatementNested
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = @expression.scalaExpression
+                    --lhs.scalaSpecialCaseOneLine = 1
 
     | SWTSAssertStatementCondNested
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1899,6 +2070,7 @@ sem StatementNested
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
+                    -- lhs.scalaSpecialCaseOneLine = 1
 
     | SWTSAssertStatementCondExNested
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1906,6 +2078,7 @@ sem StatementNested
                     lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
+                    --lhs.scalaSpecialCaseOneLine = 2
                     -- conditionalExpression :: ConditionalExpression
 
     | SWTSSwitchStatementNested
@@ -1914,6 +2087,7 @@ sem StatementNested
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @switchBlock.scalaHasForEach
                     lhs.scalaStatement = @expression.scalaStatement -- ToDo -- expression :: Expression
+                    --lhs.scalaSpecialCaseOneLine = 2
                     -- switchBlock :: SwitchBlock
 
     | SWTSDoStatementNested
@@ -1922,6 +2096,7 @@ sem StatementNested
 
                     statementNested.scalaStatement = @lhs.scalaStatement
                     expression.scalaStatement = @statementNested.scalaStatement
+                    -- lhs.scalaSpecialCaseOneLine = 2
 
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
@@ -1934,24 +2109,28 @@ sem StatementNested
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" --ToDo
+                    --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSBreakStatementIdNested
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- ToDo identifier :: Identifier
+                    --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSNilContinueStatementNested
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- ToDo
+                    --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSContinueStatementNested
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- ToDo identifier
+                    --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSReturnStatementNested
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1959,12 +2138,14 @@ sem StatementNested
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = @expression.scalaExpression
+                    --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSNilReturnStatementNested
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "()" -- ToDo
+                    --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSynchronizedStatementNested
                     blockStatements.scalaNTab = @lhs.scalaNTab
@@ -1974,6 +2155,7 @@ sem StatementNested
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @blockStatements.scalaHasForEach
                     lhs.scalaStatement = "" -- ToDo  @expression.scalaStatement ++  @blockStatements.scalaStatement -- ToDo
+                    --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTTrhowStatementNested
                     lhs.scalaNTab = @lhs.scalaNTab
@@ -1981,6 +2163,7 @@ sem StatementNested
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
                     lhs.scalaStatement = "" -- @expression.scalaStatement ToDo
+                    --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTTryStatementNested
                     blockStatements.scalaNTab = @lhs.scalaNTab
@@ -1991,6 +2174,7 @@ sem StatementNested
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @blockStatements.scalaHasForEach || @catches.scalaHasForEach
                     lhs.scalaStatement = "" -- @blockStatements.scalaStatement ++ @catches.scalaStatement
+                    --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTTryStatementFinallyNested
                     blockStatements1.scalaNTab = @lhs.scalaNTab
@@ -2000,8 +2184,7 @@ sem StatementNested
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @blockStatements1.scalaHasForEach || @catches.scalaHasForEach || @blockStatements2.scalaHasForEach
                     lhs.scalaStatement = "" -- ToDo
-
-
+                    --lhs.scalaSpecialCaseOneLine = 2
 
 sem SwitchBlock
     | SwitchBlockAll
@@ -2162,19 +2345,32 @@ sem ConstructorBody
                       lhs.scalaNTab = @blockStatements.scalaNTab
                       lhs.scalaHasForEach = @blockStatements.scalaHasForEach
 
-sem ForStatement
-    | ForStatementBasicForStatementAll      statement.scalaNTab = @lhs.scalaNTab ++ "\t"
-                                            lhs.scalaNTab = @statement.scalaNTab
-                                            expression.scalaStatement = ""
-                                            statement.scalaStatement = ""
-                                            lhs.scalaHasForEach = False
 
-                                            lhs.scalaStatement = @forInit.scalaForInit ++ "\n" ++
-                                                                 @lhs.scalaNTab ++ "while(" ++ @expression.scalaExpression ++") {" ++
-                                                                    @statement.scalaStatement ++ "\n" ++
-                                                                    @forUpdate.scalaForUpdate ++
-                                                                    "\n" ++
-                                                                    @lhs.scalaNTab ++ "}"
+{
+-- Functions For special cases
+isSpecialCaseRange :: Bool -> Bool -> Int -> Bool
+isSpecialCaseRange isInitPrimitive isSimpleIncrementDecrement lines = isInitPrimitive && isSimpleIncrementDecrement && (lines <= 1)
+}
+
+sem ForStatement
+    | ForStatementBasicForStatementAll
+                statement.scalaNTab = @lhs.scalaNTab ++ "\t"
+                lhs.scalaNTab = @statement.scalaNTab
+                expression.scalaStatement = ""
+                statement.scalaStatement = ""
+                lhs.scalaHasForEach = False
+
+                lhs.scalaStatement = { if (isSpecialCaseRange @forInit.scalaSpecialCaseIsIncrementalPrimitive @forUpdate.scalaSpecialCaseIsSimpleIncrementDecrement  @statement.scalaSpecialCaseOneLine) then
+                                            "(" ++ @forInit.scalaSpecialCaseForInitValue ++ " to " ++ @expression.scalaSpecialCaseForEndValue  ++ ").foreach(" ++ @forInit.scalaSpecialCaseForInitIdentifier ++ " => \n"++
+                                            @lhs.scalaNTab ++ @statement.scalaStatement ++")"
+                                       else
+                                            @forInit.scalaForInit ++ "\n" ++
+                                            @lhs.scalaNTab ++ "while(" ++ @expression.scalaExpression ++") {" ++
+                                                @statement.scalaStatement ++ "\n" ++
+                                                @forUpdate.scalaForUpdate ++
+                                                "\n" ++
+                                                @lhs.scalaNTab ++ "}"
+                }
 
     | ForStatementBasicForStatementNoExp    statement.scalaNTab = @lhs.scalaNTab ++ "\t"
                                             lhs.scalaNTab = @statement.scalaNTab
@@ -2247,13 +2443,17 @@ sem DimExprs
     -- | NilDimExprsDims dims :: Dims
     -- | NilDimExprs
 
+
+
 sem StatementExpressionList
     | StatementExpressionList
                             --expression.scalaStatement = "" -- ToDo
                             lhs.scalaStatement = @expression.scalaExpression ++ @statementExpressionList.scalaStatement
     --                          statementExpressionList :: StatementExpressionList
+                            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @expression.scalaSpecialCaseIsSimpleIncrementDecrement || @statementExpressionList.scalaSpecialCaseIsSimpleIncrementDecrement
     | NilStatementExpressionList
                             lhs.scalaStatement = @lhs.scalaStatement
+                            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
 
 sem SwitchLabel
     | SwitchLabelConstant expression.scalaStatement = "" -- ToDo
@@ -2268,14 +2468,18 @@ sem ZPrimaryOrExpression
 sem ZPostfixExpression
     | Cons
         lhs.scalaExpression = @hd.scalaExpression ++ @tl.scalaExpression
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @hd.scalaSpecialCaseIsSimpleIncrementDecrement || @tl.scalaSpecialCaseIsSimpleIncrementDecrement
     | Nil
         lhs.scalaExpression = ""
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
 
 sem ZPostfixExp
     | PostIncrement
             lhs.scalaExpression = " += 1"
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = True
     | PostDecrement
             lhs.scalaExpression = " -= 1"
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = True
 
 sem AssignmentOperator
     | AssignmentOp {- = -}
