@@ -9,19 +9,20 @@ class ClaseA {
 	def transformar(): Unit = {
 		var numbers: List[Integer] = Arrays.asList(1,2,3,4,5,6)
 		var l2: List[Integer] =  new ArrayList[Integer] ()
-		for (n <- numbers) {			
-			l2.add(n)
-		}
+		numbers.foreach(n =>			
+			l2.add(n))
 	}
-
-	void nombres() {
-
-		String[] players = {"Rafael", "Ana", "David",
-			"Roger", "Andy", "Tomas", "Juan"};
-
-		for (String player: players) {
-			System.out.print(player + "; ");
-		}
+	def nombres(): Unit = {
+		var players: Array[String] = Array("Rafael", "Ana", "David", "Roger", "Andy", "Tomas", "Juan")
+		players.foreach(player => 			
+			System.out.print(player + "; "))
+	}
+	def filtrar(inv: ArrayList[Integer]): List[Integer] = {
+		var sub: List[Integer] =  new ArrayList[Integer] ()
+		inv.filter(numero => (numero > 5))
+		.foreach(numero => 				
+				sub.add(numero))
+		sub
 	}
 }
 
