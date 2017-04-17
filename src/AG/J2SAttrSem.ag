@@ -1272,13 +1272,13 @@ sem ConditionalOrExpression
                 @conditionalOrExpression1.scalaExpression ++ " == " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
         lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
-        lhs.scalaSpecialCaseForEndValue = @conditionalOrExpression2.scalaExpression
+        lhs.scalaSpecialCaseForEndValue = ""
     | NotEqualTo -- :!=:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " != " ++
                 @conditionalOrExpression2.scalaExpression -- ToDo check
         lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
-        lhs.scalaSpecialCaseForEndValue = show ((read @conditionalOrExpression2.scalaExpression :: Int) - 1)
+        lhs.scalaSpecialCaseForEndValue = ""
     | LessThan -- :<:
         lhs.scalaExpression =
                 @conditionalOrExpression1.scalaExpression ++ " < " ++

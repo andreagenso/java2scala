@@ -1,15 +1,26 @@
 package code.java
 
+import scala.collection.JavaConversions._
+import java.util.List
+import java.util.Arrays
+import java.util.ArrayList
 class ClaseA { 
 
-	def forClasico(): Unit = {
-		 ---- 2
+	def transformar(): Unit = {
+		var numbers: List[Integer] = Arrays.asList(1,2,3,4,5,6)
+		var l2: List[Integer] =  new ArrayList[Integer] ()
+		for (n <- numbers) {			
+			l2.add(n)
+		}
+	}
 
-		var i: Int = 0
-		while(i < 10) {			
-			System.out.println(" i es " + i)
-			System.out.println(" xxxx es " + i)
-			i += 1
+	void nombres() {
+
+		String[] players = {"Rafael", "Ana", "David",
+			"Roger", "Andy", "Tomas", "Juan"};
+
+		for (String player: players) {
+			System.out.print(player + "; ");
 		}
 	}
 }
