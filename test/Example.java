@@ -1,38 +1,55 @@
 package code.java;
 
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
+public class Static1 {
 
-class ClaseA {
-    void transformar() {
-        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
-        List<Integer> l2 = new  ArrayList<Integer>();
-
-        for (int n : numbers) {
-            l2.add(n);
-        }
+    // 1st static block
+    static {
+        System.out.println("\nI'm static block 1..");
+        setTestString("This is static block's String");
+        setTestValue(2);
     }
 
-    void nombres() {
-
-        String[] players = {"Rafael", "Ana", "David",
-                "Roger", "Andy", "Tomas", "Juan"};
-
-        for (String player: players) {
-            System.out.print(player + "; ");
-        }
+    // 2nd static blocks in same class
+    static {
+        System.out.println("\nI'm static block 2..");
     }
 
-    List<Integer> filtrar(ArrayList<Integer> inv) {
+    // static variable example
+    private static int testValue; // kept private to control it's value through setter
 
-        List<Integer> sub = new ArrayList<Integer>();
+    public int getTestValue() {
+        return testValue;
+    }
 
-        for(Integer numero:  inv) {
-            if( numero > 5) {
-                sub.add(numero);
-            }
-        }
-        return sub;
+    // static method example
+    public static void setTestValue(int testValue) {
+        if (testValue > 0)
+            Static1.testValue = testValue;
+        System.out.println("setTestValue method: " + testValue);
+    }
+
+    public static String testString;
+
+    /**
+     * @return the testString
+     */
+    public static String getTestString() {
+        return testString;
+    }
+
+    /**
+     * @param testString the testString to set
+     */
+    public static void setTestString(String testString) {
+        Static1.testString = testString;
+        System.out.println("setTestString method: " + testString);
+    }
+
+    // static util method
+    public static int subValue(int i, int... js) {
+        int sum = i;
+        for (int x : js)
+            sum -= x;
+        return sum;
     }
 }

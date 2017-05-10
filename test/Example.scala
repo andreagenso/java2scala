@@ -1,29 +1,42 @@
 package code.java
 
-import scala.collection.JavaConversions._
-import java.util.List
-import java.util.Arrays
-import java.util.ArrayList
-class ClaseA { 
+object Static1 {
+  private var testValue: Int = 0
 
-	def transformar(): Unit = {
-		var numbers: List[Integer] = Arrays.asList(1,2,3,4,5,6)
-		var l2: List[Integer] =  new ArrayList[Integer] ()
-		numbers.foreach(n =>			
-			l2.add(n))
-	}
-	def nombres(): Unit = {
-		var players: Array[String] = Array("Rafael", "Ana", "David", "Roger", "Andy", "Tomas", "Juan")
-		players.foreach(player => 			
-			System.out.print(player + "; "))
-	}
-	def filtrar(inv: ArrayList[Integer]): List[Integer] = {
-		var sub: List[Integer] =  new ArrayList[Integer] ()
-		inv.filter(numero => (numero > 5))
-		.foreach(numero => 				
-				sub.add(numero))
-		sub
-	}
+  def setTestValue(testValue: Int) {
+    if (testValue > 0) Static1.testValue = testValue
+    System.out.println("setTestValue method: " + testValue)
+  }
+
+  var testString: Nothing = null
+
+  def getTestString: Nothing = {
+    return testString
+  }
+
+  def setTestString(testString: Nothing) {
+    Static1.testString = testString
+    System.out.println("setTestString method: " + testString)
+  }
+
+  def subValue(i: Int, js: Int*): Int = {
+    var sum: Int = i
+    for (x <- js) sum -= x
+    return sum
+  }
+
+  {
+    System.out.println("\nI'm static block 1..")
+    setTestString("This is static block's String")
+    setTestValue(2)
+  }
+  {
+    System.out.println("\nI'm static block 2..")
+  }
 }
 
-
+class Static1 {
+  def getTestValue: Int = {
+    return Static1.testValue
+  }
+}
