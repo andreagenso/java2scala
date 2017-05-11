@@ -104,6 +104,8 @@ set ScalaFieldDeclInitialization = VariableInitializer
                                     TypeName
                                     ClassOrInterfaceType ZClassOrInterfaceType ZCOITTypeDeclSpecifier
 
+
+
 -- ------------------------------------------------
 -- tabs
 -- ------------------------------------------------
@@ -343,7 +345,8 @@ attr ScalaConstructorDeclaration
 -- modifiers type variableName
 {
     -- Modifier isStatic isFinal
-type TypeModifierIsStaticIsFinal = (String, Bool, Bool)
+-- type TypeModifierIsStaticIsFinal = (String, Bool, Bool)
+type TypeModifierIsFinal = (String, Bool)
 -- Modifiers Types Variables
 type TypeFieldInitialization = Maybe String
 --type TypeFieldDeclaration = ([TypeModifierIsStaticIsFinal], String, String, TypeFieldInitialization)
@@ -384,7 +387,7 @@ set ScalaExtendClassBodyNormalCD = ExtendsInterfaces
                                  InterfaceMemberDeclaration
 
 attr ScalaNormalClassDeclaration
-    chn scalaNormalClassDeclaration :: TypeModifierIsStaticIsFinal
+    chn scalaNormalClassDeclaration :: TypeModifierIsFinal
 
 attr ScalaSuperTypeDeclaration
     syn scalaSuperTypeDeclaration :: String
@@ -410,7 +413,7 @@ set ScalaBodyNormalInterface = ListInterfaceMemberDeclaration
                                 InterfaceMemberDeclaration
 
 attr ScalaNormalInterfaceDeclaration
-    chn scalaNormalInterfaceDeclaration :: TypeModifierIsStaticIsFinal
+    chn scalaNormalInterfaceDeclaration :: TypeModifierIsFinal
 
 attr ScalaExtendInterface
     syn scalaExtendInterface ::  String
@@ -432,18 +435,31 @@ set ScalaArrayType =
 
 attr ScalaArrayType
     chn scalaArrayType :: String
+
+-- -----------------------------------------------
+-- Companion objects
+-- ------------------------------------------------
+
+set ScalaCompanionObject =
+    ClassBodyDeclaration
+
+set ScalaClassBodyDeclarations =
+    ClassBodyDeclarations
+
+attr ScalaCompanionObject
+    syn scalaIsStaticClassBodyDeclaration :: Bool
+
+attr ScalaClassBodyDeclarations
+    syn scalaClassBodyDeclarationsCompanions :: String
+
 -- -----------------------------------------------
 -- sem Type declarations
 -- ------------------------------------------------
 {
 -- modifiers of normalClassDeclaration
-normalClassDeclaration :: TypeModifierIsStaticIsFinal -> String -> String
-normalClassDeclaration ("", False, b2) nTab = "class" ++ " "
-normalClassDeclaration ("", True, b2)  bTab = "object" ++ " "
-normalClassDeclaration (str, b1, b2) nTab = if b1 then
-                                            (strictFpTab str nTab) ++ " " ++ "object" ++ " "
-                                       else
-                                            (strictFpTab str nTab) ++ " " ++ "class" ++ " "
+normalClassDeclaration :: TypeModifierIsFinal -> String -> String
+normalClassDeclaration ("",  b2) nTab = "class" ++ " "
+normalClassDeclaration (str, b2) nTab = (strictFpTab str nTab) ++ " " ++ "class" ++ " "
 
 strictFpTab :: String -> String -> String
 strictFpTab str nTab = (replace "@scala.annotation.strictfp\n" ("@scala.annotation.strictfp\n" ++ nTab) str)
@@ -460,14 +476,12 @@ constructorDeclarationBody body = body ++ "\n"
 
 {
 -- modifiers of normalinterfaceDeclaration
-normalInterfaceDeclaration :: TypeModifierIsStaticIsFinal -> String -> String
-normalInterfaceDeclaration ("", False, b2) nTab = "trait" ++ " "
-normalInterfaceDeclaration ("", True, b2) nTab = "object" ++ " "
-normalInterfaceDeclaration (str, b1, b2) nTab = if b1 then
-                                                (strictFpTab str nTab) ++ " " ++ "object" ++ " "
-                                            else
-                                                (strictFpTab str nTab) ++ " " ++ "trait" ++ " "
+normalInterfaceDeclaration :: TypeModifierIsFinal -> String -> String
+normalInterfaceDeclaration ("", b2) nTab = "trait" ++ " "
+normalInterfaceDeclaration (str, b2) nTab = (strictFpTab str nTab) ++ " " ++ "trait" ++ " "
 }
+
+
 
 sem TypeDeclarations
     | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ "\n" ++ @tl.scalaTypeDeclaration
@@ -483,30 +497,49 @@ sem TypeDeclarations
 sem TypeDeclaration
     | TypeDeclarationClassDeclarationNormalCD
                               modifiers.scalaModifierFieldDeclaration = [""]  -- ToDo
-                              modifiers.scalaNormalClassDeclaration = ("", False, False)
-                              modifiers.scalaNormalInterfaceDeclaration = ("", False, False)
+                              modifiers.scalaNormalClassDeclaration = ("", False)
+                              modifiers.scalaNormalInterfaceDeclaration = ("", False)
                               modifiers.scalaMethodDeclaration = "" -- ToDo
                               classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
                               lhs.scalaNTab = @lhs.scalaNTab
                               lhs.scalaHasForEach = @classBodyDeclarations.scalaHasForEach
 
-                              lhs.scalaTypeDeclaration =
-                                  @lhs.scalaNTab ++
-                                  (normalClassDeclaration @modifiers.scalaNormalClassDeclaration @lhs.scalaNTab) ++
-                                  (constructorDeclarationParams @identifier @classBodyDeclarations.scalaConstructorDeclarationParams) ++
-                                  @typeParameters.scalaTypeDeclaration ++ -- ToDo
-                                  @super.scalaTypeDeclaration ++
-                                  @interfaces.scalaTypeDeclaration ++
-                                  " { \n" ++
-                                  (constructorDeclarationBody @classBodyDeclarations.scalaConstructorDeclarationBody) ++
-                                  @classBodyDeclarations.scalaTypeDeclaration ++ @lhs.scalaNTab ++
-                                  "\n}\n\n"
+                              lhs.scalaTypeDeclaration = {
+                                    if (@classBodyDeclarations.scalaClassBodyDeclarationsCompanions == "") then
+                                        @lhs.scalaNTab ++
+                                          (normalClassDeclaration @modifiers.scalaNormalClassDeclaration @lhs.scalaNTab) ++
+                                          (constructorDeclarationParams @identifier @classBodyDeclarations.scalaConstructorDeclarationParams) ++
+                                          @typeParameters.scalaTypeDeclaration ++ -- ToDo
+                                          @super.scalaTypeDeclaration ++
+                                          @interfaces.scalaTypeDeclaration ++
+                                          " { \n" ++
+                                          (constructorDeclarationBody @classBodyDeclarations.scalaConstructorDeclarationBody) ++
+                                          @classBodyDeclarations.scalaTypeDeclaration ++ @lhs.scalaNTab ++
+                                          "\n}\n\n"
+                                    else
+                                        @lhs.scalaNTab ++
+                                            "object " ++ @identifier  ++
+                                              " { \n" ++
+                                              @classBodyDeclarations.scalaClassBodyDeclarationsCompanions ++ @lhs.scalaNTab ++
+                                              "\n}\n\n" ++
+                                        @lhs.scalaNTab ++
+                                          (normalClassDeclaration @modifiers.scalaNormalClassDeclaration @lhs.scalaNTab) ++
+                                          (constructorDeclarationParams @identifier @classBodyDeclarations.scalaConstructorDeclarationParams) ++
+                                          @typeParameters.scalaTypeDeclaration ++ -- ToDo
+                                          @super.scalaTypeDeclaration ++
+                                          @interfaces.scalaTypeDeclaration ++
+                                          " { \n" ++
+                                          @lhs.scalaNTab ++ "import " ++ @identifier ++ "._" ++
+                                          (constructorDeclarationBody @classBodyDeclarations.scalaConstructorDeclarationBody) ++
+                                          @classBodyDeclarations.scalaTypeDeclaration ++ @lhs.scalaNTab ++
+                                          "\n}\n\n"
+                              }
 
     | TypeDeclarationClassDeclarationEnumD
                                 modifiers.scalaModifierFieldDeclaration = [""]
                                 lhs.scalaTypeDeclaration = "" -- ToDO modifiers :: Modifiers
-                                modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-                                modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+                                modifiers.scalaNormalClassDeclaration = ("",  False) -- ToDo
+                                modifiers.scalaNormalInterfaceDeclaration = ("",  False) -- ToDo
                                 modifiers.scalaMethodDeclaration = "" -- ToDo
 
                                 enumBody.scalaNTab = @lhs.scalaNTab ++ "\t"
@@ -516,8 +549,8 @@ sem TypeDeclaration
     | TypeDeclarationInterfaceDeclarationNormalInterfaceD
                                 modifiers.scalaModifierFieldDeclaration = [""]
 
-                                modifiers.scalaNormalClassDeclaration = ("", False, False)
-                                modifiers.scalaNormalInterfaceDeclaration = ("", False, False)
+                                modifiers.scalaNormalClassDeclaration = ("",  False)
+                                modifiers.scalaNormalInterfaceDeclaration = ("",  False)
                                 modifiers.scalaMethodDeclaration = "" -- ToDo
                                 listInterfaceMemberDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
                                 lhs.scalaNTab = @lhs.scalaNTab
@@ -537,12 +570,12 @@ sem TypeDeclaration
                                 modifiers.scalaModifierFieldDeclaration = [""]
                                 lhs.scalaTypeDeclaration = "" -- ToDO  modifiers :: Modifiers
 
-                                modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
+                                modifiers.scalaNormalClassDeclaration = ("",  False) -- ToDo
                                 listAnnotationTypeElementDeclaration.scalaNTab = @lhs.scalaNTab
                                 lhs.scalaNTab = @lhs.scalaNTab
                                 lhs.scalaHasForEach = @listAnnotationTypeElementDeclaration.scalaHasForEach
 
-                                modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+                                modifiers.scalaNormalInterfaceDeclaration = ("",  False) -- ToDo
                                 modifiers.scalaMethodDeclaration = "" -- ToDo
     | TypeDeclarationSemiColon  lhs.scalaTypeDeclaration = "" -- ToDO review how to convert this case to Scala
                                 lhs.scalaNTab = @lhs.scalaNTab
@@ -565,15 +598,15 @@ changeOrderVolatileTransient modifiers = joinTuple (partition (\m -> (m == "@vol
 
 {
 -- modifiers functions for normalClassDeclaration.
-strictFpModifier :: TypeModifierIsStaticIsFinal -> TypeModifierIsStaticIsFinal
-strictFpModifier (str, b1, b2) = if T.isInfixOf (T.pack("strfp")) (T.pack(str))
-                                        then ("@scala.annotation.strictfp\n" ++ T.unpack(T.strip(T.pack(replace "strfp" "" str))), b1, b2)
-                                        else (T.unpack(T.strip(T.pack(str))), b1, b2)
+strictFpModifier :: TypeModifierIsFinal -> TypeModifierIsFinal
+strictFpModifier (str, b2) = if T.isInfixOf (T.pack("strfp")) (T.pack(str))
+                                then ("@scala.annotation.strictfp\n" ++ T.unpack(T.strip(T.pack(replace "strfp" "" str))), b2)
+                                else (T.unpack(T.strip(T.pack(str))), b2)
 
-joinTypeModifier :: TypeModifierIsStaticIsFinal -> TypeModifierIsStaticIsFinal -> TypeModifierIsStaticIsFinal
-joinTypeModifier ("", b1, b11) (str2, b2, b22) = (T.unpack(T.strip(T.pack(str2))), b1 || b2, b11 || b22)
-joinTypeModifier (str1, b1, b11) ("", b2, b22) = (T.unpack(T.strip(T.pack(str1))), b1 || b2, b11 || b22)
-joinTypeModifier (str1, b1, b11) (str2, b2, b22) = (T.unpack(T.strip(T.pack(str1))) ++  " " ++ T.unpack(T.strip(T.pack(str2))), b1 || b2, b11 || b22)
+joinTypeModifier :: TypeModifierIsFinal -> TypeModifierIsFinal -> TypeModifierIsFinal
+joinTypeModifier ("", b11) (str2, b22) = (T.unpack(T.strip(T.pack(str2))), b11 || b22)
+joinTypeModifier (str1, b11) ("",  b22) = (T.unpack(T.strip(T.pack(str1))), b11 || b22)
+joinTypeModifier (str1, b11) (str2, b22) = (T.unpack(T.strip(T.pack(str1))) ++  " " ++ T.unpack(T.strip(T.pack(str2))), b11 || b22)
 
 strictFpMethodModifier :: String -> String -> String
 strictFpMethodModifier str nTab = if T.isInfixOf (T.pack("strfp ")) (T.pack(str))
@@ -637,8 +670,8 @@ sem Modifier
                          lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
 
     | ModifierPublic
-                     lhs.scalaNormalClassDeclaration = joinTypeModifier @lhs.scalaNormalClassDeclaration ("", False, False)
-                     lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("", False, False)
+                     lhs.scalaNormalClassDeclaration = joinTypeModifier @lhs.scalaNormalClassDeclaration ("",  False)
+                     lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("",  False)
                      lhs.scalaMethodDeclaration = @lhs.scalaMethodDeclaration
                      lhs.scalaConstructorModifier = ""
                      lhs.scalaIsAbstractMethodModifier = False
@@ -648,8 +681,8 @@ sem Modifier
                      lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
 
     | ModifierProtected
-                        lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration  ("protected", False, False)
-                        lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("protected", False, False)
+                        lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration  ("protected",  False)
+                        lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("protected",  False)
                         lhs.scalaMethodDeclaration = "protected" ++ " " ++ @lhs.scalaMethodDeclaration
                         lhs.scalaConstructorModifier = "protected"
                         lhs.scalaIsAbstractMethodModifier = False
@@ -659,8 +692,8 @@ sem Modifier
                         lhs.scalaModifierFieldDeclaration = "protected": @lhs.scalaModifierFieldDeclaration
 
     | ModifierPrivate
-                      lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("private", False, False)
-                      lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("private", False, False)
+                      lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("private",  False)
+                      lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("private",  False)
                       lhs.scalaMethodDeclaration = "private" ++ " " ++ @lhs.scalaMethodDeclaration
                       lhs.scalaConstructorModifier = "private"
                       lhs.scalaIsAbstractMethodModifier = False
@@ -670,8 +703,8 @@ sem Modifier
                       lhs.scalaModifierFieldDeclaration = "private": @lhs.scalaModifierFieldDeclaration
 
     | ModifierAbstract
-                       lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("abstract", False, False)
-                       lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("abstract", False, False)
+                       lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("abstract",  False)
+                       lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("abstract",  False)
                        lhs.scalaMethodDeclaration = @lhs.scalaMethodDeclaration
                        lhs.scalaConstructorModifier = ""
                        lhs.scalaIsAbstractMethodModifier = True
@@ -681,8 +714,8 @@ sem Modifier
                        lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
 
     | ModifiersStatic
-                      lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("", True, False)
-                      lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("", True, False)
+                      lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("",  False)
+                      lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("",  False)
                       lhs.scalaMethodDeclaration = @lhs.scalaMethodDeclaration -- ToDo aplicar isStatic
                       lhs.scalaConstructorModifier = ""
                       lhs.scalaIsAbstractMethodModifier = False
@@ -692,8 +725,8 @@ sem Modifier
                       lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
 
     | ModifierFinal
-                    lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("final", False, True)
-                    lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("", False, True)
+                    lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("final",  True)
+                    lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("",  True)
                     lhs.scalaMethodDeclaration = "final" ++ " " ++ @lhs.scalaMethodDeclaration
                     lhs.scalaConstructorModifier = ""
                     lhs.scalaIsAbstractMethodModifier = False
@@ -703,8 +736,8 @@ sem Modifier
                     lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
 
     | ModifierStrictfp
-                        lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("strfp", False, False)
-                        lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("strfp", False, False)
+                        lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("strfp",  False)
+                        lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("strfp",  False)
                         lhs.scalaMethodDeclaration = "strfp " ++ @lhs.scalaMethodDeclaration
                         lhs.scalaConstructorModifier = ""
                         lhs.scalaIsAbstractMethodModifier = False
@@ -858,7 +891,18 @@ sem InterfaceTypeList
 sem ClassBodyDeclarations
     | Cons
             --hd.scalaFieldDeclaration = []
-            lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
+            lhs.scalaTypeDeclaration = {
+                if (@hd.scalaIsStaticClassBodyDeclaration) then
+                    @tl.scalaTypeDeclaration
+                else
+                    @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
+            }
+            lhs.scalaClassBodyDeclarationsCompanions = {
+               if (@hd.scalaIsStaticClassBodyDeclaration) then
+                   @hd.scalaTypeDeclaration ++ @tl.scalaClassBodyDeclarationsCompanions
+               else
+                   @tl.scalaClassBodyDeclarationsCompanions
+            }
             hd.scalaNTab = @lhs.scalaNTab
             tl.scalaNTab = @hd.scalaNTab
             lhs.scalaNTab = @tl.scalaNTab
@@ -869,10 +913,12 @@ sem ClassBodyDeclarations
 
     | Nil
             lhs.scalaTypeDeclaration = ""
+            lhs.scalaClassBodyDeclarationsCompanions = ""
             lhs.scalaNTab = @lhs.scalaNTab
             lhs.scalaConstructorDeclarationParams = ""
             lhs.scalaConstructorDeclarationBody = ""
             lhs.scalaHasForEach = False
+
 
 
 --sem ReferenceTypeList
@@ -922,21 +968,25 @@ sem ClassBodyDeclaration
                         modifiers.scalaModifierFieldDeclaration = [""]
 
                         lhs.scalaTypeDeclaration = {checkVariableDeclarators @modifiers.scalaModifierFieldDeclaration @modifiers.scalaIsStaticFieldDeclaration @modifiers.scalaIsFinalFieldDeclaration @type_.scalaResultType @variableDeclarators.scalaVariableDeclarator @variableDeclarators.scalaNTab}
+
                         variableDeclarators.scalaNTab = @lhs.scalaNTab
                         lhs.scalaNTab = @lhs.scalaNTab
 
-                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-                        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
                         modifiers.scalaMethodDeclaration = "" -- ToDo
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
                         lhs.scalaHasForEach = False
+                        lhs.scalaIsStaticClassBodyDeclaration = @modifiers.scalaIsStaticFieldDeclaration
+
     | ClassBodyDeclClassMemberDeclMethodDeclaration
                         modifiers.scalaModifierFieldDeclaration = [""]
-                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-                        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
                         modifiers.scalaMethodDeclaration = "" -- ToDo
+                        lhs.scalaIsStaticClassBodyDeclaration = @modifiers.scalaIsStaticFieldDeclaration
 
                         methodBody.scalaNTab = @lhs.scalaNTab ++ "\t"
                         lhs.scalaNTab = @lhs.scalaNTab
@@ -971,10 +1021,12 @@ sem ClassBodyDeclaration
 
     | ClassBodyDeclClassMemberDeclClassDeclarationNormalCD
                         modifiers.scalaModifierFieldDeclaration = [""]
-                        modifiers.scalaNormalClassDeclaration = ("", False, False)
-                        modifiers.scalaNormalInterfaceDeclaration = ("", False, False)
+                        modifiers.scalaNormalClassDeclaration = ("", False)
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False)
                         modifiers.scalaMethodDeclaration = "" -- ToDo
                         lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaIsStaticClassBodyDeclaration = @modifiers.scalaIsStaticFieldDeclaration
+
                         classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
 
                         lhs.scalaTypeDeclaration =
@@ -998,8 +1050,8 @@ sem ClassBodyDeclaration
                         lhs.scalaTypeDeclaration = ""
                         modifiers.scalaModifierFieldDeclaration = [""]
 
-                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-                        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
                         modifiers.scalaMethodDeclaration = "" -- ToDo
 
                         enumBody.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo, check
@@ -1008,15 +1060,17 @@ sem ClassBodyDeclaration
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = False
 
     | ClassBodyDeclClassMemberDeclInterfaceDeclarationNormalInterfaceD
                         modifiers.scalaModifierFieldDeclaration = [""] -- ToDo ?
 
-                        modifiers.scalaNormalClassDeclaration = ("", False, False)
-                        modifiers.scalaNormalInterfaceDeclaration = ("", False, False)
+                        modifiers.scalaNormalClassDeclaration = ("", False)
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False)
                         modifiers.scalaMethodDeclaration = "" -- ToDo
                         lhs.scalaNTab = @lhs.scalaNTab
                         listInterfaceMemberDeclaration.scalaNTab = @lhs.scalaNTab ++ "\t"
+                        lhs.scalaIsStaticClassBodyDeclaration = False
 
                         lhs.scalaTypeDeclaration =
                             "\n" ++
@@ -1036,8 +1090,8 @@ sem ClassBodyDeclaration
                         modifiers.scalaModifierFieldDeclaration = [""]
                         lhs.scalaTypeDeclaration = ""
 
-                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-                        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
                         modifiers.scalaMethodDeclaration = "" -- ToDo
 
                         listAnnotationTypeElementDeclaration.scalaNTab = @lhs.scalaNTab
@@ -1045,52 +1099,58 @@ sem ClassBodyDeclaration
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = False
                         lhs.scalaHasForEach = @listAnnotationTypeElementDeclaration.scalaHasForEach
 
     | ClassBodyDeclClassMemberDeclSemiColon
                         lhs.scalaTypeDeclaration = ""
                         lhs.scalaNTab = @lhs.scalaNTab
                         lhs.scalaHasForEach = False
+                        lhs.scalaIsStaticClassBodyDeclaration = False
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
 
     | ClassBodyInstanceInitializer
                         lhs.scalaTypeDeclaration = ""
-                        blockStatements.scalaNTab = @lhs.scalaNTab
+                        blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
                         blockStatements.scalaStatement = ""
                         lhs.scalaNTab = @lhs.scalaNTab
                         lhs.scalaHasForEach = @blockStatements.scalaHasForEach
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = False
 
     | ClassBodyStaticInitializer
-                        lhs.scalaTypeDeclaration = ""
-                        blockStatements.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaTypeDeclaration = @lhs.scalaNTab ++ "{" ++ @blockStatements.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}\n"
+
+                        blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
                         blockStatements.scalaStatement = ""
                         lhs.scalaNTab = @lhs.scalaNTab
                         lhs.scalaHasForEach = @blockStatements.scalaHasForEach
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = True
 
     | ClassBodyConstructorDeclaration
                         modifiers.scalaModifierFieldDeclaration = [""]
 
-                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-                        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
                         modifiers.scalaMethodDeclaration = "" -- ToDo
                         constructorBody.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo, check if is correct
                         lhs.scalaNTab = @lhs.scalaNTab
                         lhs.scalaHasForEach = @constructorBody.scalaHasForEach
 
                         lhs.scalaTypeDeclaration = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = False
 
                         lhs.scalaConstructorDeclarationParams = "(" ++  @formalParameterList.scalaMethodFormalParameters ++ ")"
                         lhs.scalaConstructorDeclarationBody = {
                             if (@constructorBody.scalaMethodBody == "") then ""
-                            else "\n" ++ @lhs.scalaNTab ++ " {" ++
+                            else "\n" ++ @lhs.scalaNTab ++ "{" ++
                                  @constructorBody.scalaMethodBody ++
                                  "\n" ++ @lhs.scalaNTab ++ "}" -- ToDo throws
                         }
@@ -1099,8 +1159,8 @@ sem ClassBodyDeclaration
                         modifiers.scalaModifierFieldDeclaration = [""]
                         lhs.scalaTypeDeclaration = ""
 
-                        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-                        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
                         modifiers.scalaMethodDeclaration = "" -- ToDo
                         constructorBody.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo , check if is correct.
                         lhs.scalaNTab = @lhs.scalaNTab
@@ -1108,6 +1168,7 @@ sem ClassBodyDeclaration
 
                         lhs.scalaConstructorDeclarationParams = ""
                         lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = False
 
 sem Type  -- ToDo check
     | TypePrimitiveType
@@ -1535,7 +1596,7 @@ sem FormalParameterList
 
         lhs.scalaMethodFormalParameters = @variableModifiers.scalaMethodFormalParameters ++
                                           @variableDeclaratorId.scalaVariableDeclaratorId ++
-                                          ": " ++ @type_.scalaResultType  -- ToDo check  ... case ( 3 points) -- met3(int a, int ...b) es para parametros infinitos
+                                          ": " ++ @type_.scalaResultType ++ "*"  -- ... case ( 3 points) -- met3(int a, int ...b) es para parametros infinitos
     | FormalParameterListNil
             lhs.scalaMethodFormalParameters = ""
 
@@ -1587,8 +1648,8 @@ sem InterfaceMemberDeclaration
         modifiers.scalaModifierFieldDeclaration = [""]
         variableDeclarators.scalaNTab = ""
 
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         lhs.scalaTypeDeclaration = ""
         lhs.scalaBodyNormalInterface = ""
@@ -1599,8 +1660,8 @@ sem InterfaceMemberDeclaration
     | InterfaceMemberDeclarationAbstract
         modifiers.scalaModifierFieldDeclaration = [""]
 
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         lhs.scalaTypeDeclaration = ""
         lhs.scalaBodyNormalInterface = ""
@@ -1610,8 +1671,8 @@ sem InterfaceMemberDeclaration
         lhs.scalaNTab = @lhs.scalaNTab
     | InterfaceMemberDeclTypeDeclarationClassDeclarationNormalCD
         modifiers.scalaModifierFieldDeclaration = [""]
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
         lhs.scalaNTab = @lhs.scalaNTab
@@ -1631,8 +1692,8 @@ sem InterfaceMemberDeclaration
 
     | InterfaceMemberDeclTypeDeclarationClassDeclarationEnumD
         modifiers.scalaModifierFieldDeclaration = [""]
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         lhs.scalaTypeDeclaration = ""
         lhs.scalaBodyNormalInterface = ""
@@ -1643,8 +1704,8 @@ sem InterfaceMemberDeclaration
 
     | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD
         modifiers.scalaModifierFieldDeclaration = [""]
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         listInterfaceMemberDeclaration.scalaNTab = @lhs.scalaNTab ++ "\t"
 
@@ -1662,8 +1723,8 @@ sem InterfaceMemberDeclaration
         lhs.scalaHasForEach = @listInterfaceMemberDeclaration.scalaHasForEach
     | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD
         modifiers.scalaModifierFieldDeclaration = [""]
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         lhs.scalaTypeDeclaration = ""
         lhs.scalaBodyNormalInterface = ""
@@ -1696,7 +1757,7 @@ sem Catches
 sem CatchClause
     | CatchClause
         variableDeclaratorId.scalaNTab = ""
-        blockStatements.scalaNTab = @lhs.scalaNTab
+        blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
         lhs.scalaNTab = @lhs.scalaNTab
         lhs.scalaStatement = "" -- ToDo
         lhs.scalaHasForEach = @blockStatements.scalaHasForEach
@@ -1726,8 +1787,8 @@ sem BlockStatement
         modifiers.scalaModifierFieldDeclaration = [""]
         variableDeclarators.scalaNTab = @lhs.scalaNTab
 
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         lhs.scalaNTab = @lhs.scalaNTab
         lhs.scalaHasForEach = False
@@ -1740,11 +1801,11 @@ sem BlockStatement
         lhs.scalaStatement = {checkVariableDeclarators @modifiers.scalaModifierFieldDeclaration @modifiers.scalaIsStaticFieldDeclaration @modifiers.scalaIsFinalFieldDeclaration @type_.scalaResultType @variableDeclarators.scalaVariableDeclarator @variableDeclarators.scalaNTab}
     | BlockStatementClassDeclarationNormalClassDeclaration
         modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
-        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaNTab = @lhs.scalaNTab ++ "\t"
         lhs.scalaHasForEach = False -- ToDo
         lhs.scalaSpecialCaseForIsIf = False
         lhs.scalaSpecialCaseOneLine = 2
@@ -1765,8 +1826,8 @@ sem BlockStatement
     | BlockStatementClassDeclarationEnumDeclaration
             modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
 
-            modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-            modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+            modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+            modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
             modifiers.scalaMethodDeclaration = "" -- ToDo
             enumBody.scalaNTab = @lhs.scalaNTab ++ "\t"
             lhs.scalaNTab = @lhs.scalaNTab
@@ -2039,7 +2100,7 @@ sem Statement
                     lhs.scalaSpeciaCaseForIfBody = ""
 
     | SWTSynchronizedStatement
-                    blockStatements.scalaNTab = @lhs.scalaNTab
+                    blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
                     lhs.scalaNTab = @blockStatements.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement -- ToDo
                     blockStatements.scalaStatement = @expression.scalaStatement -- ToDo
@@ -2065,7 +2126,7 @@ sem Statement
                     lhs.scalaSpeciaCaseForIfBody = ""
 
     | SWTTryStatement
-                    blockStatements.scalaNTab = @lhs.scalaNTab
+                    blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
                     catches.scalaNTab = @lhs.scalaNTab
                     lhs.scalaNTab = @blockStatements.scalaNTab
                     blockStatements.scalaStatement = @lhs.scalaStatement -- ToDo
@@ -2171,7 +2232,7 @@ sem StatementNested
                     lhs.scalaHasForEach =  @forStatement.scalaHasForEach
 
     | SWTSBlockNested
-                    blockStatements.scalaNTab = @lhs.scalaNTab
+                    blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
                     lhs.scalaNTab = @blockStatements.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @blockStatements.scalaHasForEach
@@ -2284,7 +2345,7 @@ sem StatementNested
                     --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSynchronizedStatementNested
-                    blockStatements.scalaNTab = @lhs.scalaNTab
+                    blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
                     lhs.scalaNTab = @blockStatements.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement -- ToDo
                     blockStatements.scalaStatement = @expression.scalaStatement -- ToDo
@@ -2302,7 +2363,7 @@ sem StatementNested
                     --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTTryStatementNested
-                    blockStatements.scalaNTab = @lhs.scalaNTab
+                    blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
                     catches.scalaNTab = @lhs.scalaNTab
                     lhs.scalaNTab = @blockStatements.scalaNTab
                     blockStatements.scalaStatement = @lhs.scalaStatement -- ToDo
@@ -2371,8 +2432,8 @@ sem AnnotationTypeElementDeclaration
         modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
         --type_.scalaFieldDeclaration = [] -- ToDo
 
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         lhs.scalaNTab = @lhs.scalaNTab
         lhs.scalaHasForEach = False
@@ -2382,15 +2443,15 @@ sem AnnotationTypeElementDeclaration
         --type_.scalaFieldDeclaration = [] -- ToDo
         variableDeclarators.scalaNTab = "" -- ToDo check if is neccesary for parent
 
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         lhs.scalaNTab = @lhs.scalaNTab
         lhs.scalaHasForEach = False
     | AnnTypeElemDeclTypeDeclarationClassDeclarationNormalCD
         modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo, check
         lhs.scalaNTab = @lhs.scalaNTab
@@ -2399,8 +2460,8 @@ sem AnnotationTypeElementDeclaration
     | AnnTypeElemDeclTypeDeclarationClassDeclarationEnumD
         modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
 
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
         enumBody.scalaNTab = @lhs.scalaNTab --ToDo
         lhs.scalaNTab = @lhs.scalaNTab
@@ -2408,8 +2469,8 @@ sem AnnotationTypeElementDeclaration
     | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD
         modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
 
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
 
         listInterfaceMemberDeclaration.scalaNTab = @lhs.scalaNTab -- ToDo
@@ -2418,8 +2479,8 @@ sem AnnotationTypeElementDeclaration
     | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD
         modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
 
-        modifiers.scalaNormalClassDeclaration = ("", False, False) -- ToDo
-        modifiers.scalaNormalInterfaceDeclaration = ("", False, False) -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
         modifiers.scalaMethodDeclaration = "" -- ToDo
 
         listAnnotationsTypeElementDeclaration.scalaNTab = @lhs.scalaNTab
@@ -2475,7 +2536,7 @@ sem MethodBody
 
 sem ConstructorBody
     | ConstructorBody
-                      blockStatements.scalaNTab = @lhs.scalaNTab
+                      blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
                       blockStatements.scalaStatement = ""
                       lhs.scalaMethodBody = @blockStatements.scalaStatement
                       lhs.scalaNTab = @blockStatements.scalaNTab

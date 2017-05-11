@@ -1,6 +1,15 @@
 package code.java;
 
-public class Static1 {
+
+interface A {
+
+}
+
+public class Static1 extends  Object implements A {
+
+    public Static1(int v){
+        System.out.println("\nI'm static block 1..");
+    }
 
     // 1st static block
     static {
