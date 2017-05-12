@@ -19,6 +19,7 @@ test001Parser = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/jav
 
 testSingleParser = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/java/CharArrayPropertyEditorTests.java")
 
+-- llamada recursiva a jdk
 testParser :: IO()
 testParser  = runSafeIO $ runProxy $ runEitherK $
                     contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/") />/ handlerParser

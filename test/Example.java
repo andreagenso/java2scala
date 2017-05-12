@@ -1,38 +1,22 @@
 package code.java;
 
 public class Switch {
-    public static void main(String[] args) {
 
-        int month = 8;
-        String monthString;
-        switch (month) {
-            case 1:  monthString = "January";
-                break;
-            case 2:  monthString = "February";
-                break;
-            case 3:  monthString = "March";
-                break;
-            case 4:  monthString = "April";
-                break;
-            case 5:  monthString = "May";
-                break;
-            case 6:  monthString = "June";
-                break;
-            case 7:  monthString = "July";
-                break;
-            case 8:  monthString = "August";
-                break;
-            case 9:  monthString = "September";
-                break;
-            case 10: monthString = "October";
-                break;
-            case 11: monthString = "November";
-                break;
-            case 12: monthString = "December";
-                break;
-            default: monthString = "Invalid month";
-                break;
+    private static void generate_hmac_sha1_40() throws Exception {
+        System.out.println("Generating ");
+
+        Document doc = dbf.newDocumentBuilder().newDocument();
+        XMLSignature sig = new XMLSignature
+                (doc, null, XMLSignature.ALGO_ID_MAC_HMAC_SHA1, 40,
+                        Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
+        try {
+            sig.sign(getSecretKey("secret".getBytes("ASCII")));
+            System.out.println("FAILED");
+            atLeastOneFailed = true;
+        } catch (XMLSignatureException xse) {
+            System.out.println(xse.getMessage());
+            System.out.println("PASSED");
         }
-        System.out.println(monthString);
     }
+
 }
