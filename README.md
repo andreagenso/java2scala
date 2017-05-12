@@ -15,6 +15,15 @@ cabal configure --ghc-options="-DEXTERNAL_UUAGC"
 cabal build --ghc-options="-DEXTERNAL_UUAGC"
 cabal install --ghc-options="-DEXTERNAL_UUAGC"
 
+-- TOKEN generation:
+Para pasar un archivo en especifico:
+./dist/build/java2scala/java2scala  "/home/andrea/workspaceclipse_haskell/java2scala/test/Example.java"
+
+Para testear ejemplos jdk1.7 
+./dist/build/test/test
+testscanner
+
+
 ./dist/build/java2scala/java2scala  "/home/andrea/workspaceclipse_haskell/java2scala/test/Example.java"
 -- "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/TmpImport.java"
 

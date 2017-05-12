@@ -26,6 +26,7 @@ main = do f <- getLine
           command
 
 test :: String -> IO()
+test "testscanner"  = testScanner
 test "singleparser" = testSingleParser
 test "testparser" = testParser
 
@@ -117,7 +118,7 @@ test "tspj" = tspj
 test "t001" = test001
 test "tp001" = test001Parser
 
-test "testscanner"  = testScanner
+
 test "testjavatest"  = testJavaTest
 test "testencodingdir" = testEncodingDir
 test "scannerwitherror" = testScannerWithError

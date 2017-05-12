@@ -17,7 +17,7 @@ import Debug.Trace ( trace )
 import System.Environment ( getArgs )
 import System.IO.Unsafe ( unsafeInterleaveIO )
 
-path = "/media/andrea/a43a31dd-6316-49c2-8627-897fc0adfbd6/andrea/"
+path = "/home/andrea/"
 
 testSingleScanner = scanner (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/src/share/classes/com/sun/demo/jvmti/hprof/Tracker.java")
 

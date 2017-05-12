@@ -13,9 +13,9 @@ import Control.Proxy
 import Control.Proxy.Safe
 import UU.Parsing
 
-path = "/media/andrea/a43a31dd-6316-49c2-8627-897fc0adfbd6/andrea/"
+path = "/home/andrea/"
 
-test001Parser = parser "/media/andrea/a43a31dd-6316-49c2-8627-897fc0adfbd6/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/javax/xml/crypto/dsig/GenerationTests.java"
+test001Parser = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/javax/xml/crypto/dsig/GenerationTests.java")
 
 testSingleParser = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/java/CharArrayPropertyEditorTests.java")
 
