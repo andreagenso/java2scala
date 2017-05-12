@@ -78,6 +78,7 @@ set ScalaAllNTab = TypeDeclarations TypeDeclaration
                 Statement StatementNested ForStatement ForInit ForUpdate
                 Catches CatchClause
                 SwitchBlock SwitchBlockStatementGroups SwitchBlockStatementGroup
+                SwitchLabels SwitchLabel
                 ListInterfaceMemberDeclaration InterfaceMemberDeclaration
                 VariableDeclarators
                 VariableDeclarator
@@ -152,6 +153,11 @@ set ScalaStatement = Statement StatementNested
                      CatchClause
                      ForStatement
                      StatementExpressionList
+                     SwitchLabels
+                     SwitchLabel
+                     SwitchBlock
+                     SwitchBlockStatementGroups
+                     SwitchBlockStatementGroup
 
 set ScalaExpression = Expression ExpressionAssignment
                       ConditionalOrExpression
@@ -2007,13 +2013,13 @@ sem Statement
                     lhs.scalaNTab = @lhs.scalaNTab
                     expression.scalaStatement = @lhs.scalaStatement -- ToDo
                     lhs.scalaIfElseStatement = False
-                    lhs.scalaHasForEach =  @switchBlock.scalaHasForEach
-                    lhs.scalaStatement = @expression.scalaStatement -- ToDo -- expression :: Expression
+                    lhs.scalaHasForEach = @switchBlock.scalaHasForEach
                     lhs.scalaSpecialCaseOneLine = 2
                     lhs.scalaSpecialCaseIfOneLine = 2
                     lhs.scalaSpecialCaseForIsIf = False
                     lhs.scalaSpecialCaseForIfCondition = ""
                     lhs.scalaSpeciaCaseForIfBody = ""
+                    lhs.scalaStatement = "(" ++ @expression.scalaExpression ++ ") match {\n" ++ @switchBlock.scalaStatement ++ "\n"++ @lhs.scalaNTab ++ "}"
 
     | SWTSDoStatement
                     statement.scalaNTab = @lhs.scalaNTab ++ "\t"
@@ -2036,7 +2042,7 @@ sem Statement
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
-                    lhs.scalaStatement = "" --ToDo
+                    lhs.scalaStatement = "//todo: break is not supported"++ "\n"
                     lhs.scalaSpecialCaseOneLine = 2
                     lhs.scalaSpecialCaseIfOneLine = 2
                     lhs.scalaSpecialCaseForIsIf = False
@@ -2047,7 +2053,7 @@ sem Statement
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
-                    lhs.scalaStatement = "" -- ToDo identifier :: Identifier
+                    lhs.scalaStatement = "//todo: break "++ @identifier ++ "is not supported"++ "\n"
                     lhs.scalaSpecialCaseOneLine = 2
                     lhs.scalaSpecialCaseIfOneLine = 2
                     lhs.scalaSpecialCaseForIsIf = False
@@ -2283,9 +2289,7 @@ sem StatementNested
                     expression.scalaStatement = @lhs.scalaStatement -- ToDo
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  @switchBlock.scalaHasForEach
-                    lhs.scalaStatement = @expression.scalaStatement -- ToDo -- expression :: Expression
-                    --lhs.scalaSpecialCaseOneLine = 2
-                    -- switchBlock :: SwitchBlock
+                    lhs.scalaStatement = "(" ++ @expression.scalaExpression ++ ") match {\n" ++ @switchBlock.scalaStatement ++ "\n"++ @lhs.scalaNTab ++ "}"
 
     | SWTSDoStatementNested
                     statementNested.scalaNTab = @lhs.scalaNTab ++ "\t"
@@ -2305,14 +2309,14 @@ sem StatementNested
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
-                    lhs.scalaStatement = "" --ToDo
+                    lhs.scalaStatement = "//todo: break is not supported"++ "\n"
                     --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSBreakStatementIdNested
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaIfElseStatement = False
                     lhs.scalaHasForEach =  False
-                    lhs.scalaStatement = "" -- ToDo identifier :: Identifier
+                    lhs.scalaStatement = "//todo: break " ++ @identifier ++ "is not supported"++ "\n"
                     --lhs.scalaSpecialCaseOneLine = 2
 
     | SWTSNilContinueStatementNested
@@ -2385,31 +2389,38 @@ sem StatementNested
 
 sem SwitchBlock
     | SwitchBlockAll
-                    switchBlockStatementGrooups.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo , check if is correct.
+                    switchBlockStatementGrooups.scalaNTab = @lhs.scalaNTab ++ "\t"
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaHasForEach = @switchBlockStatementGrooups.scalaHasForEach
+                    lhs.scalaStatement = @switchBlockStatementGrooups.scalaStatement ++ @switchLabels.scalaStatement
     | SwitchBlockLabels
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaHasForEach = False
+                    lhs.scalaStatement = @switchLabels.scalaStatement
     | SwitchBlockGroups
-                    switchBlockStatementGroups.scalaNTab = @lhs.scalaNTab ++ "\t" --ToDo check if is correct.
+                    switchBlockStatementGroups.scalaNTab = @lhs.scalaNTab ++ "\t"
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaHasForEach = @switchBlockStatementGroups.scalaHasForEach
+                    lhs.scalaStatement = @switchBlockStatementGroups.scalaStatement
     | NilSwitchBlock
                     lhs.scalaNTab = @lhs.scalaNTab
                     lhs.scalaHasForEach = False
+                    lhs.scalaStatement = ""
 
 sem SwitchBlockStatementGroups
     | Cons hd.scalaNTab = @lhs.scalaNTab
            tl.scalaNTab = @hd.scalaNTab
            lhs.scalaNTab = @tl.scalaNTab
            lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
+           lhs.scalaStatement = @hd.scalaStatement ++ @tl.scalaStatement
     | Nil lhs.scalaNTab = @lhs.scalaNTab
           lhs.scalaHasForEach = False
+          lhs.scalaStatement = ""
 
 sem SwitchBlockStatementGroup
-    | SwitchBlockStatementGroup blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
+    | SwitchBlockStatementGroup blockStatements.scalaNTab = @lhs.scalaNTab -- ++ "\t"
                                 blockStatements.scalaStatement = "" -- ToDo
+                                lhs.scalaStatement = @switchLabels.scalaStatement ++ @blockStatements.scalaStatement
                                 lhs.scalaHasForEach = @blockStatements.scalaHasForEach
 
 sem ArrayInitializer
@@ -2680,10 +2691,21 @@ sem StatementExpressionList
                             lhs.scalaStatement = @lhs.scalaStatement
                             lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
 
+
+sem SwitchLabels
+    | Cons
+        lhs.scalaStatement = @hd.scalaStatement ++ @tl.scalaStatement
+    | Nil
+        lhs.scalaStatement = ""
+
 sem SwitchLabel
-    | SwitchLabelConstant expression.scalaStatement = "" -- ToDo
-   -- | SwitchLabelEnum identifiers :: Identifier
-   -- | SwitchLabelDefault
+    | SwitchLabelConstant
+            lhs.scalaNTab = @lhs.scalaNTab ++ "\t"
+            lhs.scalaStatement = @lhs.scalaNTab ++ "case " ++ @expression.scalaExpression ++ " =>"
+   | SwitchLabelEnum
+            lhs.scalaStatement = @lhs.scalaNTab ++ "case" ++ @identifiers ++ " =>"
+   | SwitchLabelDefault
+            lhs.scalaStatement = @lhs.scalaNTab ++ "case _ =>"
 
 sem ZPrimaryOrExpression
     | ZPOEExpressionDeArrayAccess
