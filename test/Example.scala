@@ -1,27 +1,58 @@
 package code.java
 
-import scala.collection.JavaConversions._
-import java.util.List
-import java.util.Arrays
-import java.util.ArrayList
-class ClaseA { 
+object Switch { 
 
-	def filtrar(inv: ArrayList): List = {
-		var sub: List =  new ArrayList()
-		for (numero <- inv) {			
-			if (numero > 5) {
-								
-				sub.add(numero)
-			}
+	def main(args: Array[String]): Unit = {
+		var month: Int = 8
+		var monthString: String = null
+		(month) match {
+			case 1 =>
+			monthString="January"
+			//todo: break is not supported
+			case 2 =>
+			monthString="February"
+			//todo: break is not supported
+			case 3 =>
+			monthString="March"
+			//todo: break is not supported
+			case 4 =>
+			monthString="April"
+			//todo: break is not supported
+			case 5 =>
+			monthString="May"
+			//todo: break is not supported
+			case 6 =>
+			monthString="June"
+			//todo: break is not supported
+			case 7 =>
+			monthString="July"
+			//todo: break is not supported
+			case 8 =>
+			monthString="August"
+			//todo: break is not supported
+			case 9 =>
+			monthString="September"
+			//todo: break is not supported
+			case 10 =>
+			monthString="October"
+			//todo: break is not supported
+			case 11 =>
+			monthString="November"
+			//todo: break is not supported
+			case 12 =>
+			monthString="December"
+			//todo: break is not supported
+			case _ =>
+			monthString="Invalid month"
+			//todo: break is not supported
+
 		}
-		sub
+		System.out.println(monthString)
 	}
-	def nombres(): Unit = {
-		var players: String = 
-		for (player <- players) {			
-			System.out.print(player + "; ")
-		}
-	}
+}
+
+class Switch { 
+import Switch._
 }
 
 

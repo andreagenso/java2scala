@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 class ClaseA {
 
-    // Caso 1
     List<Integer> filtrar(ArrayList<Integer> inv) {
+
         List<Integer> sub = new ArrayList<Integer>();
 
         for(Integer numero:  inv) {
@@ -15,17 +15,27 @@ class ClaseA {
                 sub.add(numero);
             }
         }
-
         return sub;
     }
 
-    // Caso 2
+    void transformar() {
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
+        List<Integer> l2 = new  ArrayList<Integer>();
+
+        for (int n : numbers) {
+            l2.add(n);
+        }
+    }
+
     void nombres() {
-        String[] players = {"Rafael", "Ana", "David", "Roger", "Andy", "Tomas", "Juan"};
+
+        String[] players = {"Rafael", "Ana", "David",
+                "Roger", "Andy", "Tomas", "Juan"};
 
         for (String player: players) {
             System.out.print(player + "; ");
         }
     }
+
 
 }

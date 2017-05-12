@@ -8,7 +8,21 @@ import J2s.Scanner
 import UU.Scanner.Position
 import Data.String.Utils
 
+-- Token generation
+main  :: IO()
+main = do
+       g <- readJavaFile
+       putStrLn (show g)
+
+readJavaFile = do
+    [path] <- getArgs
+    entrada <- readFile path
+    let tokens = classify (initPos path) entrada
+        nameScalaFile =  replace ".java" ".scala" path
+    return tokens
+
 -- AST generation
+{-
 main  :: IO()
 main = do
        g <- readJavaFile
@@ -21,6 +35,7 @@ readJavaFile = do
         nameScalaFile =  replace ".java" ".scala" path
     scalaCode <- parseIO pJ2s tokens
     return scalaCode
+-}
 
 -- AG Generation
 {-
@@ -39,4 +54,5 @@ readJavaFile = do
 
 writeScalaFile nameFile content = do
     writeFile nameFile content
-    putStrLn (" Writing scala file " ++ nameFile ++ "..... ")-}
+    putStrLn (" Writing scala file " ++ nameFile ++ "..... ")
+-}
