@@ -24,6 +24,17 @@ testParser :: IO()
 testParser  = runSafeIO $ runProxy $ runEitherK $
                     contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/") />/ handlerParser
 
+-- llamada recursiva a summary
+testSummary :: IO()
+testSummary  = runSafeIO $ runProxy $ runEitherK $
+                    contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/summary/") />/ handlerParser
+
+-- llamada recursiva a priority
+testPriority :: IO()
+testPriority  = runSafeIO $ runProxy $ runEitherK $
+                    contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/priority/") />/ handlerParser
+
+
 testParserJavaTest :: IO()
 testParserJavaTest  = runSafeIO $ runProxy $ runEitherK $
                     contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/java/lang/StrictMath/") />/ handlerParser

@@ -26,9 +26,14 @@ main = do f <- getLine
           command
 
 test :: String -> IO()
+-- test of scanner
 test "testscanner"  = testScanner
 test "singleparser" = testSingleParser
+
+-- tests of parser
 test "testparser" = testParser
+test "testsummary" = testSummary
+test "testpriority" = testPriority
 
 test "tmp" = tmp
 
