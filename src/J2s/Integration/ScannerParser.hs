@@ -42,7 +42,6 @@ tSym j2s str   = obtenerVal <$> pSym (Token j2s str (initPos ""))
 pIdentifier                      = tSym Identifier   ""
 pKeyWord       kw                = tSym KeyWord kw
 pSpecialSimbol ss                = tSym SpecialSimbol ss
--- pConstant      co             = pASym Constant  co
 pOperator      op                = tSym Operator op
 pLineComment                     = tSym LineComment "" 
 pBlockComment                    = tSym BlockComment ""
@@ -50,7 +49,6 @@ pError                           = tSym Error        ""
 pBooleanLiteral cb               =  (sem_Bool ) <$> tSym BooleanLiteral cb  
 pCharacterLiteral                = tSym CharacterLiteral ""
 pStringLiteral                   = tSym StringLiteral ""
--- pTokMayor      op                = tSym TokMayor op
 
 pDecimalIntegerLiteral           =  tSym DecimalIntegerLiteral ""
 pHexIntegerLiteral               =  tSym HexIntegerLiteral ""
@@ -59,10 +57,6 @@ pDecimalFloatingPointLiteral     =  tSym DecimalFloatingPointLiteral ""
 pHexadecimalFloatingPointLiteral =  tSym HexadecimalFloatingPointLiteral ""
 
 pNullLiteral      "null"   = tSym NullLiteral "null"
-
--- ToDo check when operators will be tested
--- pOperator'' ">" ">" ">" = tSym Operator "HS@J2SShift>>>ShiftJ2S@"
--- pOperator'  ">" ">"     = tSym Operator "HS@J2SShift>>ShiftJ2s@"
 
 sem_Bool x | x == "true" = True
                    | x == "false" = False

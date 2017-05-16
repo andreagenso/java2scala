@@ -52,14 +52,9 @@ pConditionalExpression = (\z fz -> fz z) <$> pConditionalOrExpression <*> pZ
 pZ  =   (\e ce z -> AGS.sem_ConditionalExpression_ConditionalExprComb z e ce) <$ pOperator "?" <*> pExpression <* pOperator ":" <*> pConditionalExpression
    <|> pSucceed (\z -> AGS.sem_ConditionalExpression_ConditionalExpr z)
 
--- 11 AQUI REVISAR EL INSTANCEOF
+-- 11 ToDO INSTANCEOF
 pConditionalOrExpression =  foldr pGen pFactor [ orExp, andExp, orIncl, orExcl, andSingle, eqs,rels, shift, adss, muls ]
 
-{-
-pGen ops p  =  pChainl (foldr1 (<|>) (map f ops)) p
-   where f (s,c)     = const c  <$> pTokMayor s
-                                    <|> const c  <$> pOperator s
--}
 pGen ops p  =  pChainl (foldr1 (<|>) (map f ops)) p
    where f (s,c)     = const c  <$> pOperator s
 
@@ -75,33 +70,12 @@ shift = [(">>>",AGS.sem_ConditionalOrExpression_ZeroFillRightShift),(">>",AGS.se
 adss = [("+", AGS.sem_ConditionalOrExpression_Add),("-", AGS.sem_ConditionalOrExpression_Sub)]
 muls = [("*", AGS.sem_ConditionalOrExpression_Mult),("/",AGS.sem_ConditionalOrExpression_Div),("%",AGS.sem_ConditionalOrExpression_Mod),(">", AGS.sem_ConditionalOrExpression_GreaterThan)]
 
-
-
-
-{-
-orExp  = [("||",AGS.sem_ConditionalOrExpression_Or)]
-andExp = [("&&",AGS.sem_ConditionalOrExpression_And)]
-orIncl = [("|",AGS.sem_ConditionalOrExpression_OrEx)]
-andSingle = [("&",AGS.sem_ConditionalOrExpression_AndIc)]
-orExcl = [("^",AGS.sem_ConditionalOrExpression_AndEx)]
-eqs = [("==",AGS.sem_ConditionalOrExpression_Eq),("!=",AGS.sem_ConditionalOrExpression_Dist)]
-rels = [("<",AGS.sem_ConditionalOrExpression_Men),("<=",AGS.sem_ConditionalOrExpression_MenQ),(">=", AGS.sem_ConditionalOrExpression_MayQ), (">",sem_ConditionalOrExpression_May)]
-shift = [(">>>",AGS.sem_ConditionalOrExpression_DDer),(">>",AGS.sem_ConditionalOrExpression_Der),("<<",AGS.sem_ConditionalOrExpression_Izq)]
-adss = [("+", AGS.sem_ConditionalOrExpression_Add),("-", AGS.sem_ConditionalOrExpression_Res)]
-muls = [("*", AGS.sem_ConditionalOrExpression_Mul),("/",AGS.sem_ConditionalOrExpression_Div),("%",AGS.sem_ConditionalOrExpression_Mod)]
--}
-
            
 pFactor = (\pu f -> f pu) <$> pUnaryExpression <*> pFactor'
 
--- AQUI REALIZAR UN CONTROL DE CONTEXTO Y PRUEBAS
+-- ToDO CONTROL DE CONTEXTO Y PRUEBAS
 pFactor' = pSucceed (\u -> AGS.sem_ConditionalOrExpression_ConditionalOrExpressionUnaryExpression u)
            <|>  (\t u -> AGS.sem_ConditionalOrExpression_ConditionalOrExpressionIntanceOf u t) <$ pKeyWord "instanceof" <*>  pType
-           
--- pZReferenceType = pKeyWord "instanceof" *> pFoldr1 (AGS.sem_ZReferenceType_Cons, AGS.sem_ZReferenceType_Nil) pReferenceTypeOrArrayType
--- pZReferenceType = pKeyWord "instanceof" *> pFoldr1 (AGS.sem_ZReferenceType_Cons, AGS.sem_ZReferenceType_Nil) pReferenceTypeOrArrayType
--- pReferenceTypeOrArrayType =  AGS.sem_ReferenceTypeOrArrayType_InstanceOfZArrayType <$> pType <* pSpecialSimbol "[" <*  pSpecialSimbol "]"
---                      <|> AGS.sem_ReferenceTypeOrArrayType_ZReferenceType          <$> pReferenceType
 
 -- 21 - OK
 pUnaryExpression = AGS.sem_UnaryExpression_UnaryExpressionPreIncrementExpression  <$ pOperator "++"  <*> pUnaryExpression   -- PreIncrement
@@ -113,17 +87,9 @@ pUnaryExpression = AGS.sem_UnaryExpression_UnaryExpressionPreIncrementExpression
                                 <|> pPrimary         <**> ( (AGS.sem_UnaryExpression_PostExpPrimaryPostfixZ <$$> pZPostfixExpression) <|> (pSucceed AGS.sem_UnaryExpression_PostfixExpressionPrimary))  -- PostfixExpression
                                 
 -- 24 - OK
--- AQUI CONTROLAR CONDICION DE CONTEXTO PARA CAST
-{- pUnaryExpressionNotPlusMinus = AGS.sem_UnaryExpressionNotPlusMinus_Pestan                     <$ pOperator "~" <*> pUnaryExpression
-                                                    <|> AGS.sem_UnaryExpressionNotPlusMinus_Admiracion <$ pOperator "!" <*> pUnaryExpression
-                                                        <|> AGS.sem_UnaryExpressionNotPlusMinus_UnNotPlusCastExpression <$ pSpecialSimbol "(" <*> pType <* pSpecialSimbol ")" <*> pUnaryExpression
-                                                    <|> AGS.sem_UnaryExpressionNotPlusMinus_UnNotPlus <$> pPostfixExpression
--}
+-- ToDO CONDICION DE CONTEXTO PARA CAST
 
--- 25 
--- pPostfixExpression = pPrimary         <**> ( (AGS.sem_PostfixExpression_PostExpPrimaryPostfixZ <$$> pZPostfixExpression) <|> (pSucceed AGS.sem_PostfixExpression_PostfixExpressionPrimary))
---                                <|> pIdentifiers <**> (( AGS.sem_PostfixExpression_PostExpNamePostfixZ    <$$> pZPostfixExpression) <|> (pSucceed AGS.sem_PostfixExpression_PostfixExpressionExpressionName))
-
+-- 25
 -- Optimizado, aqui se refleja PostIncrementExpression y PostDecrementExpression
 pZPostfixExpression     = pFoldr1 (AGS.sem_ZPostfixExpression_Cons,AGS.sem_ZPostfixExpression_Nil) pZPostfixExp
 pZPostfixExp = AGS.sem_ZPostfixExp_PostIncrement <$ pOperator "++"
@@ -131,7 +97,6 @@ pZPostfixExp = AGS.sem_ZPostfixExp_PostIncrement <$ pOperator "++"
                                  
 -- 26                   
 pPrimary = pPrimaryNoNewArray <**> ( (pSucceed AGS.sem_Primary_PrimNoNewArray) <|> ( AGS.sem_Primary_PrimNoNewArrayZ <$$> pZPrimary))
---              <|> pArrayCreationExpression <**> ((pSucceed AGS.sem_Primary_PrimArrayCreationExpression) <|> (AGS.sem_Primary_PrimArrayCreationExpressionZ <$$> pZPrimary))
 
 -- *****************************************************************************
 -- ZPrimary Optimizado ---------------------------------------------------------
@@ -176,17 +141,14 @@ pPrimaryNNA_PrimNNATypeClassPrimitiveType_Class = pSucceed (\f -> f)
     <|> (\f -> f) <$ pSpecialSimbol "." <* pKeyWord "class"
 
 
-                  
--- pIdentifiers     = pFoldr1Sep (AGS.sem_Identifiers_Cons, AGS.sem_Identifiers_Nil) (pSpecialSimbol ".") pIdentifier
                    
-                   
--- AQUI REALIZAR PRUEBAS PARA VERIFICAR LA AFECTACION DE pClassOrInterfaceType
+-- ToDO PRUEBAS PARA VERIFICAR LA AFECTACION DE pClassOrInterfaceType
 pArrayCreationExpressionOrClassInstanceCreationExpression =  pPrimitiveType <**>  (( AGS.sem_PrimaryNNA_ArrayCreationExpressionPrimitiveType <$$> pDimExprs ) <|> ( (\ a b c -> AGS.sem_PrimaryNNA_ArrayCreationExpressionArrInitialPrim c b a) <$$> pDims <*> pArrayInitializer ))
                                                 <|>  pClassOrInterfaceType <**> (( AGS.sem_PrimaryNNA_ArrayCreationExpressionClassOrInterf <$$> pDimExprs ) <|> ( (\a b c -> AGS.sem_PrimaryNNA_ArrayCreationExpressionArrInitialClass c b a) <$$>  pDims <*> pArrayInitializer))
                                                 <|>  AGS.sem_PrimaryNNA_PrimNNAClassInstanceCreationExpression <$> pTypeArguments <*> pClassOrInterfaceType <* pSpecialSimbol "(" <*>  pArgumentList <* pSpecialSimbol ")" -- Antes -> <$> pClassInstanceCreationExpression
                                                                                                 
 -- Type.class se desglosa en varios                
--- AQUI CONTROLAR CON VARIAS CONDICIONES DE CONTEXTO EL CASO CAST
+-- ToDO CONDICIONES DE CONTEXTO EL CASO CAST
 pParExprOrCastExpression = (\e f -> f e)  <$>  pExpression <* pSpecialSimbol ")" <*> pParExprOrCastExpression'
                    
 pParExprOrCastExpression' =  pSucceed (\e -> AGS.sem_PrimaryNNA_PrimNNAParExp e)
@@ -194,10 +156,7 @@ pParExprOrCastExpression' =  pSucceed (\e -> AGS.sem_PrimaryNNA_PrimNNAParExp e)
 
 pPrimaryNNA' =   (\t i -> AGS.sem_PrimaryNNA_PrimNNATypeClassReferenceTypeTypeVariable i t)  <$>  pTypeZ   <* pSpecialSimbol "." <* pKeyWord "class"
                    <|>   (\a p i -> AGS.sem_PrimaryNNA_PrimNNATypeClassReferenceTypeClassIOT i a p ) <$>  pTypeArguments <*> pPrimNNAClassOrInterfaceType  -- .class esta a continuacion
-                   
--- pPrimaryNNA'' = (\f -> f)                                   <$ pKeyWord "super" <* pSpecialSimbol "." <*> pPrimaryNNA'''
---                   <|> (\i -> sem_PrimaryNNA_PrimNNAClassName i )  <$ pKeyWord "this"                    
-                   
+
 pPrimaryNNA''' =  (\n i a e -> AGS.sem_PrimaryNNA_PrimNNAMethodInvocationClassN e n i a )  <$> pNonWildTypeArguments <*> pIdentifier <* pSpecialSimbol "(" <*> pArgumentList <* pSpecialSimbol ")"
                       <|> (\i e -> AGS.sem_PrimaryNNA_PrimNNAFieldAccessClassName e i )            <$> pIdentifier
                    
@@ -252,8 +211,6 @@ pPrimitiveType =  AGS.sem_PrimitiveType_PrimitivetypeBoolean            <$ pKeyW
 
 -- OK
 pReferenceType  = AGS.sem_ReferenceType_ReferenceTypeClassOrInterfaceType <$> pIdentifier <*> pTypeArguments <*> pZClassOrInterfaceType
--- pReferenceType' =  (\ta z i -> AGS.sem_ReferenceType_ReferenceTypeClassOrInterfaceType i ta z) <$> pTypeArguments <*> pZClassOrInterfaceType
--- <|> pSucceed (\i -> AGS.sem_ReferenceType_ReferenceTypeT i)
 
 pClassOrInterfaceType = AGS.sem_ClassOrInterfaceType_ClassOrInterfaceType <$>   pIdentifier <*> pTypeArguments <*> pZClassOrInterfaceType
 
@@ -261,33 +218,17 @@ pZClassOrInterfaceType     = pFoldr(AGS.sem_ZClassOrInterfaceType_Cons,AGS.sem_Z
 pZCOITTypeDeclSpecifier    = AGS.sem_ZCOITTypeDeclSpecifier_ZCOITTypeDeclSpecifier <$ pSpecialSimbol "." <*> pIdentifier <*> pTypeArguments
                                          
 -- OK                             
--- pTypeArguments = AGS.sem_TypeArguments_TypeArguments <$ pOperator "<" <*> pActualTypeArgumentList <* pOperator ">"
---                        <|> pSucceed AGS.sem_TypeArguments_NilTypeArguments
 pTypeArguments = (\al f -> f al) <$ pOperator "<" <*> pActualTypeArgumentList <*> pTypeArguments'
                           <|> pSucceed AGS.sem_TypeArguments_NilTypeArguments
 
-{-
-pTypeArguments' =  (\al -> AGS.sem_TypeArguments_TypeArgumentsC3 al) <$ pOperator ">>>"
-                           <|> (\al -> AGS.sem_TypeArguments_TypeArgumentsC2 al) <$ pOperator ">>"
-                           <|> (\al -> AGS.sem_TypeArguments_TypeArgumentsC1 al) <$ pOperator ">"
--}
-
 pTypeArguments' =  (\al -> AGS.sem_TypeArguments_TypeArgumentsC1 al) <$ pOperator ">"
---                         <|>  pSucceed (\al ->AGS.sem_TypeArguments_TypeArgumentsC0 al)
 
 pActualTypeArgumentList = pFoldr1Sep (AGS.sem_ActualTypeArgumentList_Cons,AGS.sem_ActualTypeArgumentList_Nil) (pSpecialSimbol ",") pActualTypeArgument
 
 -- OK                                           
 pActualTypeArgument = AGS.sem_ActualTypeArgument_ActualTypeArgumentWildCard <$ pOperator "?" <*> pWildcardBounds
                                    <|> AGS.sem_ActualTypeArgument_ActualTypeReferenceType   <$> pType -- <* pSpecialSimbol "[" <*pSpecialSimbol "]"
-                                                                   
--- pWildCard = AGS.sem_WildCard_WildCard <$ pOperator "?" <*> pWildcardBounds
 
-{- pWildcardBounds 
-  = pKeyWord "extends" <**> (( (\ss -> AGS.sem_WildcardBounds_WilcardBoundsExtends ) <$$> pReferenceType) <|> ( (\ ss -> AGS.sem_WildcardBounds_WilcardBoundsExtendsArrayType) <$$> pType ))  -- <* pSpecialSimbol "[" <* pSpecialSimbol "]"
- <|> pKeyWord "super"  <**> (((\kw -> AGS.sem_WildcardBounds_WilcardBoundsSuper) <$$> pReferenceType ) <|> ((\kw ->  AGS.sem_WildcardBounds_WilcardBoundsSuperArrayType) <$$> pType  ))       -- <* pSpecialSimbol "[" <* pSpecialSimbol "]"
- <|> pSucceed sem_WildcardBounds_NilwildcardBounds -}
- 
 pWildcardBounds  =  AGS.sem_WildcardBounds_WilcardBoundsExtendsReferenceType <$ pKeyWord "extends" <*>  pType
                 <|>  AGS.sem_WildcardBounds_WilcardBoundsSuperReferenceType <$ pKeyWord "super"  <*>  pType
                 <|> pSucceed AGS.sem_WildcardBounds_NilwildcardBounds
@@ -311,26 +252,17 @@ pAssignmentOperator = AGS.sem_AssignmentOperator_AssignmentOp                  <
                                    <|> AGS.sem_AssignmentOperator_AssignmentOrSingle           <$ pOperator "|="
                                                    
 
--- AQUI CONTROLAR CON CONDICIONES DE CONTEXTO  a partir de PostfixExpression
--- pLeftHandSide = AGS.sem_LeftHandSide_LeftHandSideExpName  <$> pIdentifiers
-
 -- AQUI AL MENOS 1
 pArgumentList = pFoldrSep (AGS.sem_ArgumentList_Cons, AGS.sem_ArgumentList_Nil) (pSpecialSimbol ",") pExpression
                          
--- pIdentifiers     = pFoldr1Sep (AGS.sem_Identifiers_Cons, AGS.sem_Identifiers_Nil) (pSpecialSimbol ".") pIdentifier
-                   
--- pNonWildTypeArguments = AGS.sem_NonWildTypeArguments_NonWildTypeArguments <$ pOperator "<" <*> pReferenceTypeList <* pOperator ">"
---                                        <|> pSucceed AGS.sem_NonWildTypeArguments_NilNonWildTypeArguments
+
 pNonWildTypeArguments = (\tl f -> f tl ) <$ pOperator "<" <*> pReferenceTypeList <*> pNonWildTypeArguments'
                                           <|> pSucceed AGS.sem_NonWildTypeArguments_NilNonWildTypeArguments
 
 pNonWildTypeArguments' =  (\tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC3 tl) <$ pOperator ">>>"
                                           <|> (\tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC2 tl) <$ pOperator ">>"
                                           <|> (\tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC1 tl)  <$ pOperator ">"
---                                        <|> pSucceed (\tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC0 tl)
 
--- Al menos 1
--- pNonWildTypeArguments1 = AGS.sem_NonWildTypeArguments_NonWildTypeArguments <$ pOperator "<" <*> pReferenceTypeList <* pOperator ">"
 pNonWildTypeArguments1 = (\tl f -> f tl) <$ pOperator "<" <*> pReferenceTypeList <*> pNonWildTypeArguments1'
 
 pNonWildTypeArguments1' = (\ tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC3 tl) <$ pOperator ">>>"
@@ -339,13 +271,8 @@ pNonWildTypeArguments1' = (\ tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgum
 --                                        <|>  pSucceed (\ tl -> AGS.sem_NonWildTypeArguments_NonWildTypeArgumentsC0 tl)
 -- OJO OPTIMIZAR ESTO
 pReferenceTypeList = pFoldr1Sep (AGS.sem_ReferenceTypeList_Cons,AGS.sem_ReferenceTypeList_Nil) (pSpecialSimbol ",") pType
--- pReferenceTypeOrType = AGS.sem_ReferenceTypeOrType_ReferenceTypeList <$> pReferenceType
---                                      <|> AGS.sem_ReferenceTypeOrType_ReferenceTypeListArrayType <$> pType -- <* pSpecialSimbol "[" <* pSpecialSimbol "]"
 
-{- pArrayCreationExpression = pKeyWord "new" *> pArrayCreationExpression'
-pArrayCreationExpression' =  pPrimitiveType <**>  (( AGS.sem_ArrayCreationExpression_ArrayCreationExpressionPrimitiveType <$$> pDimExprs ) <|> ( (\ a b c -> AGS.sem_ArrayCreationExpression_ArrayCreationExpressionArrInitialPrim c b a) <$$> pDims <*> pArrayInitializer ))
-                                                <|>  pClassOrInterfaceType <**> (( AGS.sem_ArrayCreationExpression_ArrayCreationExpressionClassOrInterf <$$> pDimExprs ) <|> ( (\a b c -> AGS.sem_ArrayCreationExpression_ArrayCreationExpressionArrInitialClass c b a) <$$>  pDims <*> pArrayInitializer)) -}
-                                            
+
 pDimExprs = AGS.sem_DimExprs_DimExprs <$ pSpecialSimbol "[" <*> pExpression <* pSpecialSimbol "]" <*> pDimExprs
              <|> AGS.sem_DimExprs_NilDimExprsDims <$> pDims
              <|> pSucceed AGS.sem_DimExprs_NilDimExprs
@@ -408,8 +335,7 @@ pTypeDeclaration' =   (\a b c d e f    -> AGS.sem_TypeDeclaration_TypeDeclaratio
 -- NO CAMBIAR A pList
 pModifiers = AGS.sem_Modifiers_Modifiers <$> pModifier <*> pModifiers
                            <|> pSucceed AGS.sem_Modifiers_NilModifiers
-                           
--- pClassModifiers = pList pClassModifier XX                       
+
 pModifier =  AGS.sem_Modifier_ModifierPublic    <$ pKeyWord "public"
                  <|> AGS.sem_Modifier_ModifierProtected <$ pKeyWord "protected"
                  <|> AGS.sem_Modifier_ModifierPrivate   <$ pKeyWord "private"
@@ -422,10 +348,6 @@ pModifier =  AGS.sem_Modifier_ModifierPublic    <$ pKeyWord "public"
                  <|> AGS.sem_Modifier_MethodModifierSynchronized <$ pKeyWord "synchronized"
                  <|> AGS.sem_Modifier_MethodModifierNative <$ pKeyWord "native"
                  <|> AGS.sem_Modifier_ModifierAnnotation <$> pAnnotation
-                          
--- pTypeParameters = AGS.sem_TypeParameters_TypeParameters <$ pOperator "<" <*>  pTypeParameterList <* pOperator ">"
---                         <|> pSucceed AGS.sem_TypeParameters_NilTypeParameters
-
 
 pTypeParameters = (\pl f -> f pl) <$ pOperator "<" <*>  pTypeParameterList <*> pTypeParameters'
                            <|> pSucceed AGS.sem_TypeParameters_NilTypeParameters
@@ -433,8 +355,7 @@ pTypeParameters = (\pl f -> f pl) <$ pOperator "<" <*>  pTypeParameterList <*> p
 pTypeParameters' = (\ pl  -> AGS.sem_TypeParameters_TypeParametersC3 pl ) <$ pOperator ">>>"
                            <|> (\ pl  -> AGS.sem_TypeParameters_TypeParametersC2 pl ) <$ pOperator ">>"
                            <|> (\ pl  -> AGS.sem_TypeParameters_TypeParametersC1 pl ) <$ pOperator ">"
---                         <|>  pSucceed (\ pl  -> AGS.sem_TypeParameters_TypeParametersC1 pl )
-                                                   
+
 pTypeParameterList = pFoldr1Sep (AGS.sem_TypeParameterList_Cons, AGS.sem_TypeParameterList_Nil) (pSpecialSimbol ",")  pTypeParameter
                           
 pTypeParameter = (\tv ftv -> ftv tv) <$> pIdentifier <*> pZTypeBound
@@ -499,10 +420,8 @@ pFormalParameterList'' =  (\f -> f) <$ pSpecialSimbol "," <*> pFormalParameterLi
                                           <|> pSucceed AGS.sem_FormalParameterList_FormalParameterListNil
                                         
 -- debe haber al menos 1 -> NO
--- pVariableModifiers  = AGS.sem_VariableModifiers_VariableModifiers <$> pVariableModifier <*> pVariableModifiers'
 pVariableModifiers = AGS.sem_VariableModifiers_VariableModifiers <$> pVariableModifier <*> pVariableModifiers
                                    <|> pSucceed AGS.sem_VariableModifiers_NilVariableModifiers
--- pVariableModifiers = pList1 pVariableModifier                                   
 
 pVariableModifier = AGS.sem_VariableModifier_VariableModifierFinal <$ pKeyWord "final"
                                  <|> AGS.sem_VariableModifier_VariableModifierAnnotation <$> pAnnotation
@@ -545,7 +464,6 @@ pStatement =  AGS.sem_Statement_StatementLabeled                     <$> pIdenti
                   <|> (\b fts -> fts b )                             <$ pKeyWord "try" <* pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}"  <*> pZTryStatement
                   <|> AGS.sem_Statement_StatementFor                 <$> pForStatement
                   <|> AGS.sem_Statement_SWTSExpressionStatement      <$> pExpressionAssignment <*  pSpecialSimbol ";"
-                  --  reemplazado  <|> AGS.sem_StatementWithoutTrailingSubstatement_SWTSExpressionStatement  <$> pExpressionStatement
 
 pStatementNested =  AGS.sem_StatementNested_StatementLabeledNested                       <$> pIdentifier <* pOperator ":" <*> pStatementNested  -- LabeledStatement
                   <|> (\e s f -> f e s)                                                  <$ pKeyWord "if" <* pSpecialSimbol "(" <*> pExpression <* pSpecialSimbol ")" <*> pStatementNested <*> pElseNested
@@ -564,7 +482,6 @@ pStatementNested =  AGS.sem_StatementNested_StatementLabeledNested              
                   <|> AGS.sem_StatementNested_StatementForNested                         <$> pForStatement
                   <|> AGS.sem_StatementNested_SWTSExpressionStatementNested              <$> pExpression <*  pSpecialSimbol ";"
 
--- pExpressionAssignment = AGS.sem_ExpressionAssignment_ExpressionAssignmentE <$> pUnaryExpression <*> pAssignmentOperator <*> pExpression
 
 pExpressionAssignment =  (\ce f -> f ce) <$> pUnaryExpression <*> pExpressionAssignment'
 pExpressionAssignment' = (\e ce z -> AGS.sem_ExpressionAssignment_ExpressionAssignment2 z e ce) <$ pOperator "?" <*> pExpression <* pOperator ":" <*> pConditionalExpression
@@ -619,9 +536,6 @@ pZReturnStatementNested  = (\e -> AGS.sem_StatementNested_SWTSReturnStatementNes
                                  <|> AGS.sem_StatementNested_SWTSNilReturnStatementNested <$ pSpecialSimbol ";"
 
 
--- pStatementExpression = AGS.sem_StatementExpression_StatExpressionAssign <$> pAssignment -- <* pSpecialSimbol ";"
---                                      <|> AGS.sem_StatementExpression_StatExpressionConditionalExpression <$> pConditionalExpression -- <* pSpecialSimbol ";"
-                                
 -- revisar orden, optimizar
 pSwitchBlock  = (\fs -> fs)<$ pSpecialSimbol "{" <*> pZSwitchBlock
 pZSwitchBlock = (\ls fs -> fs ls)                            <$> pFoldr1 (AGS.sem_SwitchBlockStatementGroups_Cons, AGS.sem_SwitchBlockStatementGroups_Nil) pSwitchBlockStatementGroup <*> pZZSwitchBlock

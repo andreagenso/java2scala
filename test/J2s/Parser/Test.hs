@@ -34,6 +34,10 @@ testPriority :: IO()
 testPriority  = runSafeIO $ runProxy $ runEitherK $
                     contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/priority/") />/ handlerParser
 
+-- llamada recursiva a summary
+testShopizer :: IO()
+testShopizer  = runSafeIO $ runProxy $ runEitherK $
+                    contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/shopizer-2.0.5/") />/ handlerParser
 
 testParserJavaTest :: IO()
 testParserJavaTest  = runSafeIO $ runProxy $ runEitherK $

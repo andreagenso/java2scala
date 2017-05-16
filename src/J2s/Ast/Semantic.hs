@@ -2,18 +2,15 @@ module J2s.Ast.Semantic where
 
 import J2s.Ast.Syntax
 
--- tomar en cuenta comentarios
 sem_J2s_J2s = J2s
--- sem_J2s_NilJ2s = NilJ2s -- no se considera el caso Nil
-                  
--- definicion completa
+
 sem_PackageDeclaration_PackageDeclaration = PackageDeclaration
 sem_PackageDeclaration_NilPackageDeclaration =  NilPackageDeclaration
                          
 -- -------------------------------------------------------------------
 -- definicion de Annotations
 -- ------------------------------------------------------------------
-sem_Annotation_Annotation = Annotation -- TypeName TypeAnnotation
+sem_Annotation_Annotation = Annotation
 sem_TypeAnnotation_MarkerAnnotation        = MarkerAnnotation
 sem_TypeAnnotation_NormalAnnotation        = NormalAnnotation  -- ElementValuePairs
 sem_TypeAnnotation_SingleElementAnnotation = SingleElementAnnotation  -- ElementValue
@@ -38,8 +35,6 @@ sem_ConditionalOrExpression_BitwiseAnd                     = (:&:)
 
 sem_ConditionalOrExpression_EqualTo                        = (:==:)
 sem_ConditionalOrExpression_NotEqualTo                      = (:!=:)
--- sem_ConditionalOrExpression_Men                                                = (:<:) -- Cambio desde Aqui --
--- sem_ConditionalOrExpression_ConditionalRelationalExpression = ConditionalRelationalExpression
 
 sem_ConditionalOrExpression_LessThan  = (:<:)
 sem_ConditionalOrExpression_GreaterThan  = (:>:)
@@ -69,55 +64,20 @@ sem_UnaryExpression_PostExpPrimaryPostfixZ                = PostExpPrimaryPostfi
 sem_UnaryExpression_PostfixExpressionPrimary              = PostfixExpressionPrimary
 
 
---sem_PostfixExpression_PostExpPrimaryPostfixZ = PostExpPrimaryPostfixZ
--- sem_PostfixExpression_PostExpNamePostfixZ     = PostExpNamePostfixZ
---sem_UnaryExpression_PostfixExpressionPrimary = PostfixExpressionPrimary
--- sem_PostfixExpression_PostfixExpressionExpressionName = PostfixExpressionExpressionName
-
 sem_Primary_PrimNoNewArray               = PrimNoNewArray
--- sem_Primary_PrimArrayCreationExpression  = PrimArrayCreationExpression
 sem_Primary_PrimNoNewArrayZ              = PrimNoNewArrayZ
--- sem_Primary_PrimArrayCreationExpressionZ = PrimArrayCreationExpressionZ
 
 sem_PrimaryNoNewArray_PrimaryNoNewArray     = PrimaryNoNewArray
 
-{-- 28
-sem_Literal_IntegerLiteral_DecimalIntegerLiteral                 = IntegerLiteral_ecimalIntegerLiteral
-sem_Literal_IntegerLiteral_HexIntegerLiteral                     = IntegerLiteral_HexIntegerLiteral
-sem_Literal_IntegerLiteral_OctalIntegerLiteral                   = IntegerLiteral_OctalIntegerLiteral
-sem_Literal_FloatingPointLiteral_DecimalFloatingPointLiteral     = FloatingPointLiteral_DecimalFloatingPointLiteral
-sem_Literal_FloatingPointLiteral_HexadecimalFloatingPointLiteral = FloatingPointLiteral_HexadecimalFloatingPointLiteral
-sem_Literal_BooleanLiteral                                       = BooleanLiteral
-sem_Literal_CharacterLiteral                                     = CharacterLiteral
-sem_Literal_StringLiteral                                        = StringLiteral
-sem_Literal_NullLiteral                                          = NullLiteral
--}
-
-
-                                                
--- sem_ReferenceType_ReferenceTypeT = ReferenceTypeT
 sem_ReferenceType_ReferenceTypeClassOrInterfaceType = ReferenceTypeClassOrInterfaceType
 
                                           
 sem_TypeArguments_TypeArgumentsC1 = TypeArgumentsC1
-{-
-sem_TypeArguments_TypeArgumentsC2 = TypeArgumentsC2
-sem_TypeArguments_TypeArgumentsC3 = TypeArgumentsC3
-sem_TypeArguments_TypeArgumentsC0 = TypeArgumentsC0
--}
 sem_TypeArguments_NilTypeArguments = NilTypeArguments
                                         
 sem_ActualTypeArgument_ActualTypeArgumentWildCard = ActualTypeArgumentWildCard
 sem_ActualTypeArgument_ActualTypeReferenceType    = ActualTypeReferenceType
-                                                
--- sem_WildCard_WildCard = WildCard
 
-{- sem_WildcardBounds_WilcardBoundsExtends           = WilcardBoundsExtends
-sem_WildcardBounds_WilcardBoundsSuper             = WilcardBoundsSuper
-sem_WildcardBounds_WilcardBoundsExtendsArrayType  = WilcardBoundsExtendsArrayType
-sem_WildcardBounds_WilcardBoundsSuperArrayType    = WilcardBoundsSuperArrayType
-sem_WildcardBounds_NilwildcardBounds                      = NilwildcardBounds 
--}
 sem_WildcardBounds_WilcardBoundsExtendsReferenceType = WilcardBoundsExtendsReferenceType
 sem_WildcardBounds_WilcardBoundsSuperReferenceType   = WilcardBoundsSuperReferenceType
 sem_WildcardBounds_NilwildcardBounds                 = NilwildcardBounds                                        
@@ -130,9 +90,6 @@ sem_Expression_ExpressionAssignment                      = ExpressionAssignment
 sem_ExpressionAssignment_ExpressionAssignment1 = ExpressionAssignment1
 sem_ExpressionAssignment_ExpressionAssignment2 = ExpressionAssignment2
 sem_ExpressionAssignment_ExpressionAssignment3 = ExpressionAssignment3
-
-                                
--- sem_Assignment_Assignment = Assignment --  LeftHandSide AssignmentOperator AssignmentExpression
                                 
 sem_AssignmentOperator_AssignmentOp = AssignmentOp
 sem_AssignmentOperator_AssignmentPlus = AssignmentPlus -- *=
@@ -146,12 +103,6 @@ sem_AssignmentOperator_AssignmentMayShiftShiftShift = AssignmentMayShiftShiftShi
 sem_AssignmentOperator_AssignmentAndSingle = AssignmentAndSingle -- &=
 sem_AssignmentOperator_AssignmentCincun = AssignmentCincun -- ^=
 sem_AssignmentOperator_AssignmentOrSingle = AssignmentOrSingle -- |=  
-                                                                                
--- sem_LeftHandSide_LeftHandSideExpName               = LeftHandSideExpName
--- sem_LeftHandSide_LeftHandSideFieldAccess           = LeftHandSideFieldAccess
--- sem_LeftHandSide_LeftHandSidePrimary    = LeftHandSidePrimary
--- sem_LeftHandSide_LeftHandSideArrayAccessExpName         = LeftHandSideArrayAccessExpName
--- sem_LeftHandSide_LeftHandSideArrayAccessPrimaryNNA = LeftHandSideArrayAccessPrimaryNNA
 
 sem_FieldAccess_FieldAccessPrim = FieldAccessPrim
 sem_FieldAccess_FieldAccessSuper = FieldAccessSuper
@@ -159,24 +110,12 @@ sem_FieldAccess_FieldAccessClassName = FieldAccessClassName
                                  
 sem_ArrayAccess_ArrayAccessExpName = ArrayAccessExpName
 sem_ArrayAccess_ArrayAccessPrimNNA = ArrayAccessPrimNNA
-                                  
--- sem_MethodInvocation_MethodInvocationMN = MethodInvocationMN
--- sem_MethodInvocation_MethodInvocationSuper = MethodInvocationSuper
--- sem_MethodInvocation_MethodInvocationClassN = MethodInvocationClassN
--- sem_MethodInvocation_MethodInvocationTypeN = MethodInvocationTypeN
-                                
+
 sem_NonWildTypeArguments_NonWildTypeArgumentsC1 = NonWildTypeArgumentsC1
 sem_NonWildTypeArguments_NonWildTypeArgumentsC2 = NonWildTypeArgumentsC2
 sem_NonWildTypeArguments_NonWildTypeArgumentsC3 = NonWildTypeArgumentsC3
 sem_NonWildTypeArguments_NonWildTypeArgumentsC0 = NonWildTypeArgumentsC0
 sem_NonWildTypeArguments_NilNonWildTypeArguments = NilNonWildTypeArguments
-                                                  
-{-
-sem_PrimaryNNA_ArrayCreationExpressionPrimitiveType   = ArrayCreationExpressionPrimitiveType
-sem_PrimaryNNA_ArrayCreationExpressionClassOrInterf   = ArrayCreationExpressionClassOrInterf
-sem_PrimaryNNA_ArrayCreationExpressionArrInitialPrim  = ArrayCreationExpressionArrInitialPrim
-sem_PrimaryNNA_ArrayCreationExpressionArrInitialClass = ArrayCreationExpressionArrInitialClass
--}
 
 sem_ArrayInitializer_ArrayInitializer = ArrayInitializer
                                                   

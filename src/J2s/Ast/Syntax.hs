@@ -67,17 +67,6 @@ data ConditionalOrExpression = ConditionalOrExpression :||: ConditionalOrExpress
                                                      | ConditionalOrExpressionIntanceOf UnaryExpression Type
                                                          deriving Show
                                                          
---                                           | ConditionalOrExpressionIntanceOf UnaryExpression ZReferenceType
-
--- type ZReferenceType = [ReferenceTypeOrArrayType]
--- sem_ZReferenceType_Cons = (:)
--- sem_ZReferenceType_Nil = []
-
--- data ReferenceTypeOrArrayType = ZReferenceType ReferenceType
---                                                        | InstanceOfZArrayType Type   
---                                                        deriving Show
--- sem_ReferenceTypeOrArrayType_ZReferenceType = ZReferenceType
--- sem_ReferenceTypeOrArrayType_InstanceOfZArrayType = InstanceOfZArrayType
 
 data UnaryExpression = UnaryExpressionPreIncrementExpression UnaryExpression -- ++ UnaryExpression
                                          | UnaryExpressionPreDecrementExpression UnaryExpression -- -- UnaryExpression
@@ -88,24 +77,7 @@ data UnaryExpression = UnaryExpressionPreIncrementExpression UnaryExpression -- 
                                          | Pestan UnaryExpression -- :~:
                                          | Admiracion  UnaryExpression -- :!:
                                          deriving Show
-                                         
---                                       | UnNotPlusCastExpression Type UnaryExpression
-                                                                                                 
-{- data UnaryExpressionNotPlusMinus = UnNotPlus PostfixExpression
-                                                                 | Pestan UnaryExpression -- :~:
-                                                                 | Admiracion  UnaryExpression -- :!:
-                                                                 | UnNotPlusCastExpression Type UnaryExpression
-                                                                 deriving Show 
-                                                                                                                                 
-data PostfixExpression = PostExpPrimaryPostfixZ Primary ZPostfixExpression                                                                                                                                                                                                                                                                                
-                                           | PostfixExpressionPrimary Primary
-                                           deriving Show
--}      
-{-                                 
-data PostfixExpression = PostExpPrimaryPostfixZ Primary ZPostfixExpression                                                                                                                                                                                                                                                                                
-                                           | PostfixExpressionPrimary Primary
-                                           deriving Show                                           -}
-                                                                                   
+
 type ZPostfixExpression = [ZPostfixExp]
 sem_ZPostfixExpression_Cons = (:)
 sem_ZPostfixExpression_Nil = []
@@ -116,22 +88,11 @@ data ZPostfixExp = PostIncrement
 sem_ZPostfixExp_PostIncrement = PostIncrement            
 sem_ZPostfixExp_PostDecrement = PostDecrement
                                            
-{- data Primary = PrimNoNewArray PrimaryNoNewArray
-                         | PrimArrayCreationExpression ArrayCreationExpression
-                         | PrimNoNewArrayZ PrimaryNoNewArray ZPrimary
-                         | PrimArrayCreationExpressionZ ArrayCreationExpression ZPrimary 
-                         deriving Show -}
-                         
+
 -- Para Modificacion de  ArrayCreationExpression
 data Primary = PrimNoNewArray PrimaryNoNewArray  -- OR ArrayCreationExpression
                          | PrimNoNewArrayZ PrimaryNoNewArray ZPrimary -- OR ArrayCreationExpression
                          deriving Show                   
-                         
-{- data ZPrimary = PrimaryNoNewArrayFieldAccess      Identifier
-                           | PrimarynoNewArrayMethodInvocation NonWildTypeArguments Identifier ArgumentList
-                           | PrimaryNoNewArrayFieldAccessZ      Identifier           ZPrimary
-                           | PrimarynoNewArrayMethodInvocationZ NonWildTypeArguments Identifier ArgumentList ZPrimary
-                           deriving Show  -}
 
 type ZPrimary = [PrimaryNNAArrayFieldAccessOrMethodInvocation] 
 sem_ZPrimary_Cons = (:)
@@ -148,8 +109,7 @@ sem_PrimaryNNAArrayFieldAccessOrMethodInvocation_PrimaryConstructor = PrimaryCon
 -- 27
 data PrimaryNoNewArray = PrimaryNoNewArray PrimaryNNA ZPrimaryNoNewArray
                                            deriving Show
-                                           
--- sem_PrimaryNoNewArray_PrimaryNoNewArray = PrimaryNoNewArray -- PrimaryNNA ZPrimaryNoNewArray
+
 data PrimaryNNA = PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral String
                             | PrimNNALiteral_IntegerLiteral_HexIntegerLiteral     String
                             | PrimNNALiteral_IntegerLiteral_OctalIntegerLiteral   String
@@ -182,12 +142,7 @@ data PrimaryNNA = PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral String
                                 | PrimNNAArrayAccessExprName    TypeName Expression -- Antes ExpressionName
                                 | PostfixExpressionExpressionName TypeName -- AQUI IMPLEMENTAR COND CONTEXTO
                                 deriving Show
-                                
---                              | PostExpNamePostfixZ Identifiers -- ZPostfixExpression -- AQUI IMPLEMENTAR COND CONTEXTO                               
-                                
---                              | PrimNNATypeClassReferenceTypeClassIOT Identifier TypeArguments PrimNNAClassOrInterfaceType --TypeZ 
---                              | PrimNNATypeClassReferenceTypeTypeVariable TypeVariable TypeZ
-                                
+
 data PrimNNAClassOrInterfaceType = PrimNNAClassOrInterfaceType  Identifier TypeArguments PrimNNAClassOrInterfaceType
                                                                  | NilPrimNNAClassOrInterfaceType
                                                                  | TypeZPrimNNAClassOrInterfaceType TypeZ
@@ -196,7 +151,7 @@ data PrimNNAClassOrInterfaceType = PrimNNAClassOrInterfaceType  Identifier TypeA
 sem_PrimNNAClassOrInterfaceType_PrimNNAClassOrInterfaceType = PrimNNAClassOrInterfaceType
 sem_PrimNNAClassOrInterfaceType_NilPrimNNAClassOrInterfaceType = NilPrimNNAClassOrInterfaceType
 sem_PrimNNAClassOrInterfaceType_TypeZPrimNNAClassOrInterfaceType = TypeZPrimNNAClassOrInterfaceType
--- sem_PrimaryNNA_PrimNNALiteral    = PrimNNALiteral -- Literal
+
 sem_PrimaryNNA_PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral = PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral
 sem_PrimaryNNA_PrimNNALiteral_IntegerLiteral_HexIntegerLiteral     = PrimNNALiteral_IntegerLiteral_HexIntegerLiteral
 sem_PrimaryNNA_PrimNNALiteral_IntegerLiteral_OctalIntegerLiteral   = PrimNNALiteral_IntegerLiteral_OctalIntegerLiteral
@@ -225,17 +180,14 @@ sem_PrimaryNNA_PrimNNAParExp     = PrimNNAParExp -- Expression
 sem_PrimaryNNA_UnNotPlusCastExpression = UnNotPlusCastExpression
 
 sem_PrimaryNNA_PrimNNAClassInstanceCreationExpression    = PrimNNAClassInstanceCreationExpression -- ClassInstanceCreationExpression
--- sem_PrimaryNNA_PrimNNAFieldAcc        = PrimNNAFieldAcc -- FieldAccess
 
 sem_PrimaryNNA_PrimNNAFieldAccessSuper  = PrimNNAFieldAccessSuper
 sem_PrimaryNNA_PrimNNAFieldAccessClassName = PrimNNAFieldAccessClassName
 
--- sem_PrimaryNNA_PrimNNAMethIn  = PrimNNAMethIn -- MethodInvocation
 sem_PrimaryNNA_PrimNNAMethodInvocationMN = PrimNNAMethodInvocationMN
 sem_PrimaryNNA_PrimNNAMethodInvocationSuper= PrimNNAMethodInvocationSuper
 sem_PrimaryNNA_PrimNNAMethodInvocationClassN = PrimNNAMethodInvocationClassN 
 sem_PrimaryNNA_PrimNNAMethodInvocationTypeN = PrimNNAMethodInvocationTypeN
--- sem_PrimaryNNA_PrimNNAArrayAccessExprName = PrimNNAArrayAccessExprName 
 
 sem_PrimaryNNA_PrimNNAArrayAccessExprName = PrimNNAArrayAccessExprName -- ExpressionName Expression
 -- sem_PrimaryNNA_PostExpNamePostfixZ = PostExpNamePostfixZ -- AQUI IMPLEMENTAR COND CONTEXTO
@@ -255,14 +207,6 @@ sem_ZPrimaryOrExpression_ZPOEExpressionDeArrayAccess = ZPOEExpressionDeArrayAcce
 sem_ZPrimaryOrExpression_ZPOEZPrimary   = ZPOEZPrimary
                                                                         
 
-
-{- data Type = TypePrimitiveType PrimitiveType
-                  | TypeReferenceType ReferenceType
-                  | TypePrimitiveTypeArrayType PrimitiveType TypeZ
-                  | TypeReferenceTypeArrayType ReferenceType TypeZ
-                  deriving Show
-                  -}
--- 29             
 data Type = TypePrimitiveType PrimitiveOrRefereceType TypeZ
                   deriving Show
                   
@@ -288,13 +232,8 @@ sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeFloating_Float = TypeP
 sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeFloating_Double = TypePrimitiveNumericType_TypeFloating_Double
                                                         
                                                         
--- sem_PrimitiveOrRefereceType_TypePrimitive = TypePrimitive -- PrimitiveType
 sem_PrimitiveOrReferenceType_TypeReference  = TypeReferece   -- ReferenceType
                                                                 
-{- data TypeZ = ArrayTypeZ TypeZ
-           | ArrayType
-           deriving Show -}
--- *
 type TypeZ = [ArrayType]  -- en referenceType, el ArrayType que era recursivo
 data ArrayType = ArrayType
                            deriving Show
@@ -328,7 +267,6 @@ data ReferenceType = ReferenceTypeClassOrInterfaceType  Identifier TypeArguments
         
         
 -- 35 -
--- data ClassOrInterfaceType = ClassOrInterfaceType  TypeName TypeArguments ZClassOrInterfaceType
 data ClassOrInterfaceType = ClassOrInterfaceType  Identifier TypeArguments ZClassOrInterfaceType
                                                   deriving Show
                                                   
@@ -342,27 +280,11 @@ data ZCOITTypeDeclSpecifier = ZCOITTypeDeclSpecifier Identifier TypeArguments
                                                         deriving Show
 sem_ZCOITTypeDeclSpecifier_ZCOITTypeDeclSpecifier = ZCOITTypeDeclSpecifier
 
--- data ClassType = ClassType TypeDeclSpecifier TypeArguments
---                         deriving Show
-                           
--- data TypeDeclSpecifier = TypeDeclSpecifierTN TypeName
-  --                                       | TypeDeclSpecifierCI ClassOrInterfaceType Identifier
---                                         deriving Show
 
--- data TypeDeclSpecifier = TypeDeclSpecifierTN TypeName
---                                         deriving Show
-                                           
 data TypeArguments = TypeArgumentsC1 ActualTypeArgumentList
-                                   {-| TypeArgumentsC2 ActualTypeArgumentList
-                                   | TypeArgumentsC3 ActualTypeArgumentList
-                                   | TypeArgumentsC0 ActualTypeArgumentList-}
                                    | NilTypeArguments
                                         deriving Show
                                         
-{- data ActualTypeArgumentList = ActualTypeArgumentList ActualTypeArgument ActualTypeArgumentList
-                                                        | NilActualTypeArgumentList
-                                                        deriving Show
-                                                        -}
 type ActualTypeArgumentList = [ActualTypeArgument]
 sem_ActualTypeArgumentList_Cons = (:)
 sem_ActualTypeArgumentList_Nil  = []
@@ -370,30 +292,11 @@ sem_ActualTypeArgumentList_Nil  = []
 data ActualTypeArgument = ActualTypeArgumentWildCard WildcardBounds
                                                 | ActualTypeReferenceType Type
                                                 deriving Show
-                                                
--- data WildCard = WildCard WildcardBounds
---                         deriving Show
 
---  Aqui le precede las palabras reservadas extends y super
-{- data WildcardBounds = WilcardBoundsExtends ReferenceType
-                    | WilcardBoundsSuper ReferenceType
-                    | WilcardBoundsExtendsArrayType Type
-                    | WilcardBoundsSuperArrayType Type
-                                        | NilwildcardBounds 
-                                        deriving Show -}
-                                        
 data WildcardBounds =  WilcardBoundsExtendsReferenceType Type
                     | WilcardBoundsSuperReferenceType Type
                                         | NilwildcardBounds 
                                         deriving Show                                   
-                                        
-                                        
--- data InterfaceType = InterfaceType TypeDeclSpecifier TypeArguments
---                                 deriving Show
--- type TypeVariable = Identifier                                                                               
--- data ArrayType = ArrayType Type
---                         deriving Show                           
--- type ClassName = Identifier
 
 -- 47
 data Expression = ExpressionConditionalExpr     ConditionalOrExpression
@@ -405,17 +308,7 @@ data ExpressionAssignment = ExpressionAssignment1 UnaryExpression
                           | ExpressionAssignment2 UnaryExpression Expression ConditionalExpression
                           | ExpressionAssignment3 UnaryExpression AssignmentOperator Expression
                             deriving Show
-                                
--- data Expression = Expression AssignmentExpression
---                              deriving Show
-                                
--- data AssignmentExpression = AssignmentExpressionCE ConditionalExpression
---                                                | AssignmentExpressionAss Assignment
---                                                deriving Show
-                                                  
--- data Assignment =  Assignment LeftHandSide AssignmentOperator Expression -- AssignmentExpression
---                              deriving Show
-                                
+
 data AssignmentOperator = AssignmentOp -- =
                                                 | AssignmentPlus -- *=
                                                 | AssignmentDiv -- /=
@@ -429,32 +322,10 @@ data AssignmentOperator = AssignmentOp -- =
                                                 | AssignmentCincun -- ^=
                                                 | AssignmentOrSingle -- |=  
                                                 deriving Show
-                                
--- data LeftHandSide = LeftHandSideExpName Identifiers -- Antes ExpressionName
---                                | LeftHandSidePrimary Primary -- Identifier
---                            deriving Show
-                                        
-{- data ExpressionName = ExpressionName Identifier
-                                        | ExpressionNameAmb AmbiguousName Identifier
-                                        deriving Show
--}
 
 type Identifiers = [Identifier]
 sem_Identifiers_Cons = (:)
 sem_Identifiers_Nil  = []
-
-{- data AmbiguousName = AmbiguousName Identifier AmbiguousName
-                                   | NilAmbiguousName
-                                        deriving Show
-        
-type AmbiguousName = [Identifier]
-
-sem_AmbiguousName_Cons = (:)
-sem_AmbiguousName_Nil = []
--}
--- type AmbiguousTye = [ Identifier ]
--- sem_Ambiguous_AmbiguousName = (:)
--- sem_Ambiguous_NilAmbiguousName = []
 
 data FieldAccess = FieldAccessPrim Primary Identifier
                                  | FieldAccessSuper Identifier
@@ -464,67 +335,23 @@ data FieldAccess = FieldAccessPrim Primary Identifier
 data ArrayAccess = ArrayAccessExpName  Identifiers Expression -- Antes ExpressionName
                                  | ArrayAccessPrimNNA PrimaryNoNewArray Expression
                                  deriving Show
-                                 
--- data ClassInstanceCreationExpression = ClassInstanceCreationExpression TypeArguments ClassOrInterfaceType ArgumentList
---                                                                       deriving Show
-                                                                         
---                                                                       | ClassInstanceCreationExpressionTA TypeArguments ClassOrInterfaceType 
---                                                                       | ClassInstanceCreationExpressionAL  ClassOrInterfaceType ArgumentList
---                                                                       | ClassInstanceCreationExpression  ClassOrInterfaceType
 
-{- data ArgumentList = ArgumentList Expression ArgumentList
-                                  | NilArgumentList
-                                  deriving Show
--}
 type ArgumentList = [Expression]
 sem_ArgumentList_Cons = (:)
 sem_ArgumentList_Nil = []
                                   
-{- data MethodInvocation = MethodInvocationMN MethodName ArgumentList
-                                          | MethodInvocationSuper NonWildTypeArguments Identifier ArgumentList
-                                          | MethodInvocationClassN ClassName NonWildTypeArguments Identifier ArgumentList
-                                          | MethodInvocationTypeN TypeName NonWildTypeArguments Identifier ArgumentList
-                                          deriving Show
---                                        | MethodInvocationPrim Primary NonWildTypeArguments Identifier ArgumentList   
--}
 
-{- data MethodName = MethodName Identifier 
-                                | MethodNameAmbiguous AmbiguousName Identifier
-                                deriving Show
-                                -}
--- type MethodName = [Identifier]
--- sem_MethodName_Cons = (:)
--- sem_MethodName_Nil  = []
-                                
 data NonWildTypeArguments = NonWildTypeArgumentsC1 ReferenceTypeList
                                                   | NonWildTypeArgumentsC2 ReferenceTypeList
                                                   | NonWildTypeArgumentsC3 ReferenceTypeList
                                                   | NonWildTypeArgumentsC0 ReferenceTypeList
                                                   | NilNonWildTypeArguments
                                                   deriving Show
-                                                  
-{- data ReferenceTypeList = ReferenceTypeList ReferenceType ReferenceTypeList
-                                           | ReferenceTypeListArrayType Type ReferenceTypeList
-                                           |NilReferenceTypeList
-                                           deriving Show
-                                           -}
-                                           
+
 type ReferenceTypeList = [Type ]
 sem_ReferenceTypeList_Cons = (:)
 sem_ReferenceTypeList_Nil  = []
-{- data ReferenceTypeOrType = ReferenceTypeList ReferenceType
-                                                 | ReferenceTypeListArrayType   Type
-                                                 deriving Show 
-sem_ReferenceTypeOrType_ReferenceTypeList = ReferenceTypeList
-sem_ReferenceTypeOrType_ReferenceTypeListArrayType = ReferenceTypeListArrayType -}
-                                           
-                                           
-{- data ArrayCreationExpression = ArrayCreationExpressionPrimitiveType PrimitiveType DimExprs                      -- Dims
-                                                         | ArrayCreationExpressionClassOrInterf ClassOrInterfaceType DimExprs               -- Dims
-                                                         | ArrayCreationExpressionArrInitialPrim PrimitiveType Dims ArrayInitializer
-                                                         | ArrayCreationExpressionArrInitialClass ClassOrInterfaceType Dims ArrayInitializer
-                                                         deriving Show -}
-                                                         
+
 data DimExprs = DimExprs Expression DimExprs
                           | NilDimExprsDims Dims
                           | NilDimExprs
@@ -534,25 +361,6 @@ sem_DimExprs_DimExprs        = DimExprs
 sem_DimExprs_NilDimExprsDims = NilDimExprsDims
 sem_DimExprs_NilDimExprs     = NilDimExprs
 
--- data DimExpr = DimExpr Expression
---                       deriving Show
-                         
-{- data Dims = Corchetes
-                  | Dims ZDims
-                  | NilDims
-                  deriving Show
-                  
-data ZDims = ZCorchetes ZDims
-                   | NilZDims
-                   deriving Show
--}
-{-vdata Dims = Dims Dims
-                  | NilDims
-                  deriving Show
-                  
-sem_Dims_Dims    = Dims -- Dims
-sem_Dims_NilDims =  NilDims
--}
 type Dims = [ () ]
 
 sem_Dims_Cons      = (:)
@@ -562,11 +370,7 @@ sem_Dims_Nil   =  []
 data ArrayInitializer = ArrayInitializer VariableInitializers
                                           | NilArrayInitializers
                                           deriving Show
-                                          
-{- data VariableInitializers = VariableInitializers VariableInitializer VariableInitializers
-                                                  | NilVariableInitializers
-                                                  deriving Show
-                                                  -}
+
 type VariableInitializers = [VariableInitializer]                                                 
 sem_VariableInitializers_Cons = (:)
 sem_VariableInitializers_Nil = []
@@ -832,14 +636,7 @@ data StatementNested = StatementLabeledNested Identifier StatementNested  -- Lab
                    | SWTTryStatementFinallyNested  BlockStatements Catches BlockStatements -- el ultimo Block es FinallyBlock
                    deriving Show
 
-                           
--- data StatementExpression = StatExpressionAssign Assignment
---                                               | StatExpressionConditionalExpression ConditionalExpression 
---                                               deriving Show                                           
-                                                 
--- sem_StatementExpression_StatExpressionAssign= StatExpressionAssign -- Assignment
---sem_StatementExpression_StatExpressionConditionalExpression = StatExpressionConditionalExpression -- ConditionalExpression 
-                                                 
+
 data SwitchBlock = SwitchBlockAll SwitchBlockStatementGroups SwitchLabels
                                  | SwitchBlockLabels  SwitchLabels
                                  | SwitchBlockGroups SwitchBlockStatementGroups

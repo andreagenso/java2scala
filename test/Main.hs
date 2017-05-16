@@ -34,6 +34,7 @@ test "singleparser" = testSingleParser
 test "testparser" = testParser
 test "testsummary" = testSummary
 test "testpriority" = testPriority
+test "testshop" = testShopizer
 
 test "tmp" = tmp
 
