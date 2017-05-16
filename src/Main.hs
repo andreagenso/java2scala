@@ -9,7 +9,6 @@ import UU.Scanner.Position
 import Data.String.Utils
 
 -- Token generation
-{-
 main  :: IO()
 main = do
        g <- readJavaFile
@@ -21,9 +20,9 @@ readJavaFile = do
     let tokens = classify (initPos path) entrada
         nameScalaFile =  replace ".java" ".scala" path
     return tokens
--}
 
 -- AST generation
+{-
 main  :: IO()
 main = do
        g <- readJavaFile
@@ -36,6 +35,7 @@ readJavaFile = do
         nameScalaFile =  replace ".java" ".scala" path
     scalaCode <- parseIO pJ2s tokens
     return scalaCode
+-}
 
 -- AG Generation
 {-
