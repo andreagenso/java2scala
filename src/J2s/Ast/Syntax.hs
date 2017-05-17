@@ -738,6 +738,8 @@ data ExplicitConstructorInvocation = ExplConsInvThis NonWildTypeArguments Argume
 -- FIN Definicion de TypeDeclarations
 -- -------------------------------------------------------------------------
 type Catches = [CatchClause]
+sem_Catches_Cons = (:)
+sem_Catches_Nil = []
 
 data CatchClause = CatchClause VariableModifiers Type VariableDeclaratorId BlockStatements
                   deriving Show
