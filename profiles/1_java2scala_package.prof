@@ -1,0 +1,373 @@
+	Wed May 17 18:11 2017 Time and Allocation Profiling Report  (Final)
+
+	   java2scala +RTS -p -RTS /home/andrea/workspaceclipse_haskell/java2scala/test/Example.java
+
+	total time  =        0.01 secs   (15 ticks @ 1000 us, 1 processor)
+	total alloc =   1,079,168 bytes  (excludes profiling overheads)
+
+COST CENTRE                        MODULE                        %time %alloc
+
+pJ2s                               J2s.Parser                     20.0    2.7
+takeBlockComment                   J2s.Scanner                    13.3   14.2
+pAnnotation                        J2s.Parser                     13.3    0.3
+readJavaFile                       Main                           13.3    7.2
+MAIN                               MAIN                            6.7    0.1
+CAF                                GHC.IO.Encoding                 6.7    0.3
+showsPrec                          J2s.Ast.Syntax                  6.7    0.2
+pSpecialSimbol                     J2s.Integration.ScannerParser   6.7    0.1
+classify                           J2s.Scanner                     6.7    0.0
+isBlockComment                     J2s.Scanner                     6.7    0.0
+CAF                                GHC.IO.Handle.FD                0.0    3.2
+tSym                               J2s.Integration.ScannerParser   0.0    9.5
+classify1                          J2s.Scanner                     0.0    1.0
+tokClassify                        J2s.Scanner                     0.0    2.7
+verifyUnicode                      J2s.Scanner                     0.0    5.8
+takeBlockComment.searchEndComment  J2s.Scanner                     0.0   24.6
+pTypeDeclarations                  J2s.Parser                      0.0    1.0
+pTypeDeclaration                   J2s.Parser                      0.0    1.0
+pTypeDeclaration'                  J2s.Parser                      0.0    2.9
+pAnnotationTypeElementDeclaration' J2s.Parser                      0.0    1.5
+pInterfaceMemberDeclaration'       J2s.Parser                      0.0    1.8
+pClassMemberDeclaration'           J2s.Parser                      0.0    1.7
+pModifier                          J2s.Parser                      0.0    3.5
+pPrimitiveOrRefereceType           J2s.Parser                      0.0    1.5
+
+
+                                                                                                 individual     inherited
+COST CENTRE                                    MODULE                          no.     entries  %time %alloc   %time %alloc
+
+MAIN                                           MAIN                             63           0    6.7    0.1   100.0  100.0
+ main                                          Main                            127           0    0.0    0.9    33.3   59.0
+  showsPrec                                    J2s.Ast.Syntax                  431           1    0.0    0.2     0.0    0.5
+   showsPrec                                   J2s.Ast.Syntax                  442           1    0.0    0.0     0.0    0.0
+   showsPrec                                   J2s.Ast.Syntax                  433           1    0.0    0.3     0.0    0.3
+  readJavaFile                                 Main                            129           0   13.3    7.2    33.3   57.6
+   pPackageName                                J2s.Parser                      418           0    0.0    0.0     0.0    0.0
+   readJavaFile.tokens                         Main                            175           1    0.0    0.0    20.0   50.1
+    classify                                   J2s.Scanner                     176           5    6.7    0.0    20.0   50.1
+     takeComments                              J2s.Scanner                     185          33    0.0    0.1     0.0    0.1
+     classify1                                 J2s.Scanner                     178          13    0.0    1.0    13.3   44.2
+      tokClassify                              J2s.Scanner                     179           8    0.0    2.7    13.3   43.2
+       takeToken                               J2s.Scanner.Generic             401           4    0.0    0.0     0.0    0.0
+        isToken                                J2s.Scanner.Generic             402           4    0.0    0.0     0.0    0.0
+       isSpecialSimbol                         J2s.Scanner                     399           1    0.0    0.0     0.0    0.0
+        isToken                                J2s.Scanner.Generic             400           2    0.0    0.0     0.0    0.0
+       isOperator                              J2s.Scanner                     396           1    0.0    0.3     0.0    0.5
+        isToken                                J2s.Scanner.Generic             398          37    0.0    0.2     0.0    0.2
+       isStringLiteral                         J2s.Scanner                     395           1    0.0    0.0     0.0    0.0
+       isCharacterLiteral                      J2s.Scanner                     394           1    0.0    0.0     0.0    0.0
+       fIniWithZero                            J2s.Scanner                     360           2    0.0    0.1     0.0    0.4
+        takeToken                              J2s.Scanner.Generic             377          28    0.0    0.0     0.0    0.1
+         isToken                               J2s.Scanner.Generic             378          28    0.0    0.1     0.0    0.1
+        isSpecialSimbol                        J2s.Scanner                     371           2    0.0    0.1     0.0    0.2
+         isToken                               J2s.Scanner.Generic             373          14    0.0    0.1     0.0    0.1
+        isIntegerLiteral                       J2s.Scanner                     370           2    0.0    0.0     0.0    0.0
+        isDecimalFloatingLiteral4              J2s.Scanner                     369           2    0.0    0.0     0.0    0.0
+        isDecimalFloatingLiteral3              J2s.Scanner                     368           2    0.0    0.0     0.0    0.0
+        isDecimalFloatingLiteral2              J2s.Scanner                     367           2    0.0    0.0     0.0    0.0
+        isDecimalFloatingLiteral1              J2s.Scanner                     366           2    0.0    0.0     0.0    0.0
+        isHexIntegerLiteral                    J2s.Scanner                     365           2    0.0    0.0     0.0    0.0
+        isHexaFloatingPointLiteral2            J2s.Scanner                     364           2    0.0    0.0     0.0    0.0
+        isHexaFloatingPointLiteral1            J2s.Scanner                     363           2    0.0    0.0     0.0    0.0
+        isHexaFloatingPointLiteral3            J2s.Scanner                     362           2    0.0    0.0     0.0    0.0
+        isOctalIntegerLiteral                  J2s.Scanner                     361           2    0.0    0.0     0.0    0.0
+       isDigitPoint                            J2s.Scanner                     359           3    0.0    0.0     0.0    0.0
+       fIniWithId                              J2s.Scanner                     192           4    0.0    0.4     0.0    0.6
+        isIdentifier'                          J2s.Scanner.Generic             358          28    0.0    0.0     0.0    0.0
+        isIdentifier                           J2s.Scanner                     336           3    0.0    0.0     0.0    0.0
+        isNullLiteral                          J2s.Scanner                     333           3    0.0    0.0     0.0    0.0
+         isToken                               J2s.Scanner.Generic             334           3    0.0    0.0     0.0    0.0
+        isBooleanLiteral                       J2s.Scanner                     330           9    0.0    0.0     0.0    0.0
+         isBooleanLiteral'                     J2s.Scanner                     332           6    0.0    0.0     0.0    0.0
+        isKeyWord                              J2s.Scanner                     193           4    0.0    0.2     0.0    0.2
+       isId                                    J2s.Scanner                     191           7    0.0    0.0     0.0    0.0
+       isLineComment                           J2s.Scanner                     188           7    0.0    0.0     0.0    0.0
+        isToken                                J2s.Scanner.Generic             189           7    0.0    0.0     0.0    0.0
+       takeBlockComment                        J2s.Scanner                     186          23   13.3   14.2    13.3   38.8
+        takeBlockComment.searchEndComment      J2s.Scanner                     187          92    0.0   24.6     0.0   24.6
+       isBlockComment                          J2s.Scanner                     180           8    0.0    0.0     0.0    0.0
+        isToken                                J2s.Scanner.Generic             181           8    0.0    0.0     0.0    0.0
+     verifyUnicode                             J2s.Scanner                     177        1304    0.0    5.8     0.0    5.8
+   pJ2s                                        J2s.Parser                      173           0    0.0    0.0     0.0    0.3
+    machine                                    UU.Parsing.Machine              310           0    0.0    0.0     0.0    0.2
+     obtenerVal                                J2s.Integration.ScannerParser   440           3    0.0    0.0     0.0    0.0
+     machine                                   UU.Parsing.Machine              380           0    0.0    0.0     0.0    0.0
+      pPackageName                             J2s.Parser                      381           0    0.0    0.0     0.0    0.0
+       pSpecialSimbol                          J2s.Integration.ScannerParser   382           0    0.0    0.0     0.0    0.0
+        tSym                                   J2s.Integration.ScannerParser   383           0    0.0    0.0     0.0    0.0
+     pPackageName                              J2s.Parser                      349           0    0.0    0.0     0.0    0.0
+     pIdentifier                               J2s.Integration.ScannerParser   346           0    0.0    0.0     0.0    0.1
+      tSym                                     J2s.Integration.ScannerParser   347           0    0.0    0.0     0.0    0.1
+       machine                                 UU.Parsing.Machine              420           0    0.0    0.0     0.0    0.0
+        pTypeDeclarations                      J2s.Parser                      426           0    0.0    0.0     0.0    0.0
+         machine                               UU.Parsing.Machine              429           0    0.0    0.0     0.0    0.0
+         mkParser2                             UU.Parsing.Machine              427           0    0.0    0.0     0.0    0.0
+        pImportDeclarations                    J2s.Parser                      421           0    0.0    0.0     0.0    0.0
+         machine                               UU.Parsing.Machine              424           0    0.0    0.0     0.0    0.0
+         mkParser3                             UU.Parsing.Machine              422           0    0.0    0.0     0.0    0.0
+       ==                                      J2s.Integration.ScannerParser   392           3    0.0    0.0     0.0    0.0
+        ==                                     J2s.Scanner.Token               393          21    0.0    0.0     0.0    0.0
+       Locating                                UU.Parsing.Machine              388           0    0.0    0.0     0.0    0.0
+        pPackageDeclaration                    J2s.Parser                      416           0    0.0    0.0     0.0    0.0
+         pSpecialSimbol                        J2s.Integration.ScannerParser   417           0    0.0    0.0     0.0    0.0
+        pPackageName                           J2s.Parser                      391           0    0.0    0.0     0.0    0.0
+       mkParser1                               UU.Parsing.Machine              385           0    0.0    0.0     0.0    0.0
+        pPackageDeclaration                    J2s.Parser                      414           0    0.0    0.0     0.0    0.0
+         pSpecialSimbol                        J2s.Integration.ScannerParser   415           0    0.0    0.0     0.0    0.0
+        pPackageName                           J2s.Parser                      387           0    0.0    0.0     0.0    0.0
+       machine                                 UU.Parsing.Machine              354           0    0.0    0.0     0.0    0.0
+        machine                                UU.Parsing.Machine              355           0    0.0    0.0     0.0    0.0
+         pPackageName                          J2s.Parser                      356           0    0.0    0.0     0.0    0.0
+          machine                              UU.Parsing.Machine              404           0    0.0    0.0     0.0    0.0
+           pPackageDeclaration                 J2s.Parser                      410           0    0.0    0.0     0.0    0.0
+            pSpecialSimbol                     J2s.Integration.ScannerParser   412           0    0.0    0.0     0.0    0.0
+            machine                            UU.Parsing.Machine              411           0    0.0    0.0     0.0    0.0
+          ==                                   J2s.Integration.ScannerParser   375           3    0.0    0.0     0.0    0.0
+           ==                                  J2s.Scanner.Token               376          49    0.0    0.0     0.0    0.0
+          Locating                             UU.Parsing.Machine              374           0    0.0    0.0     0.0    0.0
+          mkParser2                            UU.Parsing.Machine              357           0    0.0    0.0     0.0    0.0
+       pPackageDeclaration                     J2s.Parser                      352           0    0.0    0.0     0.0    0.0
+        pKeyWord                               J2s.Integration.ScannerParser   353           0    0.0    0.0     0.0    0.0
+       pPackageName                            J2s.Parser                      348           0    0.0    0.0     0.0    0.0
+     pPackageDeclaration                       J2s.Parser                      311           0    0.0    0.0     0.0    0.1
+      pKeyWord                                 J2s.Integration.ScannerParser   317           0    0.0    0.0     0.0    0.0
+       tSym                                    J2s.Integration.ScannerParser   318           0    0.0    0.0     0.0    0.0
+        machine                                UU.Parsing.Machine              319           0    0.0    0.0     0.0    0.0
+         pPackageName                          J2s.Parser                      350           0    0.0    0.0     0.0    0.0
+         machine                               UU.Parsing.Machine              326           0    0.0    0.0     0.0    0.0
+          pPackageName                         J2s.Parser                      327           0    0.0    0.0     0.0    0.0
+           ==                                  J2s.Integration.ScannerParser   341           1    0.0    0.0     0.0    0.0
+            ==                                 J2s.Scanner.Token               342           2    0.0    0.0     0.0    0.0
+           Locating                            UU.Parsing.Machine              338           0    0.0    0.0     0.0    0.0
+           mkParser1                           UU.Parsing.Machine              329           0    0.0    0.0     0.0    0.0
+      machine                                  UU.Parsing.Machine              316           0    0.0    0.0     0.0    0.0
+      machine                                  UU.Parsing.Machine              314           0    0.0    0.0     0.0    0.0
+      machine                                  UU.Parsing.Machine              312           0    0.0    0.0     0.0    0.0
+    machine                                    UU.Parsing.Machine              306           0    0.0    0.0     0.0    0.0
+    <=                                         J2s.Integration.ScannerParser   302           4    0.0    0.0     0.0    0.0
+     ==                                        J2s.Scanner.Token               304           4    0.0    0.0     0.0    0.0
+     <                                         J2s.Scanner.Token               303           4    0.0    0.0     0.0    0.0
+    ==                                         J2s.Integration.ScannerParser   300           5    0.0    0.0     0.0    0.0
+     ==                                        J2s.Scanner.Token               301          76    0.0    0.0     0.0    0.0
+    mkParser2                                  UU.Parsing.Machine              174           0    0.0    0.0     0.0    0.0
+ CAF                                           Main                            125           0    0.0    0.0     0.0    0.0
+  readJavaFile                                 Main                            128           1    0.0    0.0     0.0    0.0
+  main                                         Main                            126           1    0.0    0.0     0.0    0.0
+ CAF                                           J2s.Parser                      123           0    0.0    0.0    40.0   35.4
+  pPackageName                                 J2s.Parser                      320           1    0.0    0.9     0.0    1.3
+   machine                                     UU.Parsing.Machine              403           1    0.0    0.0     0.0    0.0
+   mkParser2                                   UU.Parsing.Machine              351           2    0.0    0.0     0.0    0.0
+   machine                                     UU.Parsing.Machine              343           6    0.0    0.0     0.0    0.1
+    machine                                    UU.Parsing.Machine              379           2    0.0    0.0     0.0    0.0
+    pIdentifier                                J2s.Integration.ScannerParser   344           0    0.0    0.0     0.0    0.1
+     tSym                                      J2s.Integration.ScannerParser   345           0    0.0    0.1     0.0    0.1
+      ==                                       J2s.Integration.ScannerParser   389           2    0.0    0.0     0.0    0.0
+       ==                                      J2s.Scanner.Token               390           4    0.0    0.0     0.0    0.0
+      Locating                                 UU.Parsing.Machine              386           2    0.0    0.0     0.0    0.0
+      mkParser1                                UU.Parsing.Machine              384           2    0.0    0.0     0.0    0.0
+   ==                                          J2s.Integration.ScannerParser   339           3    0.0    0.0     0.0    0.0
+    ==                                         J2s.Scanner.Token               340          36    0.0    0.0     0.0    0.0
+   Locating                                    UU.Parsing.Machine              337           3    0.0    0.0     0.0    0.0
+   mkParser1                                   UU.Parsing.Machine              328           1    0.0    0.0     0.0    0.0
+   machine                                     UU.Parsing.Machine              325           3    0.0    0.0     0.0    0.0
+   pSpecialSimbol                              J2s.Integration.ScannerParser   321           1    0.0    0.0     0.0    0.2
+    tSym                                       J2s.Integration.ScannerParser   322           1    0.0    0.2     0.0    0.2
+     ==                                        J2s.Integration.ScannerParser   323           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               324          17    0.0    0.0     0.0    0.0
+  pTypeName                                    J2s.Parser                      292           1    0.0    0.1     0.0    0.1
+  pAnnotationTypeElementDeclaration'           J2s.Parser                      279           1    0.0    1.5     0.0    2.0
+   pSpecialSimbol                              J2s.Integration.ScannerParser   284           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   285           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   286           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               287          17    0.0    0.0     0.0    0.0
+   pKeyWord                                    J2s.Integration.ScannerParser   280           3    0.0    0.0     0.0    0.4
+    tSym                                       J2s.Integration.ScannerParser   281           3    0.0    0.4     0.0    0.4
+     ==                                        J2s.Integration.ScannerParser   282           3    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               283          48    0.0    0.0     0.0    0.0
+  pAnnotationTypeElementDeclaration            J2s.Parser                      278           1    0.0    0.3     0.0    0.5
+   pSpecialSimbol                              J2s.Integration.ScannerParser   288           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   289           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   290           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               291          17    0.0    0.0     0.0    0.0
+  pInterfaceMemberDeclaration'                 J2s.Parser                      265           1    0.0    1.8     0.0    2.4
+   pSpecialSimbol                              J2s.Integration.ScannerParser   270           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   271           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   272           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               273          17    0.0    0.0     0.0    0.0
+   pKeyWord                                    J2s.Integration.ScannerParser   266           3    0.0    0.0     0.0    0.4
+    tSym                                       J2s.Integration.ScannerParser   267           3    0.0    0.4     0.0    0.4
+     ==                                        J2s.Integration.ScannerParser   268           3    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               269          48    0.0    0.0     0.0    0.0
+  pInterfaceMemberDeclaration                  J2s.Parser                      264           1    0.0    0.3     0.0    0.5
+   pSpecialSimbol                              J2s.Integration.ScannerParser   274           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   275           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   276           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               277          17    0.0    0.0     0.0    0.0
+  pEnumBodyDeclarations                        J2s.Parser                      259           1    0.0    0.2     0.0    0.3
+   pSpecialSimbol                              J2s.Integration.ScannerParser   260           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   261           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   262           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               263          17    0.0    0.0     0.0    0.0
+  pZEnumBody                                   J2s.Parser                      254           1    0.0    0.4     0.0    0.7
+   pSpecialSimbol                              J2s.Integration.ScannerParser   255           2    0.0    0.0     0.0    0.3
+    tSym                                       J2s.Integration.ScannerParser   256           2    0.0    0.3     0.0    0.3
+     ==                                        J2s.Integration.ScannerParser   257           2    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               258          34    0.0    0.0     0.0    0.0
+  pEnumConstant                                J2s.Parser                      253           1    0.0    0.2     0.0    0.2
+  pEnumConstants                               J2s.Parser                      252           1    0.0    0.2     0.0    0.2
+  pResultType                                  J2s.Parser                      247           1    0.0    0.3     0.0    0.4
+   pKeyWord                                    J2s.Integration.ScannerParser   248           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   249           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   250           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               251          16    0.0    0.0     0.0    0.0
+  pClassMemberDeclarationConstructorOrMethod   J2s.Parser                      246           1    0.0    0.4     0.0    0.4
+  pReferenceType                               J2s.Parser                      245           1    0.0    0.1     0.0    0.1
+  pPrimitiveOrRefereceType                     J2s.Parser                      240           1    0.0    1.5     0.0    2.6
+   pKeyWord                                    J2s.Integration.ScannerParser   241           8    0.0    0.0     0.0    1.1
+    tSym                                       J2s.Integration.ScannerParser   242           8    0.0    1.1     0.0    1.1
+     ==                                        J2s.Integration.ScannerParser   243           8    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               244         128    0.0    0.0     0.0    0.0
+  pType                                        J2s.Parser                      239           1    0.0    0.1     0.0    0.1
+  pClassMemberDeclaration'                     J2s.Parser                      230           1    0.0    1.7     0.0    2.3
+   pSpecialSimbol                              J2s.Integration.ScannerParser   235           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   236           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   237           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               238          17    0.0    0.0     0.0    0.0
+   pKeyWord                                    J2s.Integration.ScannerParser   231           3    0.0    0.0     0.0    0.4
+    tSym                                       J2s.Integration.ScannerParser   232           3    0.0    0.4     0.0    0.4
+     ==                                        J2s.Integration.ScannerParser   233           3    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               234          48    0.0    0.0     0.0    0.0
+  pClassBodyDeclaration                        J2s.Parser                      221           1    0.0    0.8     0.0    1.2
+   pKeyWord                                    J2s.Integration.ScannerParser   226           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   227           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   228           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               229          16    0.0    0.0     0.0    0.0
+   pSpecialSimbol                              J2s.Integration.ScannerParser   222           2    0.0    0.0     0.0    0.3
+    tSym                                       J2s.Integration.ScannerParser   223           2    0.0    0.3     0.0    0.3
+     ==                                        J2s.Integration.ScannerParser   224           2    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               225          34    0.0    0.0     0.0    0.0
+  pClassBodyDeclarations                       J2s.Parser                      220           1    0.0    0.3     0.0    0.3
+  pExtendsInterfaces                           J2s.Parser                      215           1    0.0    0.3     0.0    0.4
+   pKeyWord                                    J2s.Integration.ScannerParser   216           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   217           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   218           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               219          16    0.0    0.0     0.0    0.0
+  pEnumBody                                    J2s.Parser                      210           1    0.0    0.2     0.0    0.3
+   pSpecialSimbol                              J2s.Integration.ScannerParser   211           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   212           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   213           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               214          17    0.0    0.0     0.0    0.0
+  pInterfaces                                  J2s.Parser                      205           1    0.0    0.2     0.0    0.4
+   pKeyWord                                    J2s.Integration.ScannerParser   206           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   207           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   208           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               209          16    0.0    0.0     0.0    0.0
+  pSuper                                       J2s.Parser                      200           1    0.0    0.2     0.0    0.4
+   pKeyWord                                    J2s.Integration.ScannerParser   201           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   202           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   203           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               204          16    0.0    0.0     0.0    0.0
+  pTypeParameters                              J2s.Parser                      195           1    0.0    0.2     0.0    0.4
+   pOperator                                   J2s.Integration.ScannerParser   196           1    0.0    0.0     0.0    0.1
+    tSym                                       J2s.Integration.ScannerParser   197           1    0.0    0.1     0.0    0.1
+     ==                                        J2s.Integration.ScannerParser   198           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               199          18    0.0    0.0     0.0    0.0
+  pTypeDeclaration'                            J2s.Parser                      155           1    0.0    2.9     0.0    4.0
+   pSpecialSimbol                              J2s.Integration.ScannerParser   160           3    0.0    0.0     0.0    0.5
+    tSym                                       J2s.Integration.ScannerParser   161           3    0.0    0.5     0.0    0.5
+     ==                                        J2s.Integration.ScannerParser   162           3    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               163          51    0.0    0.0     0.0    0.0
+   pKeyWord                                    J2s.Integration.ScannerParser   156           3    0.0    0.0     0.0    0.6
+    tSym                                       J2s.Integration.ScannerParser   157           3    0.0    0.6     0.0    0.6
+     ==                                        J2s.Integration.ScannerParser   158           3    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               159          48    0.0    0.0     0.0    0.0
+  pModifier                                    J2s.Parser                      150           1    0.0    3.5     0.0    5.8
+   pKeyWord                                    J2s.Integration.ScannerParser   151          11    0.0    0.0     0.0    2.3
+    tSym                                       J2s.Integration.ScannerParser   152          11    0.0    2.2     0.0    2.2
+     ==                                        J2s.Integration.ScannerParser   153          11    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               154         176    0.0    0.0     0.0    0.0
+  pModifiers                                   J2s.Parser                      149           1    0.0    0.7     0.0    0.7
+  pTypeDeclaration                             J2s.Parser                      148           1    0.0    1.0     0.0    1.2
+   pSpecialSimbol                              J2s.Integration.ScannerParser   164           1    0.0    0.0     0.0    0.2
+    tSym                                       J2s.Integration.ScannerParser   165           1    0.0    0.2     0.0    0.2
+     ==                                        J2s.Integration.ScannerParser   166           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               167          17    0.0    0.0     0.0    0.0
+  pTypeDeclarations                            J2s.Parser                      147           1    0.0    1.0     0.0    1.0
+   machine                                     UU.Parsing.Machine              428           1    0.0    0.0     0.0    0.0
+   mkParser2                                   UU.Parsing.Machine              425           1    0.0    0.0     0.0    0.0
+  pImportDeclarations                          J2s.Parser                      142           1    0.0    0.4     0.0    0.6
+   machine                                     UU.Parsing.Machine              423           1    0.0    0.0     0.0    0.0
+   mkParser3                                   UU.Parsing.Machine              419           1    0.0    0.0     0.0    0.0
+   pKeyWord                                    J2s.Integration.ScannerParser   143           1    0.0    0.0     0.0    0.2
+    tSym                                       J2s.Integration.ScannerParser   144           1    0.0    0.2     0.0    0.2
+     ==                                        J2s.Integration.ScannerParser   145           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               146          16    0.0    0.0     0.0    0.0
+  pAnnotation                                  J2s.Parser                      133           1   13.3    0.3    20.0    0.5
+   pSpecialSimbol                              J2s.Integration.ScannerParser   134           1    6.7    0.0     6.7    0.2
+    tSym                                       J2s.Integration.ScannerParser   135           1    0.0    0.2     0.0    0.2
+     ==                                        J2s.Integration.ScannerParser   136           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               137          17    0.0    0.0     0.0    0.0
+  pAnnotations                                 J2s.Parser                      132           1    0.0    0.4     0.0    0.4
+  pPackageDeclaration                          J2s.Parser                      131           1    0.0    0.7     0.0    1.2
+   pSpecialSimbol                              J2s.Integration.ScannerParser   405           1    0.0    0.0     0.0    0.3
+    tSym                                       J2s.Integration.ScannerParser   406           1    0.0    0.3     0.0    0.3
+     Locating                                  UU.Parsing.Machine              413           1    0.0    0.0     0.0    0.0
+     mkParser1                                 UU.Parsing.Machine              409           1    0.0    0.0     0.0    0.0
+     ==                                        J2s.Integration.ScannerParser   407           2    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               408          34    0.0    0.0     0.0    0.0
+   ==                                          J2s.Integration.ScannerParser   293           1    0.0    0.0     0.0    0.0
+    ==                                         J2s.Scanner.Token               294           2    0.0    0.0     0.0    0.0
+   pKeyWord                                    J2s.Integration.ScannerParser   138           1    0.0    0.0     0.0    0.2
+    tSym                                       J2s.Integration.ScannerParser   139           1    0.0    0.2     0.0    0.2
+     ==                                        J2s.Integration.ScannerParser   140           1    0.0    0.0     0.0    0.0
+      ==                                       J2s.Scanner.Token               141          16    0.0    0.0     0.0    0.0
+  pJ2s                                         J2s.Parser                      130           1   20.0    2.7    20.0    2.7
+   machine                                     UU.Parsing.Machine              307           1    0.0    0.0     0.0    0.0
+    pPackageDeclaration                        J2s.Parser                      308           0    0.0    0.0     0.0    0.0
+     machine                                   UU.Parsing.Machine              315           1    0.0    0.0     0.0    0.0
+     machine                                   UU.Parsing.Machine              313           1    0.0    0.0     0.0    0.0
+     machine                                   UU.Parsing.Machine              309           1    0.0    0.0     0.0    0.0
+   machine                                     UU.Parsing.Machine              305           2    0.0    0.0     0.0    0.0
+   <=                                          J2s.Integration.ScannerParser   297         212    0.0    0.0     0.0    0.0
+    ==                                         J2s.Scanner.Token               299         170    0.0    0.0     0.0    0.0
+    <                                          J2s.Scanner.Token               298         212    0.0    0.0     0.0    0.0
+   ==                                          J2s.Integration.ScannerParser   295         227    0.0    0.0     0.0    0.0
+    ==                                         J2s.Scanner.Token               296        2416    0.0    0.0     0.0    0.0
+   mkParser2                                   UU.Parsing.Machine              172           1    0.0    0.0     0.0    0.0
+ CAF                                           J2s.Scanner                     122           0    0.0    0.0     6.7    0.1
+  classify1                                    J2s.Scanner                     182           0    0.0    0.0     6.7    0.1
+   tokClassify                                 J2s.Scanner                     183           0    0.0    0.0     6.7    0.1
+    fIniWithId                                 J2s.Scanner                     335           0    0.0    0.0     0.0    0.0
+    isLineComment                              J2s.Scanner                     190           0    0.0    0.0     0.0    0.0
+    isBlockComment                             J2s.Scanner                     184           0    6.7    0.0     6.7    0.0
+ CAF                                           J2s.Scanner.Lexical             119           0    0.0    0.0     0.0    1.3
+  operatorList                                 J2s.Scanner.Lexical             397           1    0.0    0.5     0.0    0.5
+  specialSimbol                                J2s.Scanner.Lexical             372           1    0.0    0.1     0.0    0.1
+  constantBool                                 J2s.Scanner.Lexical             331           1    0.0    0.1     0.0    0.1
+  keyWord                                      J2s.Scanner.Lexical             194           1    0.0    0.7     0.0    0.7
+ CAF                                           J2s.Integration.ScannerParser   116           0    0.0    0.0     0.0    0.2
+  pIdentifier                                  J2s.Integration.ScannerParser   168           1    0.0    0.0     0.0    0.2
+   tSym                                        J2s.Integration.ScannerParser   169           1    0.0    0.2     0.0    0.2
+    ==                                         J2s.Integration.ScannerParser   170           1    0.0    0.0     0.0    0.0
+     ==                                        J2s.Scanner.Token               171           2    0.0    0.0     0.0    0.0
+ CAF                                           J2s.Ast.Syntax                  115           0    0.0    0.0     6.7    0.3
+  sem_TypeDeclarations_Nil                     J2s.Ast.Syntax                  446           1    0.0    0.0     0.0    0.0
+  showList                                     J2s.Ast.Syntax                  445           1    0.0    0.0     0.0    0.0
+  showsPrec                                    J2s.Ast.Syntax                  444           0    0.0    0.1     0.0    0.1
+  sem_PackageName_Nil                          J2s.Ast.Syntax                  441           1    0.0    0.0     0.0    0.0
+  sem_PackageName_Cons                         J2s.Ast.Syntax                  438           1    0.0    0.0     0.0    0.0
+  sem_Annotations_Nil                          J2s.Ast.Syntax                  437           1    0.0    0.0     0.0    0.0
+  showList                                     J2s.Ast.Syntax                  436           1    0.0    0.0     0.0    0.0
+  showsPrec                                    J2s.Ast.Syntax                  435           0    0.0    0.1     0.0    0.1
+  showsPrec                                    J2s.Ast.Syntax                  432           0    6.7    0.0     6.7    0.0
+ CAF                                           J2s.Ast.Semantic                114           0    0.0    0.0     0.0    0.0
+  sem_ImportDeclarations_NilImportDeclarations J2s.Ast.Semantic                443           1    0.0    0.0     0.0    0.0
+  sem_PackageDeclaration_PackageDeclaration    J2s.Ast.Semantic                434           1    0.0    0.0     0.0    0.0
+  sem_J2s_J2s                                  J2s.Ast.Semantic                430           1    0.0    0.0     0.0    0.0
+ CAF                                           GHC.Conc.Signal                 104           0    0.0    0.1     0.0    0.1
+ CAF                                           GHC.IO.Encoding                 100           0    6.7    0.3     6.7    0.3
+ CAF                                           GHC.IO.Encoding.Iconv            98           0    0.0    0.0     0.0    0.0
+ CAF                                           GHC.IO.Handle.FD                 91           0    0.0    3.2     0.0    3.2
+ CAF                                           GHC.IO.Handle.Internals          90           0    0.0    0.0     0.0    0.0
+ CAF                                           GHC.IO.Handle.Text               89           0    0.0    0.0     0.0    0.0
+ CAF                                           GHC.IO.FD                        81           0    0.0    0.0     0.0    0.0
