@@ -3,8 +3,8 @@ Convert Java code to Scala
 
 -- PROF
 cabal clean
-cabal configure --enable-library-profiling --enable-executable-profiling --enable-tests --enable-benchmarks
-cabal build
+cabal configure --enable-library-profiling --enable-executable-profiling --enable-tests --enable-benchmarks 
+cabal build 
 cabal install --enable-profiling --ghc-options="-DEXTERNAL_UUAGC -fprof-auto -rtsopts"
 
 ./test +RTS -p

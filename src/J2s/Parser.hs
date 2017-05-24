@@ -35,9 +35,10 @@ evps  = pElementValuePairs  <* pSpecialSimbol ")"
 ev =  pElementValue <* pSpecialSimbol ")" 
 
 -- 6 OK
-pTypeName = AGS.sem_TypeName_TypeName <$> pIdentifier <*> pTypeName'
-pTypeName' = pSucceed AGS.sem_TypeName_NilTypeName
-                  <|> AGS.sem_TypeName_TypeName <$ pSpecialSimbol "." <*> pIdentifier <*> pTypeName'
+--pTypeName = AGS.sem_TypeName_TypeName <$> pIdentifier <*> pTypeName'
+--pTypeName' = pSucceed AGS.sem_TypeName_NilTypeName
+--                  <|> AGS.sem_TypeName_TypeName <$ pSpecialSimbol "." <*> pIdentifier <*> pTypeName'
+pTypeName = pFoldr1Sep(AGS.sem_TypeName_TypeName, AGS.sem_TypeName_NilTypeName) (pSpecialSimbol ".") pIdentifier
 
 -- 7
 pElementValuePairs = pFoldrSep(AGS.sem_ElementValuePairs_Cons, AGS.sem_ElementValuePairs_Nil) (pSpecialSimbol ",") pElementValuePair
@@ -103,9 +104,9 @@ pPrimary = pPrimaryNoNewArray <**> ( (pSucceed AGS.sem_Primary_PrimNoNewArray) <
 -- *****************************************************************************
 -- ZPrimary Optimizado ---------------------------------------------------------
 -- *****************************************************************************
-pZPrimary 
+pZPrimary
   =  pFoldr1(AGS.sem_ZPrimary_Cons, AGS.sem_ZPrimary_Nil) pPrimaryNNAArrayFieldAccessOrMethodInvocation
- 
+
 pPrimaryNNAArrayFieldAccessOrMethodInvocation 
   = pSpecialSimbol "." *> pPrimaryNNAArrayFieldAccessOrMethodInvocation'
 pPrimaryNNAArrayFieldAccessOrMethodInvocation' = (\nw fcora -> fcora nw) <$> pNonWildTypeArguments <*> pPrimaryConstructorOrArrayMethod
@@ -130,11 +131,11 @@ pPrimaryNNA =  AGS.sem_PrimaryNNA_PrimNNALiteral_IntegerLiteral_DecimalIntegerLi
                    <|> AGS.sem_PrimaryNNA_PrimNNALiteral_CharacterLiteral                                     <$> pCharacterLiteral
                    <|> AGS.sem_PrimaryNNA_PrimNNALiteral_StringLiteral                                        <$> pStringLiteral
                    <|> AGS.sem_PrimaryNNA_PrimNNALiteral_NullLiteral                                          <$ pNullLiteral "null"
-                   <|> AGS.sem_PrimaryNNA_PrimNNAVoid                                                             <$ pKeyWord "void" <* pSpecialSimbol "." <* pKeyWord "class"
-                   <|> AGS.sem_PrimaryNNA_PrimNNAThis                                                             <$ pKeyWord "this"
+                   <|> AGS.sem_PrimaryNNA_PrimNNAVoid                                                         <$ pKeyWord "void" <* pSpecialSimbol "." <* pKeyWord "class"
+                   <|> AGS.sem_PrimaryNNA_PrimNNAThis                                                         <$ pKeyWord "this"
                    <|> (\f -> f)                                                                          <$ pSpecialSimbol "(" <*> pParExprOrCastExpression               
                    <|> (\f -> f)                                                                          <$ pKeyWord "super" <* pSpecialSimbol "." <*> pPrimaryNNAiV
-                   <|>  AGS.sem_PrimaryNNA_PrimNNATypeClassPrimitiveType                                      <$> pPrimitiveType <*> pTypeZ  <* pPrimaryNNA_PrimNNATypeClassPrimitiveType_Class
+                   <|>  AGS.sem_PrimaryNNA_PrimNNATypeClassPrimitiveType                                  <$> pPrimitiveType <*> pTypeZ  <* pPrimaryNNA_PrimNNATypeClassPrimitiveType_Class
                    <|> (\ids f -> f ids)                                                                  <$> pTypeName <*> pPrimaryNNAv
                    <|> (\i f -> f i)                                                                      <$> pIdentifier <*> pPrimaryNNA'
                    <|> (\f -> f)                                                                          <$ pKeyWord "new" *> pArrayCreationExpressionOrClassInstanceCreationExpression
@@ -156,8 +157,12 @@ pParExprOrCastExpression = (\e f -> f e)  <$>  pExpression <* pSpecialSimbol ")"
 pParExprOrCastExpression' =  pSucceed (\e -> AGS.sem_PrimaryNNA_PrimNNAParExp e)
                                              <|> (\u e ->  AGS.sem_PrimaryNNA_UnNotPlusCastExpression e u)  <$>  pUnaryExpression -- AQUI CONTROLAR CONDICIONES DE CONTEXTO PARA CAST
 
+pPrimaryNNA' = (\a p i -> AGS.sem_PrimaryNNA_PrimNNATypeClassReferenceTypeClassIOT i a p ) <$>  pTypeArguments <*> pPrimNNAClassOrInterfaceType  -- .class esta a continuacion
+
+{-
 pPrimaryNNA' =   (\t i -> AGS.sem_PrimaryNNA_PrimNNATypeClassReferenceTypeTypeVariable i t)  <$>  pTypeZ   <* pSpecialSimbol "." <* pKeyWord "class"
                    <|>   (\a p i -> AGS.sem_PrimaryNNA_PrimNNATypeClassReferenceTypeClassIOT i a p ) <$>  pTypeArguments <*> pPrimNNAClassOrInterfaceType  -- .class esta a continuacion
+-}
 
 pPrimaryNNA''' =  (\n i a e -> AGS.sem_PrimaryNNA_PrimNNAMethodInvocationClassN e n i a )  <$> pNonWildTypeArguments <*> pIdentifier <* pSpecialSimbol "(" <*> pArgumentList <* pSpecialSimbol ")"
                       <|> (\i e -> AGS.sem_PrimaryNNA_PrimNNAFieldAccessClassName e i )            <$> pIdentifier
@@ -177,14 +182,15 @@ pPrimaryNNAv' = (\nwt i al tn -> AGS.sem_PrimaryNNA_PrimNNAMethodInvocationTypeN
 --               <|> (\ zpe ids -> AGS.sem_PrimaryNNA_PostExpNamePostfixZ ids zpe) <$> pZPostfixExpression -- AQUI APLICAR COND CONTEXTO
 
 pPrimNNAClassOrInterfaceType  = (\f -> f) <$ pSpecialSimbol "." <*> pPrimNNAClassOrInterfaceType'
-                                <|> AGS.sem_PrimNNAClassOrInterfaceType_TypeZPrimNNAClassOrInterfaceType        <$> pTypeZ <* pSpecialSimbol "." <* pKeyWord "class"
+                                <|> AGS.sem_PrimNNAClassOrInterfaceType_TypeZPrimNNAClassOrInterfaceType <$> pTypeZ1 <* pSpecialSimbol "." <* pKeyWord "class"
+
 pPrimNNAClassOrInterfaceType'  = (\i ta co ->  AGS.sem_PrimNNAClassOrInterfaceType_PrimNNAClassOrInterfaceType i ta co ) <$> pIdentifier <*> pTypeArguments <*> pPrimNNAClassOrInterfaceType
                                         <|> (AGS.sem_PrimNNAClassOrInterfaceType_NilPrimNNAClassOrInterfaceType)           <$ pKeyWord "class"
 
 pZPrimaryNoNewArray = pFoldr(AGS.sem_ZPrimaryNoNewArray_Cons, AGS.sem_ZPrimaryNoNewArray_Nil) pZPrimaryOrExpression
 pZPrimaryOrExpression = AGS.sem_ZPrimaryOrExpression_ZPOEExpressionDeArrayAccess <$ pSpecialSimbol "[" <*> pExpression <* pSpecialSimbol "]"
                                          <|> AGS.sem_ZPrimaryOrExpression_ZPOEZPrimary <$> pZPrimary
-                                         
+
 -- 28 -  OK
 pType =  AGS.sem_Type_TypePrimitiveType <$> pPrimitiveOrRefereceType <*> pTypeZ
 
@@ -198,6 +204,7 @@ pPrimitiveOrRefereceType =  AGS.sem_PrimitiveOrReferenceType_TypePrimitivePrimit
                           <|> AGS.sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeFloating_Double <$ pKeyWord "double"
                           <|> AGS.sem_PrimitiveOrReferenceType_TypeReference <$> pReferenceType
 
+pTypeZ1 = pFoldr1 (AGS.sem_TypeZ_Cons, AGS.sem_TypeZ_Nil) pArrayType
 pTypeZ = pFoldr (AGS.sem_TypeZ_Cons, AGS.sem_TypeZ_Nil) pArrayType
 pArrayType = AGS.sem_ArrayType_ArrayType <$ pSpecialSimbol "[" <* pSpecialSimbol "]"
          
@@ -394,7 +401,7 @@ pClassMemberDeclarationConstructorOrMethod = (\rt md t mb tp m ->  AGS.sem_Class
                                                                                   <|> (\i f -> f i) <$> pIdentifier <* pSpecialSimbol "(" <*> pZConstructorDeclarator
                                                                                   
 pZConstructorDeclarator =  (\   t cb  i tp m -> AGS.sem_ClassBodyDeclaration_ClassBodyConstructorDeclarationNoFormalParList m tp i t cb) <$ pSpecialSimbol ")" <*> pThrows <*> pConstructorBody
-                                           <|> (\fp t cb  i tp m -> AGS.sem_ClassBodyDeclaration_ClassBodyConstructorDeclaration m tp i fp t cb )            <$> pFormalParameterList <* pSpecialSimbol ")" <*> pThrows <*> pConstructorBody
+                                           <|> (\fp t cb  i tp m -> AGS.sem_ClassBodyDeclaration_ClassBodyConstructorDeclaration m tp i fp t cb )            <$> pFormalParameterListOne <* pSpecialSimbol ")" <*> pThrows <*> pConstructorBody
                                                                                   
 pVariableDeclarators = pFoldr1Sep (AGS.sem_VariableDeclarators_Cons, AGS.sem_VariableDeclarators_Nil) (pSpecialSimbol ",") pVariableDeclarator
                                         
@@ -412,6 +419,10 @@ pResultType = AGS.sem_ResultType_ResultTypeVoid <$ pKeyWord "void"
                    <|> AGS.sem_ResultType_ResultTypeType <$> pType
 
 pMethodDeclarator  =  AGS.sem_MethodDeclarator_MethodDeclaratorFormalPL <$> pIdentifier <* pSpecialSimbol "(" <*> pFormalParameterList <* pSpecialSimbol ")"
+
+
+pFormalParameterListOne = (\vm t f -> f vm t ) <$> pVariableModifiers <*> pType <*> pFormalParameterList'
+--                                        <|> pSucceed AGS.sem_FormalParameterList_FormalParameterListNil
 
 pFormalParameterList = (\vm t f -> f vm t ) <$> pVariableModifiers <*> pType <*> pFormalParameterList'
                                         <|> pSucceed AGS.sem_FormalParameterList_FormalParameterListNil
@@ -433,9 +444,12 @@ pThrows = AGS.sem_Throws_Throws <$ pKeyWord "throws" <*> pExceptionTypeList
            
 pExceptionTypeList = pFoldr1Sep (AGS.sem_ExceptionTypeList_Cons, AGS.sem_ExceptionTypeList_Nil) (pSpecialSimbol ",") pExceptionType
                                    
+{-
 pExceptionType =  AGS.sem_ExceptionType_ExceptionTypeTypeVariable <$> pIdentifier
                           <|> AGS.sem_ExceptionType_ExceptionTypeClassType <$> pClassOrInterfaceType
-                          
+-}
+pExceptionType =  AGS.sem_ExceptionType_ExceptionTypeClassType <$> pClassOrInterfaceType
+
 pMethodBody = AGS.sem_MethodBody_MethodBodyBlock       <$ pSpecialSimbol "{" <*> pBlockStatements <* pSpecialSimbol "}" -- pBlock
                     <|> AGS.sem_MethodBody_MethodBodySemiColon <$ pSpecialSimbol ";"
                     

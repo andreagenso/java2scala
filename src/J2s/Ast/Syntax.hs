@@ -121,7 +121,7 @@ data PrimaryNNA = PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral String
                                 | PrimNNALiteral_NullLiteral
                                 | PrimNNATypeClassPrimitiveType PrimitiveType TypeZ  ---                                | PrimNNATypeClass Type
                                 | PrimNNATypeClassReferenceTypeClassIOT Identifier TypeArguments PrimNNAClassOrInterfaceType --TypeZ 
-                                | PrimNNATypeClassReferenceTypeTypeVariable Identifier TypeZ
+                                -- | PrimNNATypeClassReferenceTypeTypeVariable Identifier TypeZ
                                 | PrimNNAVoid
                                 | PrimNNAThis
                                 | PrimNNAClassName TypeName -- Antes Identifier
@@ -163,7 +163,7 @@ sem_PrimaryNNA_PrimNNALiteral_StringLiteral    = PrimNNALiteral_StringLiteral
 sem_PrimaryNNA_PrimNNALiteral_NullLiteral      = PrimNNALiteral_NullLiteral
 sem_PrimaryNNA_PrimNNATypeClassPrimitiveType =  PrimNNATypeClassPrimitiveType
 sem_PrimaryNNA_PrimNNATypeClassReferenceTypeClassIOT =  PrimNNATypeClassReferenceTypeClassIOT
-sem_PrimaryNNA_PrimNNATypeClassReferenceTypeTypeVariable = PrimNNATypeClassReferenceTypeTypeVariable
+-- sem_PrimaryNNA_PrimNNATypeClassReferenceTypeTypeVariable = PrimNNATypeClassReferenceTypeTypeVariable
 
 -- AQUI APLICAR CONDICIONES DE CONTEXTO para ArrayCreationExpression
 sem_PrimaryNNA_ArrayCreationExpressionPrimitiveType =  ArrayCreationExpressionPrimitiveType
@@ -205,7 +205,7 @@ data ZPrimaryOrExpression = ZPOEExpressionDeArrayAccess Expression
 
 sem_ZPrimaryOrExpression_ZPOEExpressionDeArrayAccess = ZPOEExpressionDeArrayAccess
 sem_ZPrimaryOrExpression_ZPOEZPrimary   = ZPOEZPrimary
-                                                                        
+
 
 data Type = TypePrimitiveType PrimitiveOrRefereceType TypeZ
                   deriving Show
@@ -571,7 +571,7 @@ sem_ExceptionTypeList_Cons = (:)
 sem_ExceptionTypeList_Nil  = []
                                            
 data ExceptionType = ExceptionTypeClassType ClassOrInterfaceType
-                                   | ExceptionTypeTypeVariable Identifier
+                                   -- | ExceptionTypeTypeVariable Identifier
                                    deriving Show
                                    
 data MethodBody = MethodBodyBlock BlockStatements

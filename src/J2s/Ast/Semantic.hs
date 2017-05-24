@@ -211,7 +211,7 @@ sem_Throws_Throws = Throws
 sem_Throws_NilThrows = NilThrows
                         
 sem_ExceptionType_ExceptionTypeClassType = ExceptionTypeClassType
-sem_ExceptionType_ExceptionTypeTypeVariable = ExceptionTypeTypeVariable                            
+-- sem_ExceptionType_ExceptionTypeTypeVariable = ExceptionTypeTypeVariable
                                    
 sem_MethodBody_MethodBodyBlock     = MethodBodyBlock
 sem_MethodBody_MethodBodySemiColon = MethodBodySemiColon 
