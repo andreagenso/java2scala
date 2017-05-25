@@ -622,8 +622,8 @@ pZTryStatementNested =  (\l b -> AGS.sem_StatementNested_SWTTryStatementNested b
 
 -- ToDO Check in grammar
 -- AST
-pCatchClauses1 = pList1 pCatchClause
-pCatchClauses = pList pCatchClause
+pCatchClauses1 = pFoldr1 (AGS.sem_Catches_Cons, AGS.sem_Catches_Nil) pCatchClause
+pCatchClauses = pFoldr(AGS.sem_Catches_Cons, AGS.sem_Catches_Nil) pCatchClause
 
 pZReturnStatement  = (\e -> AGS.sem_Statement_SWTSReturnStatement e)    <$> pExpression <* pSpecialSimbol ";"
                                  <|> AGS.sem_Statement_SWTSNilReturnStatement <$ pSpecialSimbol ";"
