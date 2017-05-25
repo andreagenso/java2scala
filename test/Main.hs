@@ -2,7 +2,7 @@ module Main where
 
 import J2s.Scanner.Test
 import J2s.Parser.Test
-import J2s.Ast.Sintax
+import J2s.Ast.Syntax
 
 import J2s.Scanner.Position
 import J2s.Scanner
@@ -26,8 +26,15 @@ main = do f <- getLine
           command
 
 test :: String -> IO()
+-- test of scanner
+test "testscanner"  = testScanner
 test "singleparser" = testSingleParser
+
+-- tests of parser
 test "testparser" = testParser
+test "testsummary" = testSummary
+test "testpriority" = testPriority
+test "testshop" = testShopizer
 
 test "tmp" = tmp
 
@@ -117,7 +124,7 @@ test "tspj" = tspj
 test "t001" = test001
 test "tp001" = test001Parser
 
-test "testscanner"  = testScanner
+
 test "testjavatest"  = testJavaTest
 test "testencodingdir" = testEncodingDir
 test "scannerwitherror" = testScannerWithError

@@ -5,10 +5,7 @@ import J2s.Scanner.Token
 -- Reserved Simbols of language        
 keyWord :: [KeyWord]
 
-keyWord = ["delete","update","insertion","view",
-           "facadeGen","controllerGen","persistGen","controller",
-           "facade","persist","key","project",
-           "abstract","continue","for","new","switch",
+keyWord = ["abstract","continue","for","new","switch",
            "assert","default","if","package","synchronized",
            "boolean","do","goto","private","this",
            "break","double","implements","protected","throw",
@@ -26,27 +23,12 @@ specialSimbol = [",",";","{","}","<%","%>",".","(",")","=","[","]","@"]
 constantBool ::[Constant]
 constantBool = ["true","false"]
 
--- Operatos
----- operatorSingle :: [Operator]
----- operatorSingle = [">","<","!","~","?",":","+","-","*","/","&","|","^","%"] -- se ha quitado =
-        
----- operatorDoble :: [Operator]
--- operatorDoble = ["==","<=",">=","!=","+=","-=","*=","/=","&=","|=","^=","%=","&&","||","++","--","<<", "HS@J2SShift>>ShiftJ2S@"]
----- operatorDoble = ["==","<=",">=","!=","+=","-=","*=","/=","&=","|=","^=","%=","&&","||","++","--","<<",">>"]
-
----- operatorTri :: [Operator]
----- operatorTri = ["<<=",">>=",">>>=", "HS@J2SShift>>>ShiftJ2S@"]
--- operatorTri = ["<<=",">>=",">>>=",">>>"]
-
----- operatorQuard :: [Operator]
----- operatorQuard = [">>>="]
 operatorList :: [Operator]
--- operatorList = [">>>=","<<=",">>=",">>>=",">>>","==","<=",">=","!=","+=","-=","*=","/=","&=","|=","^=","%=","&&","||","++","--","<<",">>",">","<","!","~","?",":","+","-","*","/","&","|","^","%"]
-operatorList = [">>>=","<<=",">>=",">>>=","==","<=",">=","!=","+=","-=","*=","/=","&=","|=","^=","%=","&&","||","++","--","<<","<","!","~","?",":","+","-","*","/","&","|","^","%"]        
+operatorList = [">>>=","<<=",">>=",">>>=",">>>","==","<=",">=","!=","+=","-=","*=","/=","&=","|=","^=","%=","&&","||","++","--","<<",">>",">","<","!","~","?",":","+","-","*","/","&","|","^","%"]
+--operatorList = [">>>=","<<=",">>=",">>>=","==","<=",">=","!=","+=","-=","*=","/=","&=","|=","^=","%=","&&","||","++","--","<<","<","!","~","?",":","+","-","*","/","&","|","^","%"]
 
 majorList :: [String]
 majorList = [">>>",">>",">"]
-
 
 digits :: [String]
 digits = ["0","1","2","3","4","5","6","7","8","9"]

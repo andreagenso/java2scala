@@ -6,7 +6,7 @@ import System.FilePath ((</>), splitExtension, splitFileName)
 import Control.Exception(evaluate)
 import J2s.Scanner
 import J2s.Parser
-import J2s.Ast.Sintax
+import J2s.Ast.Syntax
 import J2s.Scanner.Position
 import UU.Scanner.Position
 import UU.Parsing
@@ -28,7 +28,7 @@ import Text.Show
 
 import UU.Parsing
 
-import J2s.Ast.Sintax
+import J2s.Ast.Syntax
 import J2s.Scanner
 import J2s.Ast.Semantic
 import J2s.Integration.ScannerParser

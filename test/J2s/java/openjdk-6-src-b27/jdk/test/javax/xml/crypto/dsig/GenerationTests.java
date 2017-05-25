@@ -74,14 +74,22 @@ import javax.xml.transform.stream.StreamResult;
  * different keys and X.509 data.
  */
 
-public class GenerationTests {
+// Pablo's example
+/*public class GenerationTests {
 
-    private static XMLSignatureFactory fac;
-    private static KeyInfoFactory kifac;
-    private static DocumentBuilder db;
-    private static CanonicalizationMethod withoutComments;
+    private static int estatica;
+    private static final int xxx;
 
-}
+    public static void main(String[] args) {
+        GenerationTests instancia1 = new GenerationTests();
+        GenerationTests instancia2 = new GenerationTests();
+
+        instancia1.estatica = 4;
+        System.out.println("Estatica: " + estatica);
+        instancia2.estatica = 6;
+        System.out.println("Estatica: " + estatica);
+    }
+}*/
 
 public class GenerationTests {
 
@@ -90,6 +98,25 @@ public class GenerationTests {
     private static DocumentBuilder db;
     private static CanonicalizationMethod withoutComments;
 
+
+    private int i = 0, j = 0;
+
+    private static byte attr1;
+    private static short attr2;
+    private static int attr3;
+    private static long attr4;
+    private static float attr5;
+    private static double attr6;
+    private static char attr7;
+    private static boolean attr8;
+
+    public int attr9 = 12;
+    protected static final double attr10 = 12.5;
+
+    protected static transient KeyInfoFactory attr11;
+
+    transient volatile int aa;
+
 }
 
 public class GenerationTests {
@@ -1043,7 +1070,7 @@ public class GenerationTests {
 }
 public class GenerationTests {
 
-    private static XMLSignatureFactory fac;
+    private static XMLSignatureFactory fac = null;
     private static KeyInfoFactory kifac;
     private static DocumentBuilder db;
     private static CanonicalizationMethod withoutComments;

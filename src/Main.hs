@@ -1,6 +1,6 @@
 module Main where
 
-import qualified AG.Sintax as AGS
+import qualified AG.Syntax as AGS
 import System.Environment
 import UU.Parsing
 import J2s.Parser
@@ -8,8 +8,22 @@ import J2s.Scanner
 import UU.Scanner.Position
 import Data.String.Utils
 
+-- Token generation
 {-
+main  :: IO()
+main = do
+       g <- readJavaFile
+       putStrLn (show g)
 
+readJavaFile = do
+    [path] <- getArgs
+    entrada <- readFile path
+    let tokens = classify (initPos path) entrada
+        nameScalaFile =  replace ".java" ".scala" path
+    return tokens
+-}
+
+-- AST generation
 {-
 main  :: IO()
 main = do
@@ -25,6 +39,7 @@ readJavaFile = do
     return scalaCode
 -}
 
+-- AG Generation
 main  :: IO()
 main = do
        g <- readJavaFile

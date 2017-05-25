@@ -2,7 +2,7 @@
 module J2s.Parser.Test where
 
 import Content
-import J2s.Ast.Sintax
+import J2s.Ast.Syntax
 import J2s.Parser
 import Control.Monad ( forM, forM_, liftM )
 import Debug.Trace ( trace )
@@ -13,15 +13,31 @@ import Control.Proxy
 import Control.Proxy.Safe
 import UU.Parsing
 
-path = "/media/andrea/a43a31dd-6316-49c2-8627-897fc0adfbd6/andrea/"
+path = "/home/andrea/"
 
-test001Parser = parser "/media/andrea/a43a31dd-6316-49c2-8627-897fc0adfbd6/andrea/workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/javax/xml/crypto/dsig/GenerationTests.java"
+test001Parser = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/javax/xml/crypto/dsig/GenerationTests.java")
 
 testSingleParser = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/java/CharArrayPropertyEditorTests.java")
 
+-- llamada recursiva a jdk
 testParser :: IO()
 testParser  = runSafeIO $ runProxy $ runEitherK $
                     contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/") />/ handlerParser
+
+-- llamada recursiva a summary
+testSummary :: IO()
+testSummary  = runSafeIO $ runProxy $ runEitherK $
+                    contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/summary/") />/ handlerParser
+
+-- llamada recursiva a priority
+testPriority :: IO()
+testPriority  = runSafeIO $ runProxy $ runEitherK $
+                    contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/priority/") />/ handlerParser
+
+-- llamada recursiva a summary
+testShopizer :: IO()
+testShopizer  = runSafeIO $ runProxy $ runEitherK $
+                    contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/shopizer-2.0.5/") />/ handlerParser
 
 testParserJavaTest :: IO()
 testParserJavaTest  = runSafeIO $ runProxy $ runEitherK $
@@ -35,7 +51,7 @@ testParserEncodingDir :: IO()
 testParserEncodingDir = runSafeIO $ runProxy $ runEitherK $
                                       contentsRecursive (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/langtools/test/com/sun/javadoc/testEncoding/") />/ handlerParser
 
--- Todo check sintax
+-- Todo check syntax
 tsp0 = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/0compilationUnit.java")
 tsp1 = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/1compilationUnitSimple.java")
 tsp2 = parser (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/2packageDeclarationMarkerAnnotation.java")

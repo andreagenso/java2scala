@@ -20,8 +20,6 @@ loadLexicalStructure file = do
                             let tokens = classify (initPos file) reading
                             putStr(show tokens)
 
--- scannerStr :: String -> String
--- scannerStr file = show (classify file (initPos file))
 
 scannerStr :: String -> Tokens
 scannerStr file = classify (initPos file) file
@@ -62,7 +60,7 @@ tokClassify (scod,code) pos  | isBlockComment   scod                = (Token Blo
                                                          | isCharacterLiteral scod              = (Token CharacterLiteral (takeCharacterLit scod) pos)                       : (classify1 ((scod \\ (takeCharacterLit scod            )) ++ code) (advc (length (takeCharacterLit scod           )) pos ))                                      
                                                          | isStringLiteral scod code            = (Token StringLiteral    (fst(takeStringLiteral scod code))   pos )         : (classify  (advc (length (fst(takeStringLiteral scod code  ))) pos ) ( snd(takeStringLiteral scod code)                    ))
                                                          | isOperator       scod operatorList   = (Token Operator (takeToken scod operatorList) pos)                         : (classify1 ((scod \\ (takeToken scod operatorList)) ++ code) (advc (length (takeToken scod operatorList)) pos ))
-                                                         | isMajor       scod majorList         = (Token TokMayor (takeToken scod majorList) pos)                            : (classify1 ((scod \\ (takeToken scod majorList)) ++ code) (advc (length (takeToken scod majorList)) pos ))
+--                                                         | isMajor       scod majorList         = (Token TokMayor (takeToken scod majorList) pos)                            : (classify1 ((scod \\ (takeToken scod majorList)) ++ code) (advc (length (takeToken scod majorList)) pos ))
                                                          | isSpecialSimbol  scod specialSimbol  = (Token SpecialSimbol  (takeToken scod specialSimbol) pos)                                 : (classify1 ((scod \\ (takeToken scod specialSimbol )) ++ code) (advc (length (takeToken scod specialSimbol)) pos ))
                                                  | otherwise                            = (Token Error scod pos)                                                                    : (classify1 code (advc (length scod) pos))
 
@@ -94,22 +92,11 @@ fIniWithZero (scod,code) pos  | isOctalIntegerLiteral scod           = (Token (O
                                                           | otherwise                            = (Token Error scod pos)                                                                    : (classify1 code (advc (length scod) pos))                                         
 
 -- optimizado
--- tieneEspacio  []      = False
--- tieneEspacio (s:scod) | isSpace s = True
---                                        | otherwise = tieneEspacio scod
-                                          
 tieneEspacio = tieneEspacio' (False)
 tieneEspacio' (nil) ls = cata ls where
         cata [] = nil
         cata (l:ls) | isSpace l = True
                     | otherwise = (cata ls)
-                                          
-
--- span' hayEspacios res []       = (res, hayEspacios, [])
--- span' hayEspacios res ('>':xs) = span' hayEspacios ('>':res) xs
--- span' hayEspacios res xxs@(x:xs) | isSpace x = span' True res xs
---                                  | otherwise = (res, hayEspacios, xxs)
-
 
 {- Auxiliar functions -}
 -- verificar :  HexSignificand BinaryExponent FloatTypeSuffixopt
@@ -122,13 +109,6 @@ isHexaFloatingPointLiteral1 (c1:c2:c3:cs) |  (c1=='0') && (c2 =='x' || c2 == 'X'
 isHexaFloatingPointLiteral1 (c0:c1:c2:c3:cs) |  (c0=='-') && (c1=='0') && (c2 =='x' || c2 == 'X' ) && (isHexDigit c3) = (isBinaryExponent (dropWhile (isHexDigit) cs))
                                              | otherwise                                                  = False
 
---isHexaFloatingPointLiteral1 (c1:c2:c3:cs) | (c1 == '0') && (c2 =='x' || c2 == 'X' ) && (isHexDigit c3) = (isBinaryExponent (dropWhile (isHexDigit) cs))
---                                          | otherwise                                                  = False
-
--- optimizado
--- isBinaryExponent ""            = False
--- isBinaryExponent (c:[])        = False
--- isBinaryExponent (c1:c2:cs)    = (c1 == 'p' || c1== 'P') && (c2 == '+' || c2 == '-' || (isDigit c2))
 isBinaryExponent = isBinaryExponent' (False)
 isBinaryExponent' (nil) ls = cata ls where
         cata [] = nil
@@ -199,11 +179,6 @@ isHexaFloatingPointLiteral3 (c0:c1:c2:c3:cs) | (c0 == '-') && (c1 == '0') && (c2
                                              | (c0 == '-') && (c1 == '0') && (c2 =='x' || c2 == 'X' ) && (isHexDigit c3) = (isBinaryExponent  ( (dropWhile (isHexDigit) (isPoint (dropWhile (isHexDigit) cs)))))
                                              | otherwise                                                                 = False
 
--- isHexaFloatingPointLiteral3 ('0':c2:'.':cs) = (c2 =='x' || c2 == 'X' ) = (isBinaryExponent  ( (dropWhile (isHexDigit) (cs))))
--- isHexaFloatingPointLiteral3 ('0':c2:c3:cs) |  (c2 =='x' || c2 == 'X' ) && ((isHexDigit c3)) = (isBinaryExponent  ( (dropWhile (isHexDigit) (cs))))
---                                            | otherwise                                                                   = False
-
-
 -- no se optimiza
 isMoreHex "" = ""
 isMoreHex (c1:[]) = ""
@@ -220,9 +195,6 @@ takeHexaFloatLiteral3 (c1:c2:cs) = c1:c2:( (takeWhile isHexDigit cs) ++
                                          (takeWhile isHexDigit (drop 1 (dropWhile isHexDigit cs))) ++ 
                                          (takeBinary  (dropWhile isHexDigit (drop 1 (dropWhile isHexDigit cs))))
                                          )
-
--- verify a token is DecimalFloating
--- verify the structure : Digits . Digits(opt) ExponentParts(opt) FloatTypeSuffix(opt)
 
 -- no se optimza
 -- verificar si empieza con un digito, seguido de un punto.
@@ -241,12 +213,10 @@ takeFloat1Integer1 cod = (takeWhile (isDigit) cod) ++
                        (digitsOpt (drop 1 (dropWhile (isDigit) cod)))
 
 
--- no se optimiza
 digitsOpt "" = ""
 digitsOpt cod@(c:cs) | (isDigit c) = (takeWhile (isDigit) cod) ++ (exponentOpt (dropWhile (isDigit) cod))
                      | otherwise   = "" ++ (exponentOpt (dropWhile (isDigit) cod))
 
--- no se optimiza
 exponentOpt ""         = ""
 exponentOpt cod@(c:cs) | (c == 'e') || (c == 'E')                           = c:(signedExponent cs) 
                        | (c =='f') || (c == 'F') || (c =='d') || (c == 'D') = [c]
@@ -259,94 +229,88 @@ signedExponent (c1:[])                                                  = error 
 signedExponent (c1:c2:cs) | (isDigit c1)                                = (c1:(takeWhile isDigit (c2:cs))) ++ (floatSuffix (dropWhile isDigit (c2:cs)))
                           | ((c1 == '+') || (c1 == '-'))&& (isDigit c2) = (c1:c2:  (takeWhile isDigit cs)) ++ (floatSuffix (dropWhile isDigit (cs)))
                           | otherwise                                   = error ("Invalid  Floating Literal Number")
--- no se optimiza
+
 floatSuffix ""     = ""
 floatSuffix (c:cs) | (c =='f') || (c == 'F') || (c =='d') || (c == 'D') = [c]
                    | otherwise               = ""
 
 -- verify the structure :  . Digits ExponentParts(opt) FloatTypeSuffix(opt)
--- no se optimiza
 isDecimalFloatingLiteral2 (c:[])       = False
 isDecimalFloatingLiteral2 (c1:c2:code) = (c1 == '.') && (isDigit c2) 
 
--- no se optimiza
+
 takeFloat1Integer2 (c:cod) = (c : (takeWhile (isDigit) cod) ) ++ (exponentOpt (dropWhile (isDigit) cod))
 
--- no se optimiza
+
 -- verify the structure :  Digits ExponentParts FloatTypeSuffix(opt)
 isDecimalFloatingLiteral3 (c:[])       = False
 isDecimalFloatingLiteral3 cod@(c:code) | (isDigit c)  =  idflExponent (dropWhile (isDigit) cod)
                                        | otherwise    = False
--- no se optimiza
+
 idflExponent ""     = False
 idflExponent (c:cs) | (c == 'e') || (c == 'E') = isSignNum cs
                         | otherwise                = False
--- no se optimiza
+
 isSignNum ""        = False
 isSignNum (c:cs)    = (c == '+') || (c == '-') || (isDigit c)
 
--- no se optimiza
+
 takeFloat1Integer3 cod = (takeWhile (isDigit) cod) ++ exponentOpt3 (dropWhile (isDigit) cod)
 
--- no se optimiza
+
 exponentOpt3 ""         = error ("Invalid  Floating Literal Number")
 exponentOpt3 cod@(c:cs) | (c == 'e') || (c == 'E')                           = c:(signedExponent cs) 
                         | (c =='f') || (c == 'F') || (c =='d') || (c == 'D') = [c]
                         | otherwise                                          = error ("Invalid  Floating Literal Number")
--- no se optimiza
+
 -- verify the structure :  Digits ExponentParts(opt) FloatTypeSuffix
 isDecimalFloatingLiteral4 (c:[])       = False
 isDecimalFloatingLiteral4 cod@(c:code) | (isDigit c)  =  idflSuffix (dropWhile (isDigit) cod)
                                        | otherwise    = False
--- no se optimiza
+
 idflSuffix ""         = False
 idflSuffix cod@(c:cs) = (idflExponent cod) || (c=='d') || (c=='F') || (c=='f')|| (c=='D')
 
--- no se optimiza
+
 takeFloat1Integer4 cod = (takeWhile (isDigit) cod) ++ (take 1 ((dropWhile (isDigit) cod)))
                            
--- no se optimiza
+
 -- verify a token is OctalIntegerLiteral
 isOctalIntegerLiteral (c:[])     = False
 isOctalIntegerLiteral (c1:c2:code) = (c1 == '0') && (isOctDigit c2) 
 
--- no se optimiza
+
 -- verify a token is HexIntegerLiteral
 isHexIntegerLiteral (c:[])     = False
 isHexIntegerLiteral (c1:c2:[]) = False
 isHexIntegerLiteral (c1:c2:c3:code) = (c1 == '0') && ((c2 == 'x') || (c2 == 'X')) && (isHexDigit c3) 
 
--- no se optimiza
+
 -- verify a token is IntegerLiteral
 isIntegerLiteral (c:[]) = isDigit c
 isIntegerLiteral (c1:c2:code) = ((c1 /= '0') && (isDigit c1)) || ((c1 == '0') && (not(isDigit c2)))
 
--- no se optimiza
+
 -- verify a token is Block Comment
 isBlockComment :: SimCode -> Bool
 isBlockComment scod = isToken scod "/*"
 
 -- take octal integer
--- no se optimiza
 takeOctInteger :: Code -> String
 takeOctInteger code  = (take 2 code) ++ (takeWhile isOctDigit (drop 2 code)) ++ takeLong (dropWhile isOctDigit (drop 2 code))
 
 -- take hex integer
--- no se optimiza
 takeHexInteger :: Code -> String
 takeHexInteger code  = (take 2 code) ++ (takeWhile isHexDigit (drop 2 code)) ++ takeLong (dropWhile isHexDigit (drop 2 code))
 
 -- take decimal integer
--- no se optimiza
 takeDecimalInteger :: Code -> String
 takeDecimalInteger code  = (takeWhile isDigit code ) ++ takeLong (dropWhile isDigit code)
 
--- no se optimiza
 takeLong ""     = ""
 takeLong (c:cs) | (c == 'l') || (c == 'L') = [c]
                 | otherwise                = ""
 
--- no se optimiza
 -- take all comment block
 takeBlockComment :: Code -> Comment
 takeBlockComment []    = ""
@@ -357,32 +321,20 @@ takeBlockComment code  | length (code \\ (searchEndComment code)) < 2  = (search
                                     searchEndComment :: Code -> Comment
                                     searchEndComment code = (takeWhile (/= '*') code)
 
--- no se optimiza
 -- verify a token is Line Comment
 isLineComment :: SimCode -> Bool 
 isLineComment scod      = isToken scod "//"
 
--- no se optimiza
+
 -- take the line of Comment
 takeLineComment :: SimCode -> Comment
 takeLineComment = takeWhile ( /='\n')
 
 -- verify a token is a Key Word
--- isKeyWord :: SimCode-> [KeyWord] -> Bool
--- isKeyWord  = (elem)
-
 -- optimizado
 isKeyWord :: SimCode-> [KeyWord] -> Bool
---isKeyWord  scod lkw = isKeyWord'  scod "" lkw
 isKeyWord  scod lkw =  (elem) (takeWhile isAlphaNum scod) lkw
 
--- isKeyWord' :: SimCode-> SimCode -> [KeyWord] -> Bool
--- isKeyWord'  []      scod  lkw   = (elem) scod lkw
--- isKeyWord' (s:scod) sscod lkw   | isAlpha s = isKeyWord' scod (sscod ++ [s]) lkw
---                                              | otherwise = (elem) sscod lkw
-
--- isKeyWord :: SimCode -> IniSimbol -> Bool
--- isKeyWord scode     is = is == (take (length is) scode ) && ()
 
 -- optimizado
 -- verify a token is a SpecialSimbol
@@ -420,13 +372,6 @@ isOperator scod op      =  or (map (isToken scod) op)
 
 isMajor :: SimCode -> [String] -> Bool
 isMajor scod op      =  or (map (isToken scod) op)
-
-
--- isOperator :: SimCode -> [Operator] -> Bool
--- isOperator scod []     =  False
--- isOperator scod (x:xs) | isToken scod x  = True
---                                 | otherwise       = isOperator scod xs
-
 
 -- optimizado
 -- verify a token is a Identifier
@@ -592,11 +537,6 @@ isSingleQuote'  []               = False
 isSingleQuote'  (s1:[])          = False
 isSingleQuote'  (s1:s2:ss)       = (s1 == '\\') && (s2 == '\x0027')
 
--- No puede darse el caso de que span devuelva "" en el elemento segundo de la tupla
--- takeStringLiteral :: String -> String -> (String, String)
--- takeStringLiteral sc@(s:scod) code | (s == '"') && (isEndQuote scod)                            = ((s:(fst(span (/= '\"') scod))) ++ "\"", (tail (snd(span (/= '\"') scod))) ++ code)
---                                                                 | (s == '"') && not(isEndQuote scod) && (isEndQuote code) = ((sc ++ (fst(span (/= '\"') code)) ++ "\""), (tail (snd(span (/= '\"') code))) )
---                                                                 | otherwise                                                  = error "Invalid String Literal"
 
 takeStringLiteral :: String -> String -> (String, String)
 takeStringLiteral sc@(s:scod) code | (s == '"') && (isEndQuote scod)                         = ( ((s:(takeEndQuote scod)) ++ "\""   ),( (tail(scod \\ (takeEndQuote scod))) ++ code))
@@ -604,7 +544,3 @@ takeStringLiteral sc@(s:scod) code | (s == '"') && (isEndQuote scod)            
                                                                    | otherwise                                                  = error "Invalid String Literal"
 
 
--- isStringLiteral []      _       = False
--- isStringLiteral cod@(s1:scod)  code | (s1 == '"') && (isEndQuote scod)                         = checkString (takeEndQuote scod)
---                                                                      | (s1 == '"') && not(isEndQuote scod) && (isEndQuote code) = checkString (scod ++ (takeEndQuote code))
---                                                                      | otherwise                                                = False -- la cadena no se cierra

@@ -1,0 +1,19 @@
+J2s (PackageDeclaration [] ["code","java"]) NilImportDeclarations [TypeDeclarationClassDeclarationNormalCD NilModifiers "ClaseA" NilTypeParameters NilSuper NilInterfaces 
+[ClassBodyDeclClassMemberDeclMethodDeclaration 
+	NilModifiers 
+	NilTypeParameters 
+	ResultTypeVoid 
+	(MethodDeclaratorFormalPL "forClasico" FormalParameterListNil) 
+		NilThrows 
+		(MethodBodyBlock 
+			[BlockStatementStatement 
+				(StatementFor (ForStatementBasicForStatementAll 
+						(ForInitLocalVar NilVariableModifiers (TypePrimitiveType TypePrimitiveNumericType_TypeIntegral_Int []) [VariableDeclaratorIdAsig (VarDeclaratorId "i") 
+						(VariableInitializerExp (ExpressionConditionalExpr (ConditionalOrExpressionUnaryExpression (PostfixExpressionPrimary (PrimNoNewArray (PrimaryNoNewArray (PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "0") []))))))])
+
+ (ExpressionConditionalExpr (ConditionalOrExpressionUnaryExpression (PostfixExpressionPrimary (PrimNoNewArray (PrimaryNoNewArray (PostfixExpressionExpressionName (TypeName "i" NilTypeName)) []))) :<: ConditionalOrExpressionUnaryExpression (PostfixExpressionPrimary (PrimNoNewArray (PrimaryNoNewArray (PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral "10") []))))) 
+
+(ForUpdate (StatementExpressionList (ExpressionConditionalExpr (ConditionalOrExpressionUnaryExpression (PostExpPrimaryPostfixZ (PrimNoNewArray (PrimaryNoNewArray (PostfixExpressionExpressionName (TypeName "i" NilTypeName)) [])) [PostIncrement]) )) NilStatementExpressionList)) 
+
+(SWTSBlock [BlockStatementStatement (SWTSExpressionStatement (ExpressionAssignment1 (PostfixExpressionPrimary (PrimNoNewArray (PrimaryNoNewArray (PrimNNAMethodInvocationMN (TypeName "System" (TypeName "out" (TypeName "println" NilTypeName))) [ExpressionConditionalExpr (ConditionalOrExpressionUnaryExpression (PostfixExpressionPrimary (PrimNoNewArray (PrimaryNoNewArray (PrimNNALiteral_StringLiteral "\" i es \"") []))) :+: ConditionalOrExpressionUnaryExpression (PostfixExpressionPrimary (PrimNoNewArray (PrimaryNoNewArray (PostfixExpressionExpressionName (TypeName "i" NilTypeName)) []))))]) [])))))])))])]]
+

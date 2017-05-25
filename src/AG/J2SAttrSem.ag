@@ -1,0 +1,2788 @@
+module {AG.J2SAttrSem}
+{} -- Exports of this module, empty for none
+{
+import Data.List
+import qualified Data.Text as T
+import Data.String.Utils
+}
+include "Syntax.ag"
+
+-- ------------------------------------------------
+-- Import Declaration
+-- ------------------------------------------------
+attr TypeName PackageOrTypeName
+    syn importDeclarationList :: {[String]}
+
+attr ImportDeclaration ImportDeclarations
+    syn scalaImportDeclaration :: String
+
+sem TypeName
+    | TypeName
+            lhs.importDeclarationList = @identifier : @typeName.importDeclarationList
+            lhs.scalaFieldDeclInitialization = pointStr @identifier @typeName.scalaFieldDeclInitialization
+    | NilTypeName
+            lhs.scalaFieldDeclInitialization = ""
+            lhs.importDeclarationList = []
+
+sem PackageOrTypeName
+    | NilPackageOrTypeName  lhs.importDeclarationList = []
+    | PackageOrTypeName lhs.importDeclarationList = @identifier : @packageOrTypeName.importDeclarationList
+
+sem ImportDeclaration
+    | SingleTypeImportDeclaration lhs.scalaImportDeclaration =
+        "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList
+    | TypeImportOnDemandDeclaration lhs.scalaImportDeclaration =
+        "import" ++ " " ++
+        foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @packageOrTypeName.importDeclarationList ++
+        "._"
+    | SingleStaticImportDeclaration lhs.scalaImportDeclaration =
+        "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList
+    | StaticImportOnDemandDeclaration lhs.scalaImportDeclaration =
+        "import" ++ " " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @typeName.importDeclarationList ++
+        "._"
+
+sem ImportDeclarations
+    | ImportDeclarations lhs.scalaImportDeclaration =
+        @importDeclaration.scalaImportDeclaration ++ "\n" ++ @importDeclarations.scalaImportDeclaration
+    | NilImportDeclarations  lhs.scalaImportDeclaration = ""
+
+-- ------------------------------------------------
+-- Package declaration
+-- ------------------------------------------------
+set ScalaPackageDeclaration = PackageDeclaration
+
+attr ScalaPackageDeclaration
+    syn scalaPackageDeclaration :: String
+
+attr PackageName
+    syn scalaPackageDeclarationList :: {[String]}
+
+sem PackageDeclaration
+    | PackageDeclaration lhs.scalaPackageDeclaration =
+        "package " ++ foldl (\x y -> (if x == "" then y else x ++ "." ++ y)) ("") @packageName.scalaPackageDeclarationList ++ "\n\n"
+    | NilPackageDeclaration lhs.scalaPackageDeclaration = "\n"
+
+sem PackageName
+    | Nil  lhs.scalaPackageDeclarationList = []
+    | Cons lhs.scalaPackageDeclarationList = @hd : @tl.scalaPackageDeclarationList
+
+-- ------------------------------------------------
+-- Type declarations
+-- ------------------------------------------------
+set ScalaAllNTab = TypeDeclarations TypeDeclaration
+                EnumBody EnumBodyDeclarations EnumConstants EnumConstant
+                ListAnnotationTypeElementDeclaration AnnotationTypeElementDeclaration
+                ClassBodyDeclarations ClassBodyDeclaration ConstructorBody
+                BlockStatements BlockStatement
+                MethodBody
+                Statement StatementNested ForStatement ForInit ForUpdate
+                Catches CatchClause
+                SwitchBlock SwitchBlockStatementGroups SwitchBlockStatementGroup
+                SwitchLabels SwitchLabel
+                ListInterfaceMemberDeclaration InterfaceMemberDeclaration
+                VariableDeclarators
+                VariableDeclarator
+                VariableDeclaratorId VariableDeclaratorIdZ
+                VariableInitializer
+                VariableInitializers
+                Modifiers
+
+set ScalaAllTypeDeclaration = TypeDeclarations TypeDeclaration
+                TypeParameters TypeParameterList TypeParameter TypeBound
+                ZCOITTypeDeclSpecifier ZClassOrInterfaceType ClassOrInterfaceType
+                Super
+                Interfaces
+                ClassBodyDeclarations ClassBodyDeclaration
+                InterfaceMemberDeclaration
+
+attr ScalaAllTypeDeclaration
+     syn scalaTypeDeclaration :: String
+
+set ScalaVariableDeclarator = VariableDeclarators VariableDeclarator
+
+set ScalaFieldDeclInitialization = VariableInitializer
+                                    ArgumentList
+                                    TypeName
+                                    ClassOrInterfaceType ZClassOrInterfaceType ZCOITTypeDeclSpecifier
+
+
+
+-- ------------------------------------------------
+-- tabs
+-- ------------------------------------------------
+
+attr ScalaAllNTab
+    chn scalaNTab :: String
+
+-- ------------------------------------------------
+-- MethodDeclaration
+-- ------------------------------------------------
+set ScalaMethodDeclaration = Modifiers
+                             Modifier
+                             MethodDeclarator
+                             Throws
+set ScalaIsModifiers = Modifiers
+                       Modifier
+
+set ScalaResultType = ResultType
+                      Type
+                      PrimitiveOrReferenceType
+                      ReferenceType
+                      ZClassOrInterfaceType
+                      ZCOITTypeDeclSpecifier
+                      TypeArguments
+                      ActualTypeArgument
+                      ActualTypeArgumentList
+                      WildcardBounds
+
+set ScalaMethodFormalParameters = FormalParameterList
+                                  VariableModifiers
+                                  VariableModifier
+
+set ScalaVariableDeclaratorId = VariableDeclaratorId
+                                VariableDeclaratorIdZ
+
+set ScalaMethodBody = MethodBody
+                      ConstructorBody
+
+set ScalaStatement = Statement StatementNested
+                     Expression ExpressionAssignment
+                     BlockStatements
+                     BlockStatement
+                     Catches
+                     CatchClause
+                     ForStatement
+                     StatementExpressionList
+                     SwitchLabels
+                     SwitchLabel
+                     SwitchBlock
+                     SwitchBlockStatementGroups
+                     SwitchBlockStatementGroup
+
+set ScalaExpression = Expression ExpressionAssignment
+                      ConditionalOrExpression
+                      UnaryExpression
+                      AssignmentOperator
+                      ZPostfixExpression
+                      ZPostfixExp
+                      PrimaryNoNewArray
+                      PrimaryNNA
+                      Primary
+
+set ScalaIfElseStatement = Statement StatementNested
+
+attr ScalaMethodDeclaration
+     chn scalaMethodDeclaration :: String
+
+attr ScalaIsModifiers
+    syn scalaIsAbstractMethodModifier :: Bool
+
+attr ScalaIsModifiers
+    syn scalaIsNativeMethodModifier :: Bool
+
+attr ScalaIsModifiers
+    syn scalaIsStaticFieldDeclaration :: Bool
+
+attr ScalaIsModifiers
+    syn scalaIsFinalFieldDeclaration :: Bool
+
+attr ScalaIsModifiers
+    chn scalaModifierFieldDeclaration :: {[String]}
+
+attr ScalaResultType
+    syn scalaResultType :: String
+
+attr ScalaMethodBody
+    syn scalaMethodBody :: String
+
+attr ScalaMethodFormalParameters
+    syn scalaMethodFormalParameters :: String
+
+attr ScalaVariableDeclaratorId
+    syn scalaVariableDeclaratorId :: String
+
+attr ScalaStatement
+    chn scalaStatement :: String
+
+attr ScalaExpression
+    syn scalaExpression :: String
+
+attr ScalaIfElseStatement
+    syn scalaIfElseStatement :: Bool
+
+-- ------------------------------------------------
+-- ForInit
+-- ------------------------------------------------
+set ScalaForInit = ForInit
+
+attr ScalaForInit
+    syn scalaForInit :: String
+
+-- ------------------------------------------------
+-- ForUpdate
+-- ------------------------------------------------
+set ScalaForUpdate = ForUpdate
+
+attr ScalaForUpdate
+    syn scalaForUpdate :: String
+
+-- ------------------------------------------------
+-- has for each ? - related to import collections
+-- ------------------------------------------------
+set ScalaHasForEach = ForStatement
+                      Statement StatementNested
+                      MethodBody BlockStatements BlockStatement
+                      TypeDeclaration TypeDeclarations
+                      Catches CatchClause
+                      ClassBodyDeclaration ClassBodyDeclarations ConstructorBody
+                      EnumBodyDeclarations EnumBody
+                      EnumConstants EnumConstant
+                      InterfaceMemberDeclaration
+                      ListInterfaceMemberDeclaration
+                      AnnotationTypeElementDeclaration
+                      ListAnnotationTypeElementDeclaration
+                      SwitchBlockStatementGroup SwitchBlockStatementGroups SwitchBlock
+
+attr ScalaHasForEach
+    syn scalaHasForEach :: Bool
+-- ------------------------------------------------
+-- For special cases
+-- ------------------------------------------------
+set ScalaSpecialCaseIsIncrementalPrimitive =
+        ForInit
+        Type
+        PrimitiveOrReferenceType
+
+set ScalaSpecialCaseIsSimpleIncrementDecrement =
+        ForUpdate
+        StatementExpressionList
+        Expression
+        ConditionalOrExpression
+        UnaryExpression
+        ZPostfixExpression
+        ZPostfixExp
+
+set ScalaSpecialCaseOneLine =
+        Statement
+        BlockStatements
+        BlockStatement
+
+set ScalaSpecialCaseForInitValue =
+        ForInit
+        VariableDeclarators
+        VariableDeclarator
+
+set ScalaSpecialCaseForEndValue =
+        Expression
+        ConditionalOrExpression
+
+set ScalaSpecialCaseIfOneLine =
+        Statement
+        BlockStatements
+        BlockStatement
+
+set ScalaSpecialCaseForIsIf =
+        Statement
+        BlockStatements
+        BlockStatement
+
+set ScalaSpecialCaseForIfCondition =
+        Statement
+        BlockStatements
+        BlockStatement
+
+set ScalaSpeciaCaseForIfBody =
+        Statement
+        BlockStatements
+        BlockStatement
+
+attr ScalaSpecialCaseIsIncrementalPrimitive
+    syn scalaSpecialCaseIsIncrementalPrimitive :: Bool
+
+attr ScalaSpecialCaseIsSimpleIncrementDecrement
+    syn scalaSpecialCaseIsSimpleIncrementDecrement :: Bool
+
+attr ScalaSpecialCaseOneLine
+    syn scalaSpecialCaseOneLine :: Int
+
+attr ScalaSpecialCaseForInitValue
+    syn scalaSpecialCaseForInitValue :: String
+
+attr ScalaSpecialCaseForInitValue
+    syn scalaSpecialCaseForInitIdentifier :: String
+
+attr ScalaSpecialCaseForEndValue
+    syn scalaSpecialCaseForEndValue :: String
+
+attr ScalaSpecialCaseIfOneLine
+    syn scalaSpecialCaseIfOneLine :: Int
+
+attr ScalaSpecialCaseForIsIf
+    syn scalaSpecialCaseForIsIf :: Bool
+
+attr ScalaSpecialCaseForIfCondition
+    syn scalaSpecialCaseForIfCondition :: String
+
+attr ScalaSpeciaCaseForIfBody
+    syn scalaSpeciaCaseForIfBody :: String
+
+-- ------------------------------------------------
+-- ConstructorDeclaration
+-- ------------------------------------------------
+set ScalaConstructorModifier = Modifiers
+                               Modifier
+
+set ScalaConstructorDeclaration = ClassBodyDeclarations
+                                  ClassBodyDeclaration
+
+attr ScalaConstructorModifier
+    syn scalaConstructorModifier :: String
+
+attr ScalaConstructorDeclaration
+    syn scalaConstructorDeclarationParams :: String
+
+attr ScalaConstructorDeclaration
+    syn scalaConstructorDeclarationBody :: String
+
+-- determina si es un metodo estatico. ToDo aplicar los mismo a field y a class para el Companion object.
+{-attr ScalaMethodDeclaration
+    syn isStatic :: Bool-}
+
+-- modifiers type variableName
+{
+    -- Modifier isStatic isFinal
+-- type TypeModifierIsStaticIsFinal = (String, Bool, Bool)
+type TypeModifierIsFinal = (String, Bool)
+-- Modifiers Types Variables
+type TypeFieldInitialization = Maybe String
+--type TypeFieldDeclaration = ([TypeModifierIsStaticIsFinal], String, String, TypeFieldInitialization)
+type TypeVariableDeclaration = (String, TypeFieldInitialization)
+}
+
+--attr ScalaFieldDeclaration
+--    chn scalaFieldDeclaration :: {[TypeFieldDeclaration]}
+
+attr ScalaFieldDeclInitialization
+    syn scalaFieldDeclInitialization :: String
+
+--attr ScalaVariableInitialization
+--    syn scalaVariableInitialization :: {TypeFieldInitialization}
+
+attr ScalaVariableDeclarator
+    syn scalaVariableDeclarator :: {[TypeVariableDeclaration]}
+
+-- ------------------------------------------------
+-- NormalClassDeclaration
+-- ------------------------------------------------
+set ScalaNormalClassDeclaration = Modifiers
+                                Modifier
+
+set ScalaSuperTypeDeclaration = ClassOrInterfaceType
+                              ZClassOrInterfaceType
+                              ZCOITTypeDeclSpecifier
+
+set ScalaImplementsInterfaceTypeDeclaration =  InterfaceTypeList ClassOrInterfaceType
+                                            ZClassOrInterfaceType
+                                            ZCOITTypeDeclSpecifier
+
+set ScalaExtendClassBodyNormalCD = ExtendsInterfaces
+                                 ClassOrInterfaceType
+                                 ZClassOrInterfaceType
+                                 ZCOITTypeDeclSpecifier
+                                 ListInterfaceMemberDeclaration
+                                 InterfaceMemberDeclaration
+
+attr ScalaNormalClassDeclaration
+    chn scalaNormalClassDeclaration :: TypeModifierIsFinal
+
+attr ScalaSuperTypeDeclaration
+    syn scalaSuperTypeDeclaration :: String
+
+attr ScalaImplementsInterfaceTypeDeclaration
+    syn scalaImplementsInterfaceTypeDeclaration :: String
+
+attr ScalaExtendClassBodyNormalCD
+    syn scalaExtendClassBodyNormalCD :: String
+
+-- ------------------------------------------------
+-- NormalInterfaceDeclaration
+-- ------------------------------------------------
+set ScalaNormalInterfaceDeclaration = Modifiers
+                                    Modifier
+
+set ScalaExtendInterface = ExtendsInterfaces
+                          ClassOrInterfaceType
+                          ZClassOrInterfaceType
+                          ZCOITTypeDeclSpecifier
+
+set ScalaBodyNormalInterface = ListInterfaceMemberDeclaration
+                                InterfaceMemberDeclaration
+
+attr ScalaNormalInterfaceDeclaration
+    chn scalaNormalInterfaceDeclaration :: TypeModifierIsFinal
+
+attr ScalaExtendInterface
+    syn scalaExtendInterface ::  String
+
+attr ScalaBodyNormalInterface
+    syn scalaBodyNormalInterface :: String
+
+set ScalaArrayInitializer =
+    VariableInitializers
+    ArrayInitializer
+
+attr ScalaArrayInitializer
+    syn scalaArrayInitializer :: String
+
+
+set ScalaArrayType =
+    TypeZ
+    ArrayType
+
+attr ScalaArrayType
+    chn scalaArrayType :: String
+
+-- -----------------------------------------------
+-- Companion objects
+-- ------------------------------------------------
+
+set ScalaCompanionObject =
+    ClassBodyDeclaration
+
+set ScalaClassBodyDeclarations =
+    ClassBodyDeclarations
+
+attr ScalaCompanionObject
+    syn scalaIsStaticClassBodyDeclaration :: Bool
+
+attr ScalaClassBodyDeclarations
+    syn scalaClassBodyDeclarationsCompanions :: String
+
+-- -----------------------------------------------
+-- sem Type declarations
+-- ------------------------------------------------
+{
+-- modifiers of normalClassDeclaration
+normalClassDeclaration :: TypeModifierIsFinal -> String -> String
+normalClassDeclaration ("",  b2) nTab = "class" ++ " "
+normalClassDeclaration (str, b2) nTab = (strictFpTab str nTab) ++ " " ++ "class" ++ " "
+
+strictFpTab :: String -> String -> String
+strictFpTab str nTab = (replace "@scala.annotation.strictfp\n" ("@scala.annotation.strictfp\n" ++ nTab) str)
+
+constructorDeclarationParams :: String -> String -> String
+constructorDeclarationParams identifier "" = identifier
+constructorDeclarationParams identifier params = identifier ++ params
+
+constructorDeclarationBody :: String -> String
+constructorDeclarationBody "" = ""
+constructorDeclarationBody body = body ++ "\n"
+
+}
+
+{
+-- modifiers of normalinterfaceDeclaration
+normalInterfaceDeclaration :: TypeModifierIsFinal -> String -> String
+normalInterfaceDeclaration ("", b2) nTab = "trait" ++ " "
+normalInterfaceDeclaration (str, b2) nTab = (strictFpTab str nTab) ++ " " ++ "trait" ++ " "
+}
+
+
+
+sem TypeDeclarations
+    | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ "\n" ++ @tl.scalaTypeDeclaration
+           hd.scalaNTab = @lhs.scalaNTab
+           tl.scalaNTab = @hd.scalaNTab
+           lhs.scalaNTab = @tl.scalaNTab
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
+
+    | Nil  lhs.scalaTypeDeclaration = ""
+           lhs.scalaNTab = @lhs.scalaNTab
+           lhs.scalaHasForEach = False
+
+sem TypeDeclaration
+    | TypeDeclarationClassDeclarationNormalCD
+                              modifiers.scalaModifierFieldDeclaration = [""]  -- ToDo
+                              modifiers.scalaNormalClassDeclaration = ("", False)
+                              modifiers.scalaNormalInterfaceDeclaration = ("", False)
+                              modifiers.scalaMethodDeclaration = "" -- ToDo
+                              classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
+                              lhs.scalaNTab = @lhs.scalaNTab
+                              lhs.scalaHasForEach = @classBodyDeclarations.scalaHasForEach
+
+                              lhs.scalaTypeDeclaration = {
+                                    if (@classBodyDeclarations.scalaClassBodyDeclarationsCompanions == "") then
+                                        @lhs.scalaNTab ++
+                                          (normalClassDeclaration @modifiers.scalaNormalClassDeclaration @lhs.scalaNTab) ++
+                                          (constructorDeclarationParams @identifier @classBodyDeclarations.scalaConstructorDeclarationParams) ++
+                                          @typeParameters.scalaTypeDeclaration ++ -- ToDo
+                                          @super.scalaTypeDeclaration ++
+                                          @interfaces.scalaTypeDeclaration ++
+                                          " { \n" ++
+                                          (constructorDeclarationBody @classBodyDeclarations.scalaConstructorDeclarationBody) ++
+                                          @classBodyDeclarations.scalaTypeDeclaration ++ @lhs.scalaNTab ++
+                                          "\n}\n\n"
+                                    else
+                                        @lhs.scalaNTab ++
+                                            "object " ++ @identifier  ++
+                                              " { \n" ++
+                                              @classBodyDeclarations.scalaClassBodyDeclarationsCompanions ++ @lhs.scalaNTab ++
+                                              "\n}\n\n" ++
+                                        @lhs.scalaNTab ++
+                                          (normalClassDeclaration @modifiers.scalaNormalClassDeclaration @lhs.scalaNTab) ++
+                                          (constructorDeclarationParams @identifier @classBodyDeclarations.scalaConstructorDeclarationParams) ++
+                                          @typeParameters.scalaTypeDeclaration ++ -- ToDo
+                                          @super.scalaTypeDeclaration ++
+                                          @interfaces.scalaTypeDeclaration ++
+                                          " { \n" ++
+                                          @lhs.scalaNTab ++ "import " ++ @identifier ++ "._" ++
+                                          (constructorDeclarationBody @classBodyDeclarations.scalaConstructorDeclarationBody) ++
+                                          @classBodyDeclarations.scalaTypeDeclaration ++ @lhs.scalaNTab ++
+                                          "\n}\n\n"
+                              }
+
+    | TypeDeclarationClassDeclarationEnumD
+                                modifiers.scalaModifierFieldDeclaration = [""]
+                                lhs.scalaTypeDeclaration = "" -- ToDO modifiers :: Modifiers
+                                modifiers.scalaNormalClassDeclaration = ("",  False) -- ToDo
+                                modifiers.scalaNormalInterfaceDeclaration = ("",  False) -- ToDo
+                                modifiers.scalaMethodDeclaration = "" -- ToDo
+
+                                enumBody.scalaNTab = @lhs.scalaNTab ++ "\t"
+                                lhs.scalaNTab = @lhs.scalaNTab
+                                lhs.scalaHasForEach = @enumBody.scalaHasForEach
+
+    | TypeDeclarationInterfaceDeclarationNormalInterfaceD
+                                modifiers.scalaModifierFieldDeclaration = [""]
+
+                                modifiers.scalaNormalClassDeclaration = ("",  False)
+                                modifiers.scalaNormalInterfaceDeclaration = ("",  False)
+                                modifiers.scalaMethodDeclaration = "" -- ToDo
+                                listInterfaceMemberDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
+                                lhs.scalaNTab = @lhs.scalaNTab
+                                lhs.scalaHasForEach = @listInterfaceMemberDeclarations.scalaHasForEach
+
+
+                                lhs.scalaTypeDeclaration =
+                                    @lhs.scalaNTab ++
+                                    (normalInterfaceDeclaration @modifiers.scalaNormalInterfaceDeclaration @lhs.scalaNTab) ++
+                                    @identifier ++
+                                    @typeParameters.scalaTypeDeclaration ++ --ToDo
+                                    @extendsInterfaces.scalaExtendInterface ++
+                                    " {\n" ++ @listInterfaceMemberDeclarations.scalaBodyNormalInterface ++ @lhs.scalaNTab ++
+                                    "\n}\n\n"
+
+    | TypeDeclarationInterfaceDeclarationAnnotationTypeD
+                                modifiers.scalaModifierFieldDeclaration = [""]
+                                lhs.scalaTypeDeclaration = "" -- ToDO  modifiers :: Modifiers
+
+                                modifiers.scalaNormalClassDeclaration = ("",  False) -- ToDo
+                                listAnnotationTypeElementDeclaration.scalaNTab = @lhs.scalaNTab
+                                lhs.scalaNTab = @lhs.scalaNTab
+                                lhs.scalaHasForEach = @listAnnotationTypeElementDeclaration.scalaHasForEach
+
+                                modifiers.scalaNormalInterfaceDeclaration = ("",  False) -- ToDo
+                                modifiers.scalaMethodDeclaration = "" -- ToDo
+    | TypeDeclarationSemiColon  lhs.scalaTypeDeclaration = "" -- ToDO review how to convert this case to Scala
+                                lhs.scalaNTab = @lhs.scalaNTab
+                                lhs.scalaHasForEach = False
+
+sem ExtendsInterfaces
+    | ExtendsInterfaceType
+                lhs.scalaExtendInterface =  @classOrInterfacesType.scalaExtendInterface ++ @extendsInterfaces.scalaExtendInterface
+                lhs.scalaExtendClassBodyNormalCD = @classOrInterfacesType.scalaExtendInterface ++ @extendsInterfaces.scalaExtendClassBodyNormalCD
+    | NilExtendsInterfaces
+                lhs.scalaExtendInterface = ""
+                lhs.scalaExtendClassBodyNormalCD = ""
+
+{
+changeOrderVolatileTransient :: [String] -> [String]
+changeOrderVolatileTransient modifiers = joinTuple (partition (\m -> (m == "@volatile" || m == "@transient")) modifiers)
+    where
+        joinTuple (fst, snd) = fst ++ snd
+}
+
+{
+-- modifiers functions for normalClassDeclaration.
+strictFpModifier :: TypeModifierIsFinal -> TypeModifierIsFinal
+strictFpModifier (str, b2) = if T.isInfixOf (T.pack("strfp")) (T.pack(str))
+                                then ("@scala.annotation.strictfp\n" ++ T.unpack(T.strip(T.pack(replace "strfp" "" str))), b2)
+                                else (T.unpack(T.strip(T.pack(str))), b2)
+
+joinTypeModifier :: TypeModifierIsFinal -> TypeModifierIsFinal -> TypeModifierIsFinal
+joinTypeModifier ("", b11) (str2, b22) = (T.unpack(T.strip(T.pack(str2))), b11 || b22)
+joinTypeModifier (str1, b11) ("",  b22) = (T.unpack(T.strip(T.pack(str1))), b11 || b22)
+joinTypeModifier (str1, b11) (str2, b22) = (T.unpack(T.strip(T.pack(str1))) ++  " " ++ T.unpack(T.strip(T.pack(str2))), b11 || b22)
+
+strictFpMethodModifier :: String -> String -> String
+strictFpMethodModifier str nTab = if T.isInfixOf (T.pack("strfp ")) (T.pack(str))
+                       then "@scala.annotation.strictfp\n" ++ nTab ++ (replace "strfp " "" str)
+                       else str
+
+nativeMethodModifier :: String -> String -> String
+nativeMethodModifier str nTab = if T.isInfixOf (T.pack("ntve ")) (T.pack(str))
+                       then "@native\n" ++ nTab ++ (replace "ntve " "" str)
+                       else str
+}
+
+sem Modifiers
+    | Modifiers
+                    modifier.scalaModifierFieldDeclaration = @lhs.scalaModifierFieldDeclaration
+                    modifiers.scalaModifierFieldDeclaration = @modifier.scalaModifierFieldDeclaration
+                    lhs.scalaModifierFieldDeclaration = changeOrderVolatileTransient @modifiers.scalaModifierFieldDeclaration   -- ToDO check static final, etc
+
+                    modifier.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration
+                    modifiers.scalaNormalClassDeclaration = @modifier.scalaNormalClassDeclaration
+                    lhs.scalaNormalClassDeclaration = strictFpModifier @modifiers.scalaNormalClassDeclaration
+
+                    modifier.scalaNormalInterfaceDeclaration = @lhs.scalaNormalInterfaceDeclaration
+                    modifiers.scalaNormalInterfaceDeclaration = @modifier.scalaNormalInterfaceDeclaration
+                    lhs.scalaNormalInterfaceDeclaration = strictFpModifier @modifiers.scalaNormalInterfaceDeclaration
+
+                    modifier.scalaMethodDeclaration = @lhs.scalaMethodDeclaration
+                    --modifiers.scalaMethodDeclaration = @modifier.scalaMethodDeclaration
+                    lhs.scalaMethodDeclaration = strictFpMethodModifier(nativeMethodModifier @modifiers.scalaMethodDeclaration @lhs.scalaNTab) @lhs.scalaNTab
+
+                    lhs.scalaConstructorModifier = @modifier.scalaConstructorModifier ++ @modifiers.scalaConstructorModifier
+                    lhs.scalaIsAbstractMethodModifier = @modifier.scalaIsAbstractMethodModifier || @modifiers.scalaIsAbstractMethodModifier
+
+                    lhs.scalaIsNativeMethodModifier = @modifier.scalaIsNativeMethodModifier || @modifiers.scalaIsNativeMethodModifier
+
+                    lhs.scalaIsStaticFieldDeclaration = @modifier.scalaIsStaticFieldDeclaration || @modifiers.scalaIsStaticFieldDeclaration
+                    lhs.scalaIsFinalFieldDeclaration = @modifier.scalaIsFinalFieldDeclaration || @modifiers.scalaIsFinalFieldDeclaration
+
+    | NilModifiers
+                    lhs.scalaModifierFieldDeclaration = changeOrderVolatileTransient @lhs.scalaModifierFieldDeclaration
+                    lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration
+                    lhs.scalaNormalInterfaceDeclaration = @lhs.scalaNormalInterfaceDeclaration
+                    lhs.scalaMethodDeclaration = @lhs.scalaMethodDeclaration
+                    lhs.scalaConstructorModifier = ""
+                    lhs.scalaIsAbstractMethodModifier = False
+                    lhs.scalaIsNativeMethodModifier = False
+                    lhs.scalaIsStaticFieldDeclaration = False
+                    lhs.scalaIsFinalFieldDeclaration = False
+                    -- lhs.scalaFieldDeclaration = changeOrderVolatileTransient @lhs.scalaFieldDeclaration
+
+sem Modifier
+    | ModifierAnnotation
+                         lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration -- ToDO annotation :: Annotation
+                         lhs.scalaNormalInterfaceDeclaration =  @lhs.scalaNormalInterfaceDeclaration -- ToDo
+                         lhs.scalaMethodDeclaration = @lhs.scalaMethodDeclaration -- ToDo
+                         lhs.scalaConstructorModifier = "" -- ToDo
+                         lhs.scalaIsAbstractMethodModifier = False
+                         lhs.scalaIsNativeMethodModifier = False
+                         lhs.scalaIsStaticFieldDeclaration = False
+                         lhs.scalaIsFinalFieldDeclaration = False
+                         lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
+
+    | ModifierPublic
+                     lhs.scalaNormalClassDeclaration = joinTypeModifier @lhs.scalaNormalClassDeclaration ("",  False)
+                     lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("",  False)
+                     lhs.scalaMethodDeclaration = @lhs.scalaMethodDeclaration
+                     lhs.scalaConstructorModifier = ""
+                     lhs.scalaIsAbstractMethodModifier = False
+                     lhs.scalaIsNativeMethodModifier = False
+                     lhs.scalaIsStaticFieldDeclaration = False
+                     lhs.scalaIsFinalFieldDeclaration = False
+                     lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
+
+    | ModifierProtected
+                        lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration  ("protected",  False)
+                        lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("protected",  False)
+                        lhs.scalaMethodDeclaration = "protected" ++ " " ++ @lhs.scalaMethodDeclaration
+                        lhs.scalaConstructorModifier = "protected"
+                        lhs.scalaIsAbstractMethodModifier = False
+                        lhs.scalaIsNativeMethodModifier = False
+                        lhs.scalaIsStaticFieldDeclaration = False
+                        lhs.scalaIsFinalFieldDeclaration = False
+                        lhs.scalaModifierFieldDeclaration = "protected": @lhs.scalaModifierFieldDeclaration
+
+    | ModifierPrivate
+                      lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("private",  False)
+                      lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("private",  False)
+                      lhs.scalaMethodDeclaration = "private" ++ " " ++ @lhs.scalaMethodDeclaration
+                      lhs.scalaConstructorModifier = "private"
+                      lhs.scalaIsAbstractMethodModifier = False
+                      lhs.scalaIsNativeMethodModifier = False
+                      lhs.scalaIsStaticFieldDeclaration = False
+                      lhs.scalaIsFinalFieldDeclaration = False
+                      lhs.scalaModifierFieldDeclaration = "private": @lhs.scalaModifierFieldDeclaration
+
+    | ModifierAbstract
+                       lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("abstract",  False)
+                       lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("abstract",  False)
+                       lhs.scalaMethodDeclaration = @lhs.scalaMethodDeclaration
+                       lhs.scalaConstructorModifier = ""
+                       lhs.scalaIsAbstractMethodModifier = True
+                       lhs.scalaIsNativeMethodModifier = False
+                       lhs.scalaIsStaticFieldDeclaration = False
+                       lhs.scalaIsFinalFieldDeclaration = False
+                       lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
+
+    | ModifiersStatic
+                      lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("",  False)
+                      lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("",  False)
+                      lhs.scalaMethodDeclaration = @lhs.scalaMethodDeclaration -- ToDo aplicar isStatic
+                      lhs.scalaConstructorModifier = ""
+                      lhs.scalaIsAbstractMethodModifier = False
+                      lhs.scalaIsNativeMethodModifier = False
+                      lhs.scalaIsStaticFieldDeclaration = True
+                      lhs.scalaIsFinalFieldDeclaration = False
+                      lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
+
+    | ModifierFinal
+                    lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("final",  True)
+                    lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("",  True)
+                    lhs.scalaMethodDeclaration = "final" ++ " " ++ @lhs.scalaMethodDeclaration
+                    lhs.scalaConstructorModifier = ""
+                    lhs.scalaIsAbstractMethodModifier = False
+                    lhs.scalaIsNativeMethodModifier = False
+                    lhs.scalaIsStaticFieldDeclaration = False
+                    lhs.scalaIsFinalFieldDeclaration = True
+                    lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
+
+    | ModifierStrictfp
+                        lhs.scalaNormalClassDeclaration = joinTypeModifier  @lhs.scalaNormalClassDeclaration ("strfp",  False)
+                        lhs.scalaNormalInterfaceDeclaration = joinTypeModifier @lhs.scalaNormalInterfaceDeclaration ("strfp",  False)
+                        lhs.scalaMethodDeclaration = "strfp " ++ @lhs.scalaMethodDeclaration
+                        lhs.scalaConstructorModifier = ""
+                        lhs.scalaIsAbstractMethodModifier = False
+                        lhs.scalaIsNativeMethodModifier = False
+                        lhs.scalaIsStaticFieldDeclaration = False
+                        lhs.scalaIsFinalFieldDeclaration = False
+                        lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
+
+    | FieldModifierTransient
+                             lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration
+                             lhs.scalaNormalInterfaceDeclaration = @lhs.scalaNormalInterfaceDeclaration
+                             lhs.scalaMethodDeclaration = @lhs.scalaMethodDeclaration
+                             lhs.scalaConstructorModifier = ""
+                             lhs.scalaIsAbstractMethodModifier = False
+                             lhs.scalaIsNativeMethodModifier = False
+                             lhs.scalaIsStaticFieldDeclaration = False
+                             lhs.scalaIsFinalFieldDeclaration = False
+                             lhs.scalaModifierFieldDeclaration = "@transient": @lhs.scalaModifierFieldDeclaration
+
+    | FieldModifierVolatile
+                            lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration
+                            lhs.scalaNormalInterfaceDeclaration = @lhs.scalaNormalInterfaceDeclaration
+                            lhs.scalaMethodDeclaration = @lhs.scalaMethodDeclaration
+                            lhs.scalaConstructorModifier = ""
+                            lhs.scalaIsAbstractMethodModifier = False
+                            lhs.scalaIsNativeMethodModifier = False
+                            lhs.scalaIsStaticFieldDeclaration = False
+                            lhs.scalaIsFinalFieldDeclaration = False
+                            lhs.scalaModifierFieldDeclaration = "@volatile": @lhs.scalaModifierFieldDeclaration
+
+    | MethodModifierSynchronized
+                                 lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration
+                                 lhs.scalaNormalInterfaceDeclaration = @lhs.scalaNormalInterfaceDeclaration
+                                 lhs.scalaMethodDeclaration = @lhs.scalaMethodDeclaration -- ToDo aplicar isSynchronized
+                                 lhs.scalaConstructorModifier = ""
+                                 lhs.scalaIsAbstractMethodModifier = False
+                                 lhs.scalaIsNativeMethodModifier = False
+                                 lhs.scalaIsStaticFieldDeclaration = False
+                                 lhs.scalaIsFinalFieldDeclaration = False
+                                 lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
+
+    | MethodModifierNative
+                           lhs.scalaNormalClassDeclaration = @lhs.scalaNormalClassDeclaration
+                           lhs.scalaNormalInterfaceDeclaration = @lhs.scalaNormalInterfaceDeclaration
+                           lhs.scalaMethodDeclaration = "ntve " ++ @lhs.scalaMethodDeclaration
+                           lhs.scalaConstructorModifier = ""
+                           lhs.scalaIsAbstractMethodModifier = False
+                           lhs.scalaIsNativeMethodModifier = True
+                           lhs.scalaIsStaticFieldDeclaration = False
+                           lhs.scalaIsFinalFieldDeclaration = False
+                           lhs.scalaModifierFieldDeclaration = "": @lhs.scalaModifierFieldDeclaration
+
+sem TypeParameters
+    | TypeParametersC1
+            lhs.scalaTypeDeclaration = "[" ++ @typeParameterList.scalaTypeDeclaration ++ "]" -- ToDO check >>>
+    | TypeParametersC2
+            lhs.scalaTypeDeclaration = "[" ++ @typeParameterList.scalaTypeDeclaration ++ "]" -- ToDO check >>
+    | TypeParametersC3
+            lhs.scalaTypeDeclaration = "[" ++ @typeParameterList.scalaTypeDeclaration ++ "]" -- ToDO check >
+    | TypeParametersC0
+            lhs.scalaTypeDeclaration = "[" ++ @typeParameterList.scalaTypeDeclaration ++ "]" -- ToDO
+    | NilTypeParameters
+            lhs.scalaTypeDeclaration = ""
+
+{
+commaTypeParameters :: String -> String -> String
+commaTypeParameters hd "" = hd
+commaTypeParameters hd tl = hd ++ ", " ++ tl
+
+pointStr :: String -> String -> String
+pointStr hd "" = hd
+pointStr hd tl = hd ++ "." ++ tl
+}
+
+sem TypeParameterList
+    | Cons lhs.scalaTypeDeclaration = commaTypeParameters @hd.scalaTypeDeclaration @tl.scalaTypeDeclaration
+    | Nil lhs.scalaTypeDeclaration = ""
+
+sem TypeParameter
+    | TypeParameterBound lhs.scalaTypeDeclaration = @identifier ++ @typeBound.scalaTypeDeclaration
+    | TypeParameter lhs.scalaTypeDeclaration = @identifier
+
+{
+typeBoundInterface :: String -> String
+typeBoundInterface str = replace "<:" "with" str
+}
+
+sem TypeBound
+    | TypeBound lhs.scalaTypeDeclaration =  " <: " ++ @classOrInterfaceType.scalaTypeDeclaration ++ (typeBoundInterface @typeBound.scalaTypeDeclaration)
+    | NilAdditionalBoundList lhs.scalaTypeDeclaration = ""
+
+sem ClassOrInterfaceType
+    | ClassOrInterfaceType lhs.scalaTypeDeclaration =  @identifier ++ @typeArguments.scalaResultType ++ " " ++ @zClassOrInterfaceType.scalaTypeDeclaration -- used in typeArguments of normal class ToDo @typeArguments.scalaTypeDeclaration ++
+                           lhs.scalaSuperTypeDeclaration = " extends " ++ @identifier ++ @typeArguments.scalaResultType ++ " "  ++ @zClassOrInterfaceType.scalaSuperTypeDeclaration -- used in Super
+                           lhs.scalaImplementsInterfaceTypeDeclaration = @identifier ++ @typeArguments.scalaResultType ++ " "  ++ @zClassOrInterfaceType.scalaImplementsInterfaceTypeDeclaration
+                           lhs.scalaExtendInterface = " extends " ++ @identifier ++ @typeArguments.scalaResultType ++ " "  ++ @zClassOrInterfaceType.scalaExtendInterface
+                           lhs.scalaExtendClassBodyNormalCD = " extends " ++ @identifier ++ @typeArguments.scalaResultType ++ " "  ++ @zClassOrInterfaceType.scalaExtendClassBodyNormalCD
+                           lhs.scalaFieldDeclInitialization = @identifier ++ @typeArguments.scalaResultType ++ " " ++ @zClassOrInterfaceType.scalaFieldDeclInitialization
+
+sem ListInterfaceMemberDeclaration
+    | Cons lhs.scalaExtendClassBodyNormalCD = @hd.scalaExtendClassBodyNormalCD ++ @tl.scalaExtendClassBodyNormalCD
+           lhs.scalaBodyNormalInterface = @hd.scalaBodyNormalInterface ++ @tl.scalaBodyNormalInterface
+           hd.scalaNTab = @lhs.scalaNTab
+           tl.scalaNTab = @hd.scalaNTab
+           lhs.scalaNTab = @tl.scalaNTab
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
+    | Nil lhs.scalaExtendClassBodyNormalCD = ""
+          lhs.scalaBodyNormalInterface = ""
+          lhs.scalaNTab = @lhs.scalaNTab
+          lhs.scalaHasForEach = False
+
+
+sem ZClassOrInterfaceType
+    | Cons lhs.scalaTypeDeclaration = @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
+           lhs.scalaSuperTypeDeclaration = "." ++ @hd.scalaSuperTypeDeclaration ++ @tl.scalaSuperTypeDeclaration
+           lhs.scalaImplementsInterfaceTypeDeclaration = "." ++ @hd.scalaImplementsInterfaceTypeDeclaration ++ @tl.scalaImplementsInterfaceTypeDeclaration
+           lhs.scalaExtendInterface =  "." ++ @hd.scalaExtendInterface ++ @tl.scalaExtendInterface
+           lhs.scalaExtendClassBodyNormalCD = "." ++ @hd.scalaExtendClassBodyNormalCD ++ @tl.scalaExtendClassBodyNormalCD
+           lhs.scalaFieldDeclInitialization = "." ++ @hd.scalaExtendInterface ++ @tl.scalaExtendInterface
+           lhs.scalaResultType = "." ++ @hd.scalaResultType ++ @tl.scalaResultType
+
+    | Nil lhs.scalaTypeDeclaration = ""
+          lhs.scalaSuperTypeDeclaration = ""
+          lhs.scalaImplementsInterfaceTypeDeclaration = ""
+          lhs.scalaExtendInterface = ""
+          lhs.scalaExtendClassBodyNormalCD = ""
+          lhs.scalaFieldDeclInitialization = ""
+          lhs.scalaResultType = ""
+
+sem ZCOITTypeDeclSpecifier
+    | ZCOITTypeDeclSpecifier lhs.scalaTypeDeclaration = @identifier ++ @typeArguments.scalaResultType -- ToDo ++ @typeArguments.scalaTypeDeclaration
+                             lhs.scalaSuperTypeDeclaration = @identifier ++ @typeArguments.scalaResultType  -- ToDo ++ @typeArguments.scalaTypeDeclaration
+                             lhs.scalaImplementsInterfaceTypeDeclaration = @identifier
+                             lhs.scalaExtendInterface = @identifier
+                             lhs.scalaExtendClassBodyNormalCD = @identifier
+                             lhs.scalaFieldDeclInitialization = @identifier
+                             lhs.scalaResultType = @identifier
+
+sem Super
+    | Super lhs.scalaTypeDeclaration = @classOrInterfaceType.scalaSuperTypeDeclaration
+    | NilSuper lhs.scalaTypeDeclaration = ""
+
+sem Interfaces
+    | Interfaces lhs.scalaTypeDeclaration = @interfaceTypeList.scalaImplementsInterfaceTypeDeclaration   -- ToDO interfaceTypeList :: InterfaceTypeList
+    | NilInterfaces lhs.scalaTypeDeclaration = ""
+
+sem InterfaceTypeList
+    | Cons lhs.scalaImplementsInterfaceTypeDeclaration = " with " ++ @hd.scalaImplementsInterfaceTypeDeclaration ++ @tl.scalaImplementsInterfaceTypeDeclaration
+    | Nil lhs.scalaImplementsInterfaceTypeDeclaration = ""
+
+sem ClassBodyDeclarations
+    | Cons
+            --hd.scalaFieldDeclaration = []
+            lhs.scalaTypeDeclaration = {
+                if (@hd.scalaIsStaticClassBodyDeclaration) then
+                    @tl.scalaTypeDeclaration
+                else
+                    @hd.scalaTypeDeclaration ++ @tl.scalaTypeDeclaration
+            }
+            lhs.scalaClassBodyDeclarationsCompanions = {
+               if (@hd.scalaIsStaticClassBodyDeclaration) then
+                   @hd.scalaTypeDeclaration ++ @tl.scalaClassBodyDeclarationsCompanions
+               else
+                   @tl.scalaClassBodyDeclarationsCompanions
+            }
+            hd.scalaNTab = @lhs.scalaNTab
+            tl.scalaNTab = @hd.scalaNTab
+            lhs.scalaNTab = @tl.scalaNTab
+            lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
+
+            lhs.scalaConstructorDeclarationParams = @hd.scalaConstructorDeclarationParams ++ @tl.scalaConstructorDeclarationParams
+            lhs.scalaConstructorDeclarationBody = @hd.scalaConstructorDeclarationBody ++ @tl.scalaConstructorDeclarationBody
+
+    | Nil
+            lhs.scalaTypeDeclaration = ""
+            lhs.scalaClassBodyDeclarationsCompanions = ""
+            lhs.scalaNTab = @lhs.scalaNTab
+            lhs.scalaConstructorDeclarationParams = ""
+            lhs.scalaConstructorDeclarationBody = ""
+            lhs.scalaHasForEach = False
+
+
+
+--sem ReferenceTypeList
+--    | Cons  hd.scalaFieldDeclaration = []
+
+{
+-- checkVariableDeclarators @modifiers isStatic isFinal @type_ variableDeclarator scalaNTab
+checkVariableDeclarators :: [String] -> Bool -> Bool -> String -> [TypeVariableDeclaration] -> String -> String
+checkVariableDeclarators modifiers isStatic isFinal type_ [] _ = ""
+checkVariableDeclarators modifiers isStatic@True isFinal@True type_ ((variable, typeInitialization):vs) nTab =  "\n" ++ nTab ++ (takeModifiers modifiers) ++ "val "  ++ (variable) ++
+                                                                              ": " ++ (checkTypeInitialization typeInitialization type_) ++  (checkVariableDeclarators modifiers isStatic isFinal type_ vs nTab)
+checkVariableDeclarators modifiers isStatic@True isFinal@False type_ ((variable, typeInitialization):vs) nTab =   "\n" ++ nTab ++ (takeModifiers modifiers) ++ "var "  ++ (variable) ++
+                                                                              ": " ++ (checkTypeInitialization typeInitialization type_) ++  (checkVariableDeclarators modifiers isStatic isFinal type_ vs nTab)
+checkVariableDeclarators modifiers isStatic@False isFinal@True type_ ((variable, typeInitialization):vs) nTab =   "\n" ++ nTab ++ (takeModifiers modifiers) ++ "val "  ++ (variable) ++
+                                                                              ": " ++ (checkTypeInitialization typeInitialization type_) ++  (checkVariableDeclarators modifiers isStatic isFinal type_ vs nTab)
+checkVariableDeclarators modifiers isStatic isFinal type_ ((variable, typeInitialization):vs) nTab =   "\n" ++ nTab ++ (takeModifiers modifiers) ++ "var "  ++ (variable) ++
+                                                                               ": " ++ (checkTypeInitialization typeInitialization type_) ++  (checkVariableDeclarators modifiers isStatic isFinal type_ vs nTab)
+
+checkTypeInitialization :: TypeFieldInitialization -> String -> String
+checkTypeInitialization Nothing type_ = defaultValueType type_
+checkTypeInitialization (Just initialization) type_ = type_ ++ " = " ++ initialization
+
+takeModifiers :: [String] -> String
+takeModifiers modifiers = foldl takeModifiers' "" modifiers
+    where
+        takeModifiers' s fs = if (fs == "") then s else s ++ fs ++ " "
+
+defaultValueType :: String -> String
+defaultValueType type_
+            | type_ == "Byte"    = type_ ++ " = 0"
+            | type_ == "Short"   = type_ ++ " = 0"
+            | type_ == "Int"     = type_ ++ " = 0"
+            | type_ == "Long"    = type_ ++ " = 0L"
+            | type_ == "Float"   = type_ ++ " = 0"
+            | type_ == "Double"  = type_ ++ " = 0.0"
+            | type_ == "Char"    = type_ ++ " = \'\\u0000\'"
+            | type_ == "Boolean" = type_ ++ " = false"
+            | otherwise          = type_ ++ " = null"
+
+deletePrivateModifier :: String -> String
+deletePrivateModifier modifiers = replace "private "  "" modifiers
+
+}
+
+sem ClassBodyDeclaration
+    | ClassBodyDeclClassMemberDeclFieldDeclaration
+                        modifiers.scalaModifierFieldDeclaration = [""]
+
+                        lhs.scalaTypeDeclaration = {checkVariableDeclarators @modifiers.scalaModifierFieldDeclaration @modifiers.scalaIsStaticFieldDeclaration @modifiers.scalaIsFinalFieldDeclaration @type_.scalaResultType @variableDeclarators.scalaVariableDeclarator @variableDeclarators.scalaNTab}
+
+                        variableDeclarators.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaNTab = @lhs.scalaNTab
+
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+                        modifiers.scalaMethodDeclaration = "" -- ToDo
+
+                        lhs.scalaConstructorDeclarationParams = ""
+                        lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaHasForEach = False
+                        lhs.scalaIsStaticClassBodyDeclaration = @modifiers.scalaIsStaticFieldDeclaration
+
+    | ClassBodyDeclClassMemberDeclMethodDeclaration
+                        modifiers.scalaModifierFieldDeclaration = [""]
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+                        modifiers.scalaMethodDeclaration = "" -- ToDo
+                        lhs.scalaIsStaticClassBodyDeclaration = @modifiers.scalaIsStaticFieldDeclaration
+
+                        methodBody.scalaNTab = @lhs.scalaNTab ++ "\t"
+                        lhs.scalaNTab = @lhs.scalaNTab
+
+                        lhs.scalaTypeDeclaration = {
+                            if (@modifiers.scalaIsAbstractMethodModifier) then
+                                "\n" ++ @lhs.scalaNTab ++
+                                @modifiers.scalaMethodDeclaration ++
+                                @typeParameters.scalaTypeDeclaration ++ -- ToDo
+                                "def " ++ @methosDeclarator.scalaMethodDeclaration ++
+                                ": " ++ @resultType.scalaResultType
+                            else if (@modifiers.scalaIsNativeMethodModifier) then
+                                "\n" ++ @lhs.scalaNTab ++
+                                deletePrivateModifier (@modifiers.scalaMethodDeclaration) ++
+                                @typeParameters.scalaTypeDeclaration ++ -- ToDo
+                                "def " ++ @methosDeclarator.scalaMethodDeclaration ++
+                                ": " ++ @resultType.scalaResultType
+                            else
+                                "\n" ++ @lhs.scalaNTab ++
+                                @modifiers.scalaMethodDeclaration ++
+                                @typeParameters.scalaTypeDeclaration ++ -- ToDo
+                                "def " ++ @methosDeclarator.scalaMethodDeclaration ++
+                                ": " ++ @resultType.scalaResultType ++
+                                " = {" ++
+                                @methodBody.scalaMethodBody ++
+                                "\n" ++ @lhs.scalaNTab ++ "}" -- ToDo throws
+                        }
+
+                        lhs.scalaConstructorDeclarationParams = ""
+                        lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaHasForEach = @methodBody.scalaHasForEach
+
+    | ClassBodyDeclClassMemberDeclClassDeclarationNormalCD
+                        modifiers.scalaModifierFieldDeclaration = [""]
+                        modifiers.scalaNormalClassDeclaration = ("", False)
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False)
+                        modifiers.scalaMethodDeclaration = "" -- ToDo
+                        lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaIsStaticClassBodyDeclaration = @modifiers.scalaIsStaticFieldDeclaration
+
+                        classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
+
+                        lhs.scalaTypeDeclaration =
+                            "\n" ++
+                            @lhs.scalaNTab ++
+                            (normalClassDeclaration @modifiers.scalaNormalClassDeclaration @lhs.scalaNTab) ++
+                            (constructorDeclarationParams @identifier @classBodyDeclarations.scalaConstructorDeclarationParams) ++
+                            @typeParameters.scalaTypeDeclaration ++ -- ToDo
+                            @super.scalaTypeDeclaration ++
+                            @interfaces.scalaTypeDeclaration ++
+                            " {\n" ++
+                            (constructorDeclarationBody @classBodyDeclarations.scalaConstructorDeclarationBody) ++
+                            @classBodyDeclarations.scalaTypeDeclaration ++
+                            "\n" ++ @lhs.scalaNTab ++ "}\n\n"
+
+                        lhs.scalaConstructorDeclarationParams = ""
+                        lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaHasForEach = @classBodyDeclarations.scalaHasForEach
+
+    | ClassBodyDeclClassMemberDeclClassDeclarationEnumD
+                        lhs.scalaTypeDeclaration = ""
+                        modifiers.scalaModifierFieldDeclaration = [""]
+
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+                        modifiers.scalaMethodDeclaration = "" -- ToDo
+
+                        enumBody.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo, check
+                        lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = @enumBody.scalaHasForEach
+
+                        lhs.scalaConstructorDeclarationParams = ""
+                        lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = False
+
+    | ClassBodyDeclClassMemberDeclInterfaceDeclarationNormalInterfaceD
+                        modifiers.scalaModifierFieldDeclaration = [""] -- ToDo ?
+
+                        modifiers.scalaNormalClassDeclaration = ("", False)
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False)
+                        modifiers.scalaMethodDeclaration = "" -- ToDo
+                        lhs.scalaNTab = @lhs.scalaNTab
+                        listInterfaceMemberDeclaration.scalaNTab = @lhs.scalaNTab ++ "\t"
+                        lhs.scalaIsStaticClassBodyDeclaration = False
+
+                        lhs.scalaTypeDeclaration =
+                            "\n" ++
+                            @lhs.scalaNTab ++
+                            (normalInterfaceDeclaration @modifiers.scalaNormalInterfaceDeclaration @lhs.scalaNTab) ++
+                            @identifier ++
+                            @typeParameters.scalaTypeDeclaration ++ --ToDo
+                            @extendsInterfaces.scalaExtendInterface ++
+                            " {\n" ++ @listInterfaceMemberDeclaration.scalaBodyNormalInterface ++
+                            "\n" ++ @lhs.scalaNTab ++ "}\n\n"
+
+                        lhs.scalaConstructorDeclarationParams = ""
+                        lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaHasForEach = @listInterfaceMemberDeclaration.scalaHasForEach
+
+    | ClassBodyDeclClassMemberDeclInterfaceDeclarationAnnotationTypeD
+                        modifiers.scalaModifierFieldDeclaration = [""]
+                        lhs.scalaTypeDeclaration = ""
+
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+                        modifiers.scalaMethodDeclaration = "" -- ToDo
+
+                        listAnnotationTypeElementDeclaration.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaNTab = @lhs.scalaNTab
+
+                        lhs.scalaConstructorDeclarationParams = ""
+                        lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = False
+                        lhs.scalaHasForEach = @listAnnotationTypeElementDeclaration.scalaHasForEach
+
+    | ClassBodyDeclClassMemberDeclSemiColon
+                        lhs.scalaTypeDeclaration = ""
+                        lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = False
+                        lhs.scalaIsStaticClassBodyDeclaration = False
+
+                        lhs.scalaConstructorDeclarationParams = ""
+                        lhs.scalaConstructorDeclarationBody = ""
+
+    | ClassBodyInstanceInitializer
+                        lhs.scalaTypeDeclaration = ""
+                        blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
+                        blockStatements.scalaStatement = ""
+                        lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = @blockStatements.scalaHasForEach
+
+                        lhs.scalaConstructorDeclarationParams = ""
+                        lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = False
+
+    | ClassBodyStaticInitializer
+                        lhs.scalaTypeDeclaration = @lhs.scalaNTab ++ "{" ++ @blockStatements.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}\n"
+
+                        blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
+                        blockStatements.scalaStatement = ""
+                        lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = @blockStatements.scalaHasForEach
+
+                        lhs.scalaConstructorDeclarationParams = ""
+                        lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = True
+
+    | ClassBodyConstructorDeclaration
+                        modifiers.scalaModifierFieldDeclaration = [""]
+
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+                        modifiers.scalaMethodDeclaration = "" -- ToDo
+                        constructorBody.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo, check if is correct
+                        lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = @constructorBody.scalaHasForEach
+
+                        lhs.scalaTypeDeclaration = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = False
+
+                        lhs.scalaConstructorDeclarationParams = "(" ++  @formalParameterList.scalaMethodFormalParameters ++ ")"
+                        lhs.scalaConstructorDeclarationBody = {
+                            if (@constructorBody.scalaMethodBody == "") then ""
+                            else "\n" ++ @lhs.scalaNTab ++ "{" ++
+                                 @constructorBody.scalaMethodBody ++
+                                 "\n" ++ @lhs.scalaNTab ++ "}" -- ToDo throws
+                        }
+
+    | ClassBodyConstructorDeclarationNoFormalParList
+                        modifiers.scalaModifierFieldDeclaration = [""]
+                        lhs.scalaTypeDeclaration = ""
+
+                        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+                        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+                        modifiers.scalaMethodDeclaration = "" -- ToDo
+                        constructorBody.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo , check if is correct.
+                        lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = @constructorBody.scalaHasForEach
+
+                        lhs.scalaConstructorDeclarationParams = ""
+                        lhs.scalaConstructorDeclarationBody = ""
+                        lhs.scalaIsStaticClassBodyDeclaration = False
+
+sem Type  -- ToDo check
+    | TypePrimitiveType
+            typeZ.scalaArrayType = @primitiveOrReferenceType.scalaResultType
+            lhs.scalaResultType = { if @typeZ.scalaArrayType == "" then
+                                        @primitiveOrReferenceType.scalaResultType
+                                    else
+                                        @typeZ.scalaArrayType
+            }
+            lhs.scalaSpecialCaseIsIncrementalPrimitive = @primitiveOrReferenceType.scalaSpecialCaseIsIncrementalPrimitive
+
+sem TypeZ
+    | Cons
+        hd.scalaArrayType = @lhs.scalaArrayType
+        tl.scalaArrayType = @hd.scalaArrayType
+        lhs.scalaArrayType = @tl.scalaArrayType
+    | Nil lhs.scalaArrayType = @lhs.scalaArrayType
+
+sem ArrayType
+    | ArrayType lhs.scalaArrayType = "Array[" ++ @lhs.scalaArrayType ++ "]"
+
+sem PrimitiveOrReferenceType
+    | TypePrimitiveNumericType_TypeIntegral_Byte
+                                lhs.scalaResultType = "Byte"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = True
+
+    | TypePrimitiveNumericType_TypeIntegral_Short
+                                lhs.scalaResultType = "Short"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = True
+
+    | TypePrimitiveNumericType_TypeIntegral_Int
+                                lhs.scalaResultType = "Int"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = True
+
+    | TypePrimitiveNumericType_TypeIntegral_Long
+                                lhs.scalaResultType = "Long"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = True
+
+    | TypePrimitiveNumericType_TypeIntegral_Char
+                                lhs.scalaResultType = "Char"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = False
+
+    | TypePrimitiveNumericType_TypeFloating_Float
+                                lhs.scalaResultType = "Float"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = False
+
+    | TypePrimitiveNumericType_TypeFloating_Double
+                                lhs.scalaResultType = "Double"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = False
+
+    | TypePrimitivePrimitivetypeBoolean
+                                lhs.scalaResultType = "Boolean"
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = False
+
+    | TypeReference
+                                lhs.scalaResultType = @referenceType.scalaResultType
+                                lhs.scalaSpecialCaseIsIncrementalPrimitive = False
+
+sem ReferenceType
+    | ReferenceTypeClassOrInterfaceType
+                                        lhs.scalaResultType = @identifier ++ @typeArguments.scalaResultType ++ @zClassOrInterfaceType.scalaResultType -- ToDo
+
+sem TypeArguments
+    | TypeArgumentsC1
+            lhs.scalaResultType = @actualTypeArgumentList.scalaResultType
+    | NilTypeArguments
+            lhs.scalaResultType = ""
+
+sem ActualTypeArgumentList
+    | Cons lhs.scalaResultType = "["++ @hd.scalaResultType ++ "]" ++ @tl.scalaResultType
+    | Nil lhs.scalaResultType = ""
+
+
+sem ActualTypeArgument
+    | ActualTypeArgumentWildCard
+            lhs.scalaResultType =  @wildcardBound.scalaResultType
+    | ActualTypeReferenceType
+            --type_.scalaFieldDeclaration = [] -- ToDo
+            lhs.scalaResultType = @type_.scalaResultType
+
+sem VariableDeclarators
+    | Cons lhs.scalaVariableDeclarator = @hd.scalaVariableDeclarator ++ @tl.scalaVariableDeclarator
+           hd.scalaNTab = @lhs.scalaNTab
+           tl.scalaNTab = @lhs.scalaNTab
+           lhs.scalaNTab = @hd.scalaNTab
+           lhs.scalaSpecialCaseForInitValue = @hd.scalaSpecialCaseForInitValue ++ @tl.scalaSpecialCaseForInitValue
+           lhs.scalaSpecialCaseForInitIdentifier = @hd.scalaSpecialCaseForInitIdentifier ++ @tl.scalaSpecialCaseForInitIdentifier
+    | Nil  lhs.scalaVariableDeclarator  = []
+           lhs.scalaNTab = @lhs.scalaNTab
+           lhs.scalaSpecialCaseForInitValue = ""
+           lhs.scalaSpecialCaseForInitIdentifier = ""
+
+
+sem VariableDeclarator
+    | VariableDeclaratorId
+            lhs.scalaVariableDeclarator = (@variableDeclaratorId.scalaVariableDeclaratorId, Nothing):[]
+            lhs.scalaSpecialCaseForInitValue = ""
+            lhs.scalaSpecialCaseForInitIdentifier = ""
+    | VariableDeclaratorIdAsig
+            lhs.scalaVariableDeclarator = (@variableDeclaratorId.scalaVariableDeclaratorId , (Just @variableInitializer.scalaFieldDeclInitialization)):[]
+            lhs.scalaSpecialCaseForInitValue = @variableInitializer.scalaFieldDeclInitialization
+            lhs.scalaSpecialCaseForInitIdentifier = @variableDeclaratorId.scalaVariableDeclaratorId
+
+sem VariableInitializers
+    | Cons
+        lhs.scalaArrayInitializer = commaTypeParameters @hd.scalaFieldDeclInitialization @tl.scalaArrayInitializer
+    | Nil
+        lhs.scalaArrayInitializer = ""
+
+sem VariableInitializer
+    | VariableInitializerExp
+            lhs.scalaFieldDeclInitialization = @expression.scalaExpression
+            expression.scalaStatement = "" -- ToDo
+    | VariableInitializerArr
+            lhs.scalaFieldDeclInitialization = @attayInitializer.scalaArrayInitializer
+
+sem ArgumentList
+    | Cons
+        lhs.scalaFieldDeclInitialization = {
+            if @tl.scalaFieldDeclInitialization == "" then
+                @hd.scalaExpression
+            else
+                @hd.scalaExpression ++ "," ++ @tl.scalaFieldDeclInitialization
+        } -- ToDo
+        -- lhs.scalaExpression = @hd.scalaExpression ++ @tl.scalaExpression -- ToDo
+        hd.scalaStatement = ""
+    | Nil
+        lhs.scalaFieldDeclInitialization = ""
+
+sem Expression
+    | ExpressionConditionalExpr
+            lhs.scalaExpression = @conditionalOrExpression.scalaExpression -- ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @conditionalOrExpression.scalaSpecialCaseIsSimpleIncrementDecrement
+            lhs.scalaSpecialCaseForEndValue = @conditionalOrExpression.scalaSpecialCaseForEndValue
+    | ExpressionConditionalExprComb
+            lhs.scalaExpression = @conditionalOrExpression1.scalaExpression ++
+                                  @expression.scalaExpression
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+            lhs.scalaSpecialCaseForEndValue = ""
+
+    | ExpressionAssignment
+            lhs.scalaExpression = @conditionalOrExpression.scalaExpression ++
+                                  @assignmentOperator.scalaExpression ++
+                                  @expression.scalaExpression
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+            lhs.scalaSpecialCaseForEndValue = ""
+
+
+sem ConditionalOrExpression
+    | Mod -- :%:
+        lhs.scalaExpression =
+             @conditionalOrExpression1.scalaExpression ++ " % " ++
+             @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | Or -- :||:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " || " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | And -- :&&:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " && " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | BitwiseOr  -- :|:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " | " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | BitwiseXor -- :^:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " ^ " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | BitwiseAnd -- :&:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " & " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | EqualTo -- :==:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " == " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | NotEqualTo -- :!=:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " != " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | LessThan -- :<:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " < " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = show ((read @conditionalOrExpression2.scalaExpression :: Int) - 1)
+    | GreaterThan -- :>:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " > " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = show ((read @conditionalOrExpression2.scalaExpression :: Int) + 1)
+    | LessThanOrEqualTo -- :<=:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " <= " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = @conditionalOrExpression2.scalaExpression
+    | GreaterThanOrEqualTo -- :>=:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " >= " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = @conditionalOrExpression2.scalaExpression
+    | LeftShift -- :<<:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " << " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | RightShift -- :>>:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " >> " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | ZeroFillRightShift -- :>>>:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " >>> " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | Add -- :+:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " + " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | Sub -- :-:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " - " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | Mult -- :*:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " * " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | Div -- :/:
+        lhs.scalaExpression =
+                @conditionalOrExpression1.scalaExpression ++ " / " ++
+                @conditionalOrExpression2.scalaExpression -- ToDo check
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+        lhs.scalaSpecialCaseForEndValue = ""
+    | ConditionalOrExpressionUnaryExpression
+            lhs.scalaExpression = @unaryExpression.scalaExpression
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @unaryExpression.scalaSpecialCaseIsSimpleIncrementDecrement
+            lhs.scalaSpecialCaseForEndValue = ""
+    | ConditionalOrExpressionIntanceOf
+            lhs.scalaExpression = @unaryExpression.scalaExpression -- ToDo check  type_ :: Type
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+            lhs.scalaSpecialCaseForEndValue = ""
+
+
+sem UnaryExpression
+    | UnaryExpressionPreIncrementExpression
+            lhs.scalaExpression =  @unaryExpression.scalaExpression --ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+    | UnaryExpressionPreDecrementExpression
+            lhs.scalaExpression =  @unaryExpression.scalaExpression --ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+    | UnExpMas
+            lhs.scalaExpression =  @unaryExpression.scalaExpression --ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+    | UnExpMenos
+            lhs.scalaExpression =  @unaryExpression.scalaExpression --ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+    | PostExpPrimaryPostfixZ
+            lhs.scalaExpression =  @primary.scalaExpression ++ @zpostfixExpression.scalaExpression
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @zpostfixExpression.scalaSpecialCaseIsSimpleIncrementDecrement
+    | PostfixExpressionPrimary
+            lhs.scalaExpression = @primary.scalaExpression
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+    | Pestan
+            lhs.scalaExpression =  @unaryExpression.scalaExpression -- ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+    | Admiracion
+            lhs.scalaExpression =  @unaryExpression.scalaExpression -- ToDo
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+
+sem Primary
+    | PrimNoNewArray
+            lhs.scalaExpression = @primaryNoNewArray.scalaExpression
+    | PrimNoNewArrayZ
+            lhs.scalaExpression = @primaryNoNewArray.scalaExpression
+                            -- @zprimary.scalaFieldDeclInitialization  --ToDo, check
+sem PrimaryNoNewArray
+    | PrimaryNoNewArray
+                lhs.scalaExpression = @primarynna.scalaExpression
+                        -- ToDO zPrimaryNoNewArray :: ZPrimaryNoNewArray
+sem PrimaryNNA
+    | PrimNNALiteral_IntegerLiteral_DecimalIntegerLiteral
+                        lhs.scalaExpression = @string
+    | PrimNNALiteral_IntegerLiteral_HexIntegerLiteral
+                        lhs.scalaExpression = @string
+    | PrimNNALiteral_IntegerLiteral_OctalIntegerLiteral
+                        lhs.scalaExpression = @string
+    | PrimNNALiteral_FloatingPointLiteral_DecimalFloatingPointLiteral
+                        lhs.scalaExpression = @string
+    | PrimNNALiteral_FloatingPointLiteral_HexadecimalFloatingPointLiteral
+                        lhs.scalaExpression = @string
+    | PrimNNALiteral_BooleanLiteral
+                        lhs.scalaExpression = { if @bool then "true" else "false" }
+    | PrimNNALiteral_CharacterLiteral
+                        lhs.scalaExpression = @string  -- ToDo revisar
+    | PrimNNALiteral_StringLiteral
+                        lhs.scalaExpression = @string
+    | PrimNNALiteral_NullLiteral
+                        lhs.scalaExpression = "null" -- ToDo revisar
+    | PrimNNATypeClassPrimitiveType
+                        typeZ.scalaArrayType = ""
+                        lhs.scalaExpression = "" -- ToDo analizar si caso entra.
+                        -- primitiveType :: PrimitiveType typeZ :: TypeZ
+    | PrimNNATypeClassReferenceTypeClassIOT
+                        lhs.scalaExpression = @identifier ++ @typeArguments.scalaResultType  -- ToDo revisar y analizar caso.
+                        -- identifier :: Identifier typeArguments :: TypeArguments primNNAClassOrInterfaceType :: PrimNNAClassOrInterfaceType
+    | PrimNNATypeClassReferenceTypeTypeVariable
+                        typeZ.scalaArrayType = ""
+                        lhs.scalaExpression = @identifier -- ToDo revisar caso
+                        -- identifier :: Identifier typeZ :: TypeZ
+    | PrimNNAVoid
+                        lhs.scalaExpression = "Unit" -- ToDo check caso
+    | PrimNNAThis
+                        lhs.scalaExpression = "this???" -- ToDO check caso
+    | PrimNNAClassName
+                        lhs.scalaExpression = @typeName.scalaFieldDeclInitialization -- ToDo check
+    | PrimNNAParExp
+                        lhs.scalaExpression = "(" ++ @expression.scalaExpression ++ ")"
+                        expression.scalaStatement = "" -- ToDo
+    | UnNotPlusCastExpression
+                        lhs.scalaExpression = "" -- ToDo
+                        expression.scalaStatement = "" -- ToDo
+                        -- expression :: Expression unaryExpression :: UnaryExpression {- ANTES Type        UnaryExpression  -- CONTROLAR COND CONTEXTO -}
+
+    | PrimNNAClassInstanceCreationExpression
+                        lhs.scalaExpression = " new " ++ @classOrInterfaceType.scalaFieldDeclInitialization ++ @typeArguments.scalaResultType ++ "(" ++ @argumentList.scalaFieldDeclInitialization ++ ")"
+    | ArrayCreationExpressionPrimitiveType
+                        lhs.scalaExpression = "" -- ToDo
+                        -- primitiveType :: PrimitiveType dimExprs :: DimExprs                      {- Dims -- ARRAYCreationExpression Aplicar Cond Contexto -}
+    | ArrayCreationExpressionClassOrInterf
+                        lhs.scalaExpression = "" -- ToDo
+                        -- classOrInterfaceType :: ClassOrInterfaceType dimExprs :: DimExprs               {-- Dims -- ARRAYCreationExpression Aplicar Cond Contexto -}
+    | ArrayCreationExpressionArrInitialPrim
+                        lhs.scalaExpression = "" -- ToDo
+                        -- primitiveType :: PrimitiveType dims :: Dims arrayInitilizer :: ArrayInitializer          {-- ARRAYCreationExpression Aplicar Cond Contexto -}
+    | ArrayCreationExpressionArrInitialClass
+                        lhs.scalaExpression = "" -- ToDo
+                        -- classOrInterfaceType :: ClassOrInterfaceType dims :: Dims arrayInitializer :: ArrayInitializer  {-- ARRAYCreationExpression Aplicar Cond Contexto -}
+    | PrimNNAFieldAccessPrim
+                        lhs.scalaExpression = "" -- ToDo
+                        -- primary :: Primary identifier :: Identifier
+    | PrimNNAFieldAccessSuper
+                        lhs.scalaExpression = @identifier -- ToDo
+    | PrimNNAFieldAccessClassName
+                        lhs.scalaExpression =  @typeName.scalaFieldDeclInitialization ++ @identifier {-- Antes Identifier -}
+                        -- ToDo ?????
+    | PrimNNAMethodInvocationMN
+                        lhs.scalaExpression = @typeName.scalaFieldDeclInitialization ++ "(" ++  @argumentList.scalaFieldDeclInitialization ++ ")"   -- ToDo
+                        -- typeName :: TypeName argumentList :: ArgumentList  {-- Antes MethodName -}
+    | PrimNNAMethodInvocationSuper
+                        lhs.scalaExpression = "" -- ToDo
+                        -- nonWildTypeArguments :: NonWildTypeArguments identifier :: Identifier argumentList :: ArgumentList
+    | PrimNNAMethodInvocationClassN
+                        lhs.scalaExpression = "" -- ToDo
+                        -- typeName :: TypeName nonWildTypeArguments :: NonWildTypeArguments identifier :: Identifier argumentList :: ArgumentList  {- TypeNAme ANtes Identifier CONTROLAR EN COND CONTEXTO -}
+    | PrimNNAMethodInvocationTypeN
+                        lhs.scalaExpression = "" -- ToDo
+                        -- typeName :: TypeName nonWildTypeArguments :: NonWildTypeArguments identifier :: Identifier argumentList :: ArgumentList
+    | PrimNNAArrayAccessExprName
+                        lhs.scalaExpression = @typeName.scalaFieldDeclInitialization ++ @expression.scalaExpression  -- ToDo
+                        expression.scalaStatement = "" -- ToDo
+                        -- typeName :: TypeName expression :: Expression  {-- Antes ExpressionName -}
+    | PostfixExpressionExpressionName
+                        lhs.scalaExpression = @typeName.scalaFieldDeclInitialization
+
+sem VariableDeclaratorId
+    | VarDeclaratorId
+        lhs.scalaNTab= @lhs.scalaNTab   -- ++ "\t" -- ToDo Check
+        lhs.scalaVariableDeclaratorId = @identifier
+    | VarDeclaratorIdVDZ
+        lhs.scalaNTab = @lhs.scalaNTab -- ++ "\t" -- ToDo Check
+        lhs.scalaVariableDeclaratorId = @identifier ++ @variableDeclaratorIdZ.scalaVariableDeclaratorId
+
+sem VariableDeclaratorIdZ
+    | VarDeclaratorIdCorchete
+                lhs.scalaVariableDeclaratorId = "[]"
+    | VarDeclaratorIdZ
+                lhs.scalaVariableDeclaratorId = "[]" ++ @variableDeclaratorIdZ.scalaVariableDeclaratorId
+
+sem ResultType
+    | ResultTypeType
+            lhs.scalaResultType= @type_.scalaResultType
+    | ResultTypeVoid
+            lhs.scalaResultType = "Unit"
+
+sem FormalParameterList
+    | FormalParameterListFormal
+        variableDeclaratorId.scalaNTab = ""
+
+        lhs.scalaMethodFormalParameters = commaTypeParameters (@variableModifiers.scalaMethodFormalParameters ++
+                                          @variableDeclaratorId.scalaVariableDeclaratorId ++
+                                          ": " ++ @type_.scalaResultType)
+                                          @formalParameterList.scalaMethodFormalParameters
+    | FormalParameterListLast
+        variableDeclaratorId.scalaNTab = ""
+
+        lhs.scalaMethodFormalParameters = @variableModifiers.scalaMethodFormalParameters ++
+                                          @variableDeclaratorId.scalaVariableDeclaratorId ++
+                                          ": " ++ @type_.scalaResultType ++ "*"  -- ... case ( 3 points) -- met3(int a, int ...b) es para parametros infinitos
+    | FormalParameterListNil
+            lhs.scalaMethodFormalParameters = ""
+
+{-sem ForStatement
+    | ForStatementEnhancedForStatementNoVarModif type_.scalaFieldDeclaration = []
+    | ForStatementEnhancedForStatement type_.scalaFieldDeclaration = []-}
+
+sem ForInit
+    | ForInitLocalVar
+        variableDeclarators.scalaNTab = @lhs.scalaNTab
+        lhs.scalaNTab = @lhs.scalaNTab
+
+        lhs.scalaForInit = {checkVariableDeclarators [""] False False @type_.scalaResultType @variableDeclarators.scalaVariableDeclarator @variableDeclarators.scalaNTab}
+        lhs.scalaSpecialCaseIsIncrementalPrimitive = @type_.scalaSpecialCaseIsIncrementalPrimitive
+        lhs.scalaSpecialCaseForInitValue = @variableDeclarators.scalaSpecialCaseForInitValue
+        lhs.scalaSpecialCaseForInitIdentifier = @variableDeclarators.scalaSpecialCaseForInitIdentifier
+    | NilForInit
+        lhs.scalaForInit = ""
+        lhs.scalaSpecialCaseIsIncrementalPrimitive = False
+        lhs.scalaSpecialCaseForInitValue = ""
+        lhs.scalaSpecialCaseForInitIdentifier = ""
+    | ForInitStaExp
+        statementExpressionList.scalaStatement = "" -- ToDo
+        lhs.scalaForInit = "" -- ToDo
+        lhs.scalaSpecialCaseIsIncrementalPrimitive = False
+        lhs.scalaSpecialCaseForInitValue = ""
+        lhs.scalaSpecialCaseForInitIdentifier = ""
+
+sem ForUpdate
+    | ForUpdate
+        lhs.scalaNTab = @lhs.scalaNTab
+        statemebtExpressionList.scalaStatement = ""
+        lhs.scalaForUpdate = @lhs.scalaNTab ++ "\t" ++ @statemebtExpressionList.scalaStatement
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @statemebtExpressionList.scalaSpecialCaseIsSimpleIncrementDecrement
+    | NilForUpdate
+        lhs.scalaForUpdate = ""
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+
+sem WildcardBounds
+    | WilcardBoundsExtendsReferenceType
+            lhs.scalaResultType = @type_.scalaResultType
+    | WilcardBoundsSuperReferenceType
+            lhs.scalaResultType = @type_.scalaResultType
+    | NilwildcardBounds
+            lhs.scalaResultType = ""
+
+sem InterfaceMemberDeclaration
+    | InterfaceMemberDeclarationConstant
+        modifiers.scalaModifierFieldDeclaration = [""]
+        variableDeclarators.scalaNTab = ""
+
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        lhs.scalaTypeDeclaration = ""
+        lhs.scalaBodyNormalInterface = ""
+        lhs.scalaExtendClassBodyNormalCD = ""
+
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
+    | InterfaceMemberDeclarationAbstract
+        modifiers.scalaModifierFieldDeclaration = [""]
+
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        lhs.scalaTypeDeclaration = ""
+        lhs.scalaBodyNormalInterface = ""
+        lhs.scalaExtendClassBodyNormalCD = ""
+        lhs.scalaHasForEach = False
+
+        lhs.scalaNTab = @lhs.scalaNTab
+    | InterfaceMemberDeclTypeDeclarationClassDeclarationNormalCD
+        modifiers.scalaModifierFieldDeclaration = [""]
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = @classBodyDeclarations.scalaHasForEach
+
+        lhs.scalaTypeDeclaration =
+            @lhs.scalaNTab ++
+            (normalClassDeclaration @modifiers.scalaNormalClassDeclaration @lhs.scalaNTab) ++
+            @identifier ++
+            @typeParameters.scalaTypeDeclaration ++
+            @super.scalaTypeDeclaration ++
+            @interfaces.scalaTypeDeclaration ++
+            " { \n" ++ @classBodyDeclarations.scalaTypeDeclaration ++ @lhs.scalaNTab ++ "}\n\n"
+
+        lhs.scalaBodyNormalInterface = ""
+        lhs.scalaExtendClassBodyNormalCD = ""
+
+    | InterfaceMemberDeclTypeDeclarationClassDeclarationEnumD
+        modifiers.scalaModifierFieldDeclaration = [""]
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        lhs.scalaTypeDeclaration = ""
+        lhs.scalaBodyNormalInterface = ""
+        lhs.scalaExtendClassBodyNormalCD = ""
+        lhs.scalaNTab = @lhs.scalaNTab
+        enumBody.scalaNTab = @lhs.scalaNTab ++ "\t"
+        lhs.scalaHasForEach = @enumBody.scalaHasForEach
+
+    | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD
+        modifiers.scalaModifierFieldDeclaration = [""]
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        listInterfaceMemberDeclaration.scalaNTab = @lhs.scalaNTab ++ "\t"
+
+        lhs.scalaBodyNormalInterface =
+            @lhs.scalaNTab ++
+            (normalInterfaceDeclaration @modifiers.scalaNormalInterfaceDeclaration @lhs.scalaNTab) ++
+            @identifier ++
+            @typeParameters.scalaTypeDeclaration ++ --ToDo
+            @extendsInterfaces.scalaExtendInterface ++
+            " {\n" ++ @listInterfaceMemberDeclaration.scalaBodyNormalInterface ++ @lhs.scalaNTab ++  "}\n\n"
+
+        lhs.scalaTypeDeclaration = ""
+        lhs.scalaExtendClassBodyNormalCD = ""
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = @listInterfaceMemberDeclaration.scalaHasForEach
+    | InterfaceMemberDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD
+        modifiers.scalaModifierFieldDeclaration = [""]
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        lhs.scalaTypeDeclaration = ""
+        lhs.scalaBodyNormalInterface = ""
+        lhs.scalaExtendClassBodyNormalCD = ""
+        listAnnotationTypeElementDeclaration.scalaNTab = @lhs.scalaNTab
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = @listAnnotationTypeElementDeclaration.scalaHasForEach
+    | InterfaceMemberDeclTypeDeclarationSemiColon
+        lhs.scalaTypeDeclaration = ""
+        lhs.scalaBodyNormalInterface = ""
+        lhs.scalaExtendClassBodyNormalCD = ""
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
+
+{-sem ConditionalOrExpression
+    | ConditionalOrExpressionIntanceOf
+            type_.scalaFieldDeclaration = []-}
+
+
+sem Catches
+    | Cons hd.scalaNTab = @lhs.scalaNTab
+           tl.scalaNTab = @hd.scalaNTab
+           lhs.scalaNTab = @tl.scalaNTab
+           lhs.scalaStatement = @hd.scalaStatement ++ @tl.scalaStatement -- ToDo
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
+    | Nil  lhs.scalaNTab = @lhs.scalaNTab
+           lhs.scalaStatement = ""
+           lhs.scalaHasForEach = False
+
+sem CatchClause
+    | CatchClause
+        variableDeclaratorId.scalaNTab = ""
+        blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaStatement = "" -- ToDo
+        lhs.scalaHasForEach = @blockStatements.scalaHasForEach
+
+sem BlockStatements
+    | Cons hd.scalaNTab = @lhs.scalaNTab
+           tl.scalaNTab = @hd.scalaNTab
+           lhs.scalaNTab = @tl.scalaNTab
+           lhs.scalaStatement = @hd.scalaStatement ++ @tl.scalaStatement -- ToDO
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
+           lhs.scalaSpecialCaseOneLine = @hd.scalaSpecialCaseOneLine + @tl.scalaSpecialCaseOneLine
+           lhs.scalaSpecialCaseForIsIf = @hd.scalaSpecialCaseForIsIf || @tl.scalaSpecialCaseForIsIf
+           lhs.scalaSpecialCaseIfOneLine = @hd.scalaSpecialCaseIfOneLine + @tl.scalaSpecialCaseIfOneLine
+           lhs.scalaSpecialCaseForIfCondition = @hd.scalaSpecialCaseForIfCondition ++ @tl.scalaSpecialCaseForIfCondition
+           lhs.scalaSpeciaCaseForIfBody = @hd.scalaSpeciaCaseForIfBody ++ @tl.scalaSpeciaCaseForIfBody
+    | Nil lhs.scalaNTab = @lhs.scalaNTab
+          lhs.scalaStatement = ""
+          lhs.scalaHasForEach = False
+          lhs.scalaSpecialCaseForIsIf = False
+          lhs.scalaSpecialCaseOneLine = 0
+          lhs.scalaSpecialCaseIfOneLine = 0
+          lhs.scalaSpecialCaseForIfCondition = ""
+          lhs.scalaSpeciaCaseForIfBody = ""
+
+sem BlockStatement
+    | BlockStatementLocalVariableDeclarationStatement
+        modifiers.scalaModifierFieldDeclaration = [""]
+        variableDeclarators.scalaNTab = @lhs.scalaNTab
+
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
+        lhs.scalaSpecialCaseForIsIf = False
+        lhs.scalaSpecialCaseOneLine = 1
+        lhs.scalaSpecialCaseIfOneLine = 1
+        lhs.scalaSpecialCaseForIfCondition = ""
+        lhs.scalaSpeciaCaseForIfBody = ""
+
+        lhs.scalaStatement = {checkVariableDeclarators @modifiers.scalaModifierFieldDeclaration @modifiers.scalaIsStaticFieldDeclaration @modifiers.scalaIsFinalFieldDeclaration @type_.scalaResultType @variableDeclarators.scalaVariableDeclarator @variableDeclarators.scalaNTab}
+    | BlockStatementClassDeclarationNormalClassDeclaration
+        modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t"
+        lhs.scalaNTab = @lhs.scalaNTab ++ "\t"
+        lhs.scalaHasForEach = False -- ToDo
+        lhs.scalaSpecialCaseForIsIf = False
+        lhs.scalaSpecialCaseOneLine = 2
+        lhs.scalaSpecialCaseIfOneLine = 2
+        lhs.scalaSpecialCaseForIfCondition = ""
+        lhs.scalaSpeciaCaseForIfBody = ""
+
+        lhs.scalaStatement =
+          @lhs.scalaNTab ++
+          (normalClassDeclaration @modifiers.scalaNormalClassDeclaration @lhs.scalaNTab) ++
+          @identifier ++
+          @typeParameters.scalaTypeDeclaration ++ -- ToDo
+          @super.scalaTypeDeclaration ++
+          @interfaces.scalaTypeDeclaration ++
+          " { \n" ++ @classBodyDeclarations.scalaTypeDeclaration ++ @lhs.scalaNTab ++
+          "\n}\n\n"
+
+    | BlockStatementClassDeclarationEnumDeclaration
+            modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
+
+            modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+            modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+            modifiers.scalaMethodDeclaration = "" -- ToDo
+            enumBody.scalaNTab = @lhs.scalaNTab ++ "\t"
+            lhs.scalaNTab = @lhs.scalaNTab
+            lhs.scalaHasForEach = False
+            lhs.scalaStatement = ""
+            lhs.scalaSpecialCaseForIsIf = False
+            lhs.scalaSpecialCaseOneLine = 2
+            lhs.scalaSpecialCaseIfOneLine = 2
+            lhs.scalaSpecialCaseForIfCondition = ""
+            lhs.scalaSpeciaCaseForIfBody = ""
+
+    | BlockStatementStatement
+            lhs.scalaNTab = @lhs.scalaNTab
+            statement.scalaStatement = @lhs.scalaStatement
+            lhs.scalaHasForEach = @statement.scalaHasForEach
+            lhs.scalaStatement = "\n" ++ @lhs.scalaNTab ++ @statement.scalaStatement
+            lhs.scalaSpecialCaseOneLine = @statement.scalaSpecialCaseOneLine
+            lhs.scalaSpecialCaseForIsIf = @statement.scalaSpecialCaseForIsIf
+            lhs.scalaSpecialCaseIfOneLine = @statement.scalaSpecialCaseIfOneLine
+            lhs.scalaSpecialCaseForIfCondition = @statement.scalaSpecialCaseForIfCondition
+            lhs.scalaSpeciaCaseForIfBody = @statement.scalaSpeciaCaseForIfBody
+
+sem Statement
+    | StatementLabeled
+                       statement.scalaNTab = @lhs.scalaNTab
+                       lhs.scalaNTab = @statement.scalaNTab
+                       statement.scalaStatement = @lhs.scalaStatement
+                       lhs.scalaStatement = @statement.scalaStatement -- ToDO no considerar label
+                       lhs.scalaIfElseStatement = False
+                       lhs.scalaHasForEach =  @statement.scalaHasForEach
+                       lhs.scalaSpecialCaseOneLine = 1
+                       lhs.scalaSpecialCaseForIsIf = False
+                       lhs.scalaSpecialCaseIfOneLine = 2
+                       lhs.scalaSpecialCaseForIfCondition = ""
+                       lhs.scalaSpeciaCaseForIfBody = ""
+
+    | StatementIf
+                    statement.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    statement.scalaStatement = @expression.scalaStatement
+                    lhs.scalaStatement = "if (" ++ @expression.scalaExpression ++ ") {" ++
+                                         @statement.scalaNTab ++ @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+                    lhs.scalaIfElseStatement = True
+                    lhs.scalaHasForEach =  @statement.scalaHasForEach
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = True
+                    lhs.scalaSpecialCaseIfOneLine = 1
+                    lhs.scalaSpecialCaseForIfCondition = "(" ++ @expression.scalaExpression ++ ")"
+                    lhs.scalaSpeciaCaseForIfBody = @statement.scalaStatement
+
+    | StatementIfElse
+                      -- *** tabs organizados para IfElse anidados ***
+                      lhs.scalaHasForEach =  @statement1.scalaHasForEach || @statement2.scalaHasForEach
+                      statement1.scalaNTab = @lhs.scalaNTab ++ "\t"
+                      statement2.scalaNTab = { if (@statement2.scalaIfElseStatement) then
+                                                @lhs.scalaNTab
+                                             else
+                                                @lhs.scalaNTab ++ "\t"
+                                             }
+                      lhs.scalaNTab = @lhs.scalaNTab
+
+                      expression.scalaStatement = @lhs.scalaStatement
+                      statement1.scalaStatement = @expression.scalaStatement
+                      statement2.scalaStatement = @statement1.scalaStatement
+                      lhs.scalaIfElseStatement = True
+                      lhs.scalaSpecialCaseOneLine = 2
+                      lhs.scalaSpecialCaseForIsIf = False
+                      lhs.scalaSpecialCaseIfOneLine = 2
+                      lhs.scalaSpecialCaseForIfCondition = ""
+                      lhs.scalaSpeciaCaseForIfBody = ""
+
+                      lhs.scalaStatement = { if (@statement2.scalaIfElseStatement) then
+                        "if (" ++ @expression.scalaExpression ++ ") {"
+                        ++ @statement1.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "} " ++
+                        "else "
+                        ++ @statement2.scalaStatement
+                      else
+                        "if (" ++ @expression.scalaExpression ++ ") {" ++
+                        @statement1.scalaNTab ++ @statement1.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "} " ++
+                        "else {" ++ @statement2.scalaNTab ++ @statement2.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+                      }
+    | StatementWhile
+                     statement.scalaNTab = @lhs.scalaNTab ++ "\t"
+                     lhs.scalaNTab = @lhs.scalaNTab
+                     expression.scalaStatement = @lhs.scalaStatement
+                     lhs.scalaIfElseStatement = False
+                     lhs.scalaHasForEach =  @statement.scalaHasForEach
+                     lhs.scalaStatement = "while ( " ++ @expression.scalaExpression  ++ " ) {" ++
+                                          @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+                     lhs.scalaSpecialCaseOneLine = 2
+                     lhs.scalaSpecialCaseForIsIf = False
+                     lhs.scalaSpecialCaseIfOneLine = 2
+                     lhs.scalaSpecialCaseForIfCondition = ""
+                     lhs.scalaSpeciaCaseForIfBody = ""
+
+    | StatementFor
+                    forStatement.scalaNTab = @lhs.scalaNTab -- ToDo
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    forStatement.scalaStatement = ""
+                    lhs.scalaStatement = @forStatement.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @forStatement.scalaHasForEach
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSBlock
+                    blockStatement.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaNTab = @blockStatement.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatement.scalaHasForEach
+                    lhs.scalaSpecialCaseOneLine = @blockStatement.scalaSpecialCaseOneLine
+                    lhs.scalaSpecialCaseIfOneLine = @blockStatement.scalaSpecialCaseIfOneLine
+                    lhs.scalaSpecialCaseForIsIf = @blockStatement.scalaSpecialCaseForIsIf
+                    lhs.scalaSpecialCaseForIfCondition = @blockStatement.scalaSpecialCaseForIfCondition
+                    lhs.scalaSpeciaCaseForIfBody = @blockStatement.scalaSpeciaCaseForIfBody
+
+                    blockStatement.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaStatement = {
+                        if (@blockStatement.scalaStatement == "") then
+                            ""
+                        else
+                            @lhs.scalaNTab ++  @blockStatement.scalaStatement
+                    }
+
+    | SWTSEmptyStatement
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = ""
+                    lhs.scalaSpecialCaseOneLine = 0
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseIfOneLine = 0
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSExpressionStatement
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expressionAssignment.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = @expressionAssignment.scalaExpression
+                    lhs.scalaSpecialCaseOneLine = 1
+                    lhs.scalaSpecialCaseIfOneLine = 1
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSAssertStatementCond
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    -- expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSAssertStatementCondEx
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    -- expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSSwitchStatement
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach = @switchBlock.scalaHasForEach
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+                    lhs.scalaStatement = "(" ++ @expression.scalaExpression ++ ") match {\n" ++ @switchBlock.scalaStatement ++ "\n"++ @lhs.scalaNTab ++ "}"
+
+    | SWTSDoStatement
+                    statement.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    statement.scalaStatement = @lhs.scalaStatement
+                    expression.scalaStatement = @statement.scalaStatement
+
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaStatement = "do {" ++
+                                         @statement.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}\n" ++
+                                         @lhs.scalaNTab ++ "while ( " ++ @expression.scalaExpression  ++ " )"
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSBreakStatement
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "//todo: break is not supported"++ "\n"
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSBreakStatementId
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "//todo: break "++ @identifier ++ "is not supported"++ "\n"
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSNilContinueStatement
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSContinueStatement
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- ToDo identifier
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSReturnStatement
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = @expression.scalaExpression
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSNilReturnStatement
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "()" -- ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTSynchronizedStatement
+                    blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @blockStatements.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    blockStatements.scalaStatement = @expression.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements.scalaHasForEach
+                    lhs.scalaStatement = "" -- ToDo  @expression.scalaStatement ++  @blockStatements.scalaStatement -- ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTTrhowStatement
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- @expression.scalaStatement ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTTryStatement
+                    blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    catches.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaNTab = @blockStatements.scalaNTab
+                    blockStatements.scalaStatement = @lhs.scalaStatement -- ToDo
+                    catches.scalaStatement = @blockStatements.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements.scalaHasForEach || @catches.scalaHasForEach
+                    lhs.scalaStatement = "" -- @blockStatements.scalaStatement ++ @catches.scalaStatement
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+    | SWTTryStatementFinally
+                    blockStatements1.scalaNTab = @lhs.scalaNTab
+                    catches.scalaNTab = @blockStatements1.scalaNTab
+                    blockStatements2.scalaNTab = @catches.scalaNTab
+                    lhs.scalaNTab = @blockStatements2.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements1.scalaHasForEach || @catches.scalaHasForEach || @blockStatements2.scalaHasForEach
+                    lhs.scalaStatement = "" -- ToDo
+                    lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaSpecialCaseIfOneLine = 2
+                    lhs.scalaSpecialCaseForIsIf = False
+                    lhs.scalaSpecialCaseForIfCondition = ""
+                    lhs.scalaSpeciaCaseForIfBody = ""
+
+sem ExpressionAssignment
+    | ExpressionAssignment1
+            lhs.scalaExpression = @unaryExpression.scalaExpression -- ToDo
+    | ExpressionAssignment2
+            lhs.scalaExpression = @unaryExpression.scalaExpression ++
+                                  @expression.scalaExpression
+    | ExpressionAssignment3
+            lhs.scalaExpression = @unaryExpression.scalaExpression ++
+                                  @assignmentOperator.scalaExpression ++
+                                  @expression.scalaExpression
+
+sem StatementNested
+    | StatementLabeledNested
+                       statementNested.scalaNTab = @lhs.scalaNTab
+                       lhs.scalaNTab = @statementNested.scalaNTab
+                       statementNested.scalaStatement = @lhs.scalaStatement
+                       lhs.scalaStatement = @statementNested.scalaStatement -- ToDO no considerar label
+                       lhs.scalaIfElseStatement = False
+                       lhs.scalaHasForEach =  @statementNested.scalaHasForEach
+                       -- lhs.scalaSpecialCaseOneLine = 1
+    | StatementIfNested
+                    statementNested.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    statementNested.scalaStatement = @expression.scalaStatement
+                    lhs.scalaStatement = "if (" ++ @expression.scalaExpression ++ ") {\n" ++
+                                         @statementNested.scalaNTab ++ @statementNested.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+                    lhs.scalaIfElseStatement = True
+                    lhs.scalaHasForEach =  @statementNested.scalaHasForEach
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+    | StatementIfElseNested
+                      -- *** tabs organizados para IfElse anidados ***
+                      lhs.scalaHasForEach =  @statementNested1.scalaHasForEach || @statementNested2.scalaHasForEach
+                      statementNested1.scalaNTab = @lhs.scalaNTab ++ "\t"
+                      statementNested2.scalaNTab = { if (@statementNested2.scalaIfElseStatement) then
+                                                @lhs.scalaNTab
+                                             else
+                                                @lhs.scalaNTab ++ "\t"
+                                             }
+                      lhs.scalaNTab = @lhs.scalaNTab
+
+                      expression.scalaStatement = @lhs.scalaStatement
+                      statementNested1.scalaStatement = @expression.scalaStatement
+                      statementNested2.scalaStatement = @statementNested1.scalaStatement
+                      lhs.scalaIfElseStatement = True
+                      --lhs.scalaSpecialCaseOneLine = 2
+
+                      lhs.scalaStatement = { if (@statementNested2.scalaIfElseStatement) then
+                        "if (" ++ @expression.scalaExpression ++ ") {"
+                        ++ @statementNested1.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "} " ++
+                        "else "
+                        ++ @statementNested2.scalaStatement
+                      else
+                        "if (" ++ @expression.scalaExpression ++ ") {" ++
+                        @statementNested1.scalaNTab ++ @statementNested1.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "} " ++
+                        "else {" ++ @statementNested2.scalaNTab ++ @statementNested2.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+                      }
+    | StatementWhileNested
+                     statementNested.scalaNTab = @lhs.scalaNTab ++ "\t"
+                     lhs.scalaNTab = @lhs.scalaNTab
+                     expression.scalaStatement = @lhs.scalaStatement
+                     lhs.scalaIfElseStatement = False
+                     lhs.scalaHasForEach =  @statementNested.scalaHasForEach
+                     --lhs.scalaSpecialCaseOneLine = 2
+                     lhs.scalaStatement = "while ( " ++ @expression.scalaExpression  ++ " ) {" ++
+                                          @statementNested.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}"
+
+    | StatementForNested
+                    forStatement.scalaNTab = @lhs.scalaNTab -- ToDo
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    forStatement.scalaStatement = ""
+                    lhs.scalaStatement = @forStatement.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    -- lhs.scalaSpecialCaseOneLine = 2
+                    lhs.scalaHasForEach =  @forStatement.scalaHasForEach
+
+    | SWTSBlockNested
+                    blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @blockStatements.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements.scalaHasForEach
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+                    blockStatements.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaStatement = {
+                            if (@blockStatements.scalaStatement == "") then
+                                ""
+                            else
+                                @lhs.scalaNTab ++  @blockStatements.scalaStatement
+                    }
+
+    | SWTSEmptyStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = ""
+                    --lhs.scalaSpecialCaseOneLine = 0
+
+    | SWTSExpressionStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = @expression.scalaExpression
+                    --lhs.scalaSpecialCaseOneLine = 1
+
+    | SWTSAssertStatementCondNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    -- expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
+                    -- lhs.scalaSpecialCaseOneLine = 1
+
+    | SWTSAssertStatementCondExNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    -- expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    lhs.scalaStatement = "" -- @expression.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    --lhs.scalaSpecialCaseOneLine = 2
+                    -- conditionalExpression :: ConditionalExpression
+
+    | SWTSSwitchStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @switchBlock.scalaHasForEach
+                    lhs.scalaStatement = "(" ++ @expression.scalaExpression ++ ") match {\n" ++ @switchBlock.scalaStatement ++ "\n"++ @lhs.scalaNTab ++ "}"
+
+    | SWTSDoStatementNested
+                    statementNested.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @lhs.scalaNTab
+
+                    statementNested.scalaStatement = @lhs.scalaStatement
+                    expression.scalaStatement = @statementNested.scalaStatement
+                    -- lhs.scalaSpecialCaseOneLine = 2
+
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "do {" ++
+                                         @statementNested.scalaStatement ++ "\n" ++ @lhs.scalaNTab ++ "}\n" ++
+                                         @lhs.scalaNTab ++ "while ( " ++ @expression.scalaExpression  ++ " )"
+
+    | SWTSBreakStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "//todo: break is not supported"++ "\n"
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+    | SWTSBreakStatementIdNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "//todo: break " ++ @identifier ++ "is not supported"++ "\n"
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+    | SWTSNilContinueStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- ToDo
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+    | SWTSContinueStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- ToDo identifier
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+    | SWTSReturnStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = @expression.scalaExpression
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+    | SWTSNilReturnStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "()" -- ToDo
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+    | SWTSynchronizedStatementNested
+                    blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @blockStatements.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement -- ToDo
+                    blockStatements.scalaStatement = @expression.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements.scalaHasForEach
+                    lhs.scalaStatement = "" -- ToDo  @expression.scalaStatement ++  @blockStatements.scalaStatement -- ToDo
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+    | SWTTrhowStatementNested
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    expression.scalaStatement = @lhs.scalaStatement
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  False
+                    lhs.scalaStatement = "" -- @expression.scalaStatement ToDo
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+    | SWTTryStatementNested
+                    blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    catches.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaNTab = @blockStatements.scalaNTab
+                    blockStatements.scalaStatement = @lhs.scalaStatement -- ToDo
+                    catches.scalaStatement = @blockStatements.scalaStatement -- ToDo
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements.scalaHasForEach || @catches.scalaHasForEach
+                    lhs.scalaStatement = "" -- @blockStatements.scalaStatement ++ @catches.scalaStatement
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+    | SWTTryStatementFinallyNested
+                    blockStatements1.scalaNTab = @lhs.scalaNTab
+                    catches.scalaNTab = @blockStatements1.scalaNTab
+                    blockStatements2.scalaNTab = @catches.scalaNTab
+                    lhs.scalaNTab = @blockStatements2.scalaNTab
+                    lhs.scalaIfElseStatement = False
+                    lhs.scalaHasForEach =  @blockStatements1.scalaHasForEach || @catches.scalaHasForEach || @blockStatements2.scalaHasForEach
+                    lhs.scalaStatement = "" -- ToDo
+                    --lhs.scalaSpecialCaseOneLine = 2
+
+sem SwitchBlock
+    | SwitchBlockAll
+                    switchBlockStatementGrooups.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaHasForEach = @switchBlockStatementGrooups.scalaHasForEach
+                    lhs.scalaStatement = @switchBlockStatementGrooups.scalaStatement ++ @switchLabels.scalaStatement
+    | SwitchBlockLabels
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaHasForEach = False
+                    lhs.scalaStatement = @switchLabels.scalaStatement
+    | SwitchBlockGroups
+                    switchBlockStatementGroups.scalaNTab = @lhs.scalaNTab ++ "\t"
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaHasForEach = @switchBlockStatementGroups.scalaHasForEach
+                    lhs.scalaStatement = @switchBlockStatementGroups.scalaStatement
+    | NilSwitchBlock
+                    lhs.scalaNTab = @lhs.scalaNTab
+                    lhs.scalaHasForEach = False
+                    lhs.scalaStatement = ""
+
+sem SwitchBlockStatementGroups
+    | Cons hd.scalaNTab = @lhs.scalaNTab
+           tl.scalaNTab = @hd.scalaNTab
+           lhs.scalaNTab = @tl.scalaNTab
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
+           lhs.scalaStatement = @hd.scalaStatement ++ @tl.scalaStatement
+    | Nil lhs.scalaNTab = @lhs.scalaNTab
+          lhs.scalaHasForEach = False
+          lhs.scalaStatement = ""
+
+sem SwitchBlockStatementGroup
+    | SwitchBlockStatementGroup blockStatements.scalaNTab = @lhs.scalaNTab -- ++ "\t"
+                                blockStatements.scalaStatement = "" -- ToDo
+                                lhs.scalaStatement = @switchLabels.scalaStatement ++ @blockStatements.scalaStatement
+                                lhs.scalaHasForEach = @blockStatements.scalaHasForEach
+
+sem ArrayInitializer
+    | ArrayInitializer
+        variableInitializers.scalaNTab = "" -- ToDo
+        lhs.scalaArrayInitializer = "Array(" ++ @variableInitializers.scalaArrayInitializer ++ ")"
+    | NilArrayInitializers
+        lhs.scalaArrayInitializer = "Array()"
+
+sem ListAnnotationTypeElementDeclaration
+    | Cons hd.scalaNTab = @lhs.scalaNTab
+           tl.scalaNTab = @hd.scalaNTab
+           lhs.scalaNTab = @tl.scalaNTab
+           lhs.scalaHasForEach = @hd.scalaHasForEach || @tl.scalaHasForEach
+    | Nil lhs.scalaNTab = @lhs.scalaNTab
+          lhs.scalaHasForEach = False
+
+sem AnnotationTypeElementDeclaration
+    | AnnTypeElemDeclAbstract
+        modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
+        --type_.scalaFieldDeclaration = [] -- ToDo
+
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
+
+    | AnnTypeElemDeclConstant
+        modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
+        --type_.scalaFieldDeclaration = [] -- ToDo
+        variableDeclarators.scalaNTab = "" -- ToDo check if is neccesary for parent
+
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
+    | AnnTypeElemDeclTypeDeclarationClassDeclarationNormalCD
+        modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        classBodyDeclarations.scalaNTab = @lhs.scalaNTab ++ "\t" -- ToDo, check
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
+
+    | AnnTypeElemDeclTypeDeclarationClassDeclarationEnumD
+        modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
+
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+        enumBody.scalaNTab = @lhs.scalaNTab --ToDo
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = @enumBody.scalaHasForEach
+    | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationNormalInterfaceD
+        modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
+
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+
+        listInterfaceMemberDeclaration.scalaNTab = @lhs.scalaNTab -- ToDo
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = @listInterfaceMemberDeclaration.scalaHasForEach
+    | AnnTypeElemDeclTypeDeclarationInterfaceDeclarationAnnotationTypeD
+        modifiers.scalaModifierFieldDeclaration = [""] -- ToDo
+
+        modifiers.scalaNormalClassDeclaration = ("", False) -- ToDo
+        modifiers.scalaNormalInterfaceDeclaration = ("", False) -- ToDo
+        modifiers.scalaMethodDeclaration = "" -- ToDo
+
+        listAnnotationsTypeElementDeclaration.scalaNTab = @lhs.scalaNTab
+        lhs.scalaNTab = @lhs.scalaNTab
+        lhs.scalaHasForEach = False
+    | AnnTypeElemDeclTypeDeclarationSemiColon
+        lhs.scalaHasForEach = False
+
+
+sem EnumBody
+    | EnumBody enumConstants.scalaNTab = @lhs.scalaNTab
+               enumBodyDeclarations.scalaNTab = @enumConstants.scalaNTab
+               lhs.scalaNTab = @enumBodyDeclarations.scalaNTab
+               lhs.scalaHasForEach = @enumConstants.scalaHasForEach || @enumBodyDeclarations.scalaHasForEach
+
+sem EnumBodyDeclarations
+    | EnumBodyDeclarations classBodyDeclarations.scalaNTab = @lhs.scalaNTab -- ToDo check
+                           lhs.scalaNTab = @lhs.scalaNTab
+                           lhs.scalaHasForEach = @classBodyDeclarations.scalaHasForEach
+    | NilEnumBodyDeclarations
+                           lhs.scalaHasForEach = False
+
+sem EnumConstants
+    | EnumConstants enumConstant.scalaNTab = @lhs.scalaNTab
+                    enumConstants.scalaNTab = @enumConstant.scalaNTab
+                    lhs.scalaNTab = @enumConstants.scalaNTab
+                    lhs.scalaHasForEach = @enumConstant.scalaHasForEach || @enumConstants.scalaHasForEach
+    | NilEnumConstants lhs.scalaNTab = @lhs.scalaNTab
+                       lhs.scalaHasForEach = False
+
+sem EnumConstant
+    | EnumConstantAll classBodyDeclarations.scalaNTab = @lhs.scalaNTab
+                      lhs.scalaNTab = @lhs.scalaNTab
+                      lhs.scalaHasForEach = @classBodyDeclarations.scalaHasForEach
+
+    | EnumConstantClasB classBodyDeclaratiosn.scalaNTab = @lhs.scalaNTab
+                         lhs.scalaNTab = @lhs.scalaNTab
+                         lhs.scalaHasForEach = @classBodyDeclaratiosn.scalaHasForEach
+    | EnumConstantArgL  lhs.scalaHasForEach = False -- ToDo
+    | EnumConstantNothing lhs.scalaHasForEach = False -- ToDo
+
+sem MethodBody
+    | MethodBodyBlock
+                        blokStatements.scalaNTab = @lhs.scalaNTab
+                        blokStatements.scalaStatement = ""
+                        lhs.scalaMethodBody = @blokStatements.scalaStatement
+                        lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaHasForEach = @blokStatements.scalaHasForEach
+    | MethodBodySemiColon
+                        lhs.scalaNTab = @lhs.scalaNTab
+                        lhs.scalaMethodBody = ""
+                        lhs.scalaHasForEach = False
+
+sem ConstructorBody
+    | ConstructorBody
+                      blockStatements.scalaNTab = @lhs.scalaNTab ++ "\t"
+                      blockStatements.scalaStatement = ""
+                      lhs.scalaMethodBody = @blockStatements.scalaStatement
+                      lhs.scalaNTab = @blockStatements.scalaNTab
+                      lhs.scalaHasForEach = @blockStatements.scalaHasForEach
+
+
+{
+-- Functions For special cases
+isSpecialCaseRange :: Bool -> Bool -> Int -> Bool
+isSpecialCaseRange isInitPrimitive isSimpleIncrementDecrement lines = isInitPrimitive && isSimpleIncrementDecrement && (lines <= 1)
+
+isSpecialCaseSimpleCollection :: Int -> Bool
+isSpecialCaseSimpleCollection lines = lines <= 1
+
+isSpecialCaseFilterCollection :: Bool -> Int -> Int -> Bool
+isSpecialCaseFilterCollection isIf linesIf linesFor = isIf && (linesIf == 1) && (linesFor <= 2)
+
+}
+
+sem ForStatement
+    | ForStatementBasicForStatementAll
+                statement.scalaNTab = @lhs.scalaNTab ++ "\t"
+                lhs.scalaNTab = @statement.scalaNTab
+                expression.scalaStatement = ""
+                statement.scalaStatement = ""
+                lhs.scalaHasForEach = False
+
+                lhs.scalaStatement = { if (isSpecialCaseRange @forInit.scalaSpecialCaseIsIncrementalPrimitive @forUpdate.scalaSpecialCaseIsSimpleIncrementDecrement  @statement.scalaSpecialCaseOneLine) then
+                                            "(" ++ @forInit.scalaSpecialCaseForInitValue ++ " to " ++ @expression.scalaSpecialCaseForEndValue  ++ ").foreach(" ++ @forInit.scalaSpecialCaseForInitIdentifier ++ " => \n"++
+                                            @lhs.scalaNTab ++ @statement.scalaStatement ++")"
+                                       else
+                                            @forInit.scalaForInit ++ "\n" ++
+                                            @lhs.scalaNTab ++ "while(" ++ @expression.scalaExpression ++") {" ++
+                                                @statement.scalaStatement ++ "\n" ++
+                                                @forUpdate.scalaForUpdate ++
+                                                "\n" ++
+                                                @lhs.scalaNTab ++ "}"
+                }
+
+    | ForStatementBasicForStatementNoExp
+                statement.scalaNTab = @lhs.scalaNTab ++ "\t"
+                lhs.scalaNTab = @statement.scalaNTab
+                statement.scalaStatement = ""
+                lhs.scalaHasForEach = False
+
+                lhs.scalaStatement = @forInit.scalaForInit ++ "\n" ++
+                                     @lhs.scalaNTab ++ "while(true) {" ++
+                                     @statement.scalaStatement ++ "\n" ++
+                                     @forUpdate.scalaForUpdate ++
+                                     "\n" ++
+                                     @lhs.scalaNTab ++ "}"
+
+    | ForStatementEnhancedForStatement
+                statement.scalaNTab = @lhs.scalaNTab ++ "\t"
+                lhs.scalaNTab = @statement.scalaNTab
+                expression.scalaStatement = ""
+                lhs.scalaHasForEach = True
+                lhs.scalaStatement = { if (isSpecialCaseFilterCollection @statement.scalaSpecialCaseForIsIf @statement.scalaSpecialCaseIfOneLine @statement.scalaSpecialCaseOneLine) then
+                            @expression.scalaExpression ++ ".filter(" ++ @identifier ++ " => " ++ @statement.scalaSpecialCaseForIfCondition ++ ")\n" ++
+                            @lhs.scalaNTab ++ ".foreach(" ++ @identifier ++ " => " ++
+                            @statement.scalaSpeciaCaseForIfBody ++ ")"
+                        else if (@statement.scalaSpecialCaseOneLine == 1) then
+                            @expression.scalaExpression ++ ".foreach(" ++ @identifier ++ " => " ++
+                            @statement.scalaStatement ++ ")"
+                        else
+                            "for (" ++ -- no se considera variableModifiers
+                            @identifier ++ " <- " ++ @expression.scalaExpression ++ ") {" ++
+                            @statement.scalaStatement ++
+                            "\n" ++ @lhs.scalaNTab ++"}"
+                }
+
+    | ForStatementEnhancedForStatementNoVarModif
+                statement.scalaNTab = @lhs.scalaNTab ++ "\t"
+                lhs.scalaNTab = @statement.scalaNTab
+                expression.scalaStatement = ""
+                statement.scalaStatement = ""
+                lhs.scalaHasForEach = True
+
+                lhs.scalaStatement ={ if (isSpecialCaseFilterCollection @statement.scalaSpecialCaseForIsIf @statement.scalaSpecialCaseIfOneLine @statement.scalaSpecialCaseOneLine) then
+                            @expression.scalaExpression ++ ".filter(" ++ @identifier ++ " => " ++ @statement.scalaSpecialCaseForIfCondition ++ ")\n" ++
+                            @lhs.scalaNTab ++ ".foreach(" ++ @identifier ++ " => " ++
+                            @statement.scalaSpeciaCaseForIfBody ++ ")"
+                        else if (@statement.scalaSpecialCaseOneLine == 1) then
+                            @expression.scalaExpression ++ ".foreach(" ++ @identifier ++ " =>" ++
+                            @statement.scalaStatement ++ ")"
+                        else
+                            "for (" ++ @identifier ++ " <- " ++ @expression.scalaExpression ++ ") {" ++
+                             @statement.scalaStatement ++
+                             "\n" ++ @lhs.scalaNTab ++"}"
+                }
+
+sem MethodDeclarator
+    | MethodDeclaratorFormalPL
+                lhs.scalaMethodDeclaration = @identifier ++ "(" ++
+                                             @formalParameterList.scalaMethodFormalParameters ++ ")"
+    | MethodDeclaratorSingle
+                lhs.scalaMethodDeclaration = @identifier
+
+sem VariableModifiers
+    | VariableModifiers
+                lhs.scalaMethodFormalParameters = @variableModifier.scalaMethodFormalParameters ++ " " ++
+                                                  @variableModifiers.scalaMethodFormalParameters
+    | NilVariableModifiers
+                lhs.scalaMethodFormalParameters = ""
+
+sem VariableModifier
+    | VariableModifierFinal
+                lhs.scalaMethodFormalParameters = "final"
+    | VariableModifierAnnotation
+                lhs.scalaMethodFormalParameters = "" -- ToDo
+                -- annotation :: Annotation
+
+sem ArrayAccess
+    | ArrayAccessExpName  -- identifiers :: Identifiers
+                        expression.scalaStatement = ""
+    | ArrayAccessPrimNNA -- primaryNoNewArray :: PrimaryNoNewArray
+                        expression.scalaStatement = ""
+
+sem ConditionalExpression
+    -- | ConditionalExpr conditionalOrExpression
+    | ConditionalExprComb
+       --         conditionalOrExpression
+                expression.scalaStatement = "" -- ToDO
+       --         conditionalExpression
+
+sem DimExprs
+    | DimExprs expression.scalaStatement = "" -- ToDo
+    --           dimExprs :: DimExprs
+    -- | NilDimExprsDims dims :: Dims
+    -- | NilDimExprs
+
+
+
+sem StatementExpressionList
+    | StatementExpressionList
+                            --expression.scalaStatement = "" -- ToDo
+                            lhs.scalaStatement = @expression.scalaExpression ++ @statementExpressionList.scalaStatement
+    --                          statementExpressionList :: StatementExpressionList
+                            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @expression.scalaSpecialCaseIsSimpleIncrementDecrement || @statementExpressionList.scalaSpecialCaseIsSimpleIncrementDecrement
+    | NilStatementExpressionList
+                            lhs.scalaStatement = @lhs.scalaStatement
+                            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+
+
+sem SwitchLabels
+    | Cons
+        lhs.scalaStatement = @hd.scalaStatement ++ @tl.scalaStatement
+    | Nil
+        lhs.scalaStatement = ""
+
+sem SwitchLabel
+    | SwitchLabelConstant
+            lhs.scalaNTab = @lhs.scalaNTab ++ "\t"
+            lhs.scalaStatement = @lhs.scalaNTab ++ "case " ++ @expression.scalaExpression ++ " =>"
+   | SwitchLabelEnum
+            lhs.scalaStatement = @lhs.scalaNTab ++ "case" ++ @identifiers ++ " =>"
+   | SwitchLabelDefault
+            lhs.scalaStatement = @lhs.scalaNTab ++ "case _ =>"
+
+sem ZPrimaryOrExpression
+    | ZPOEExpressionDeArrayAccess
+                    expression.scalaStatement = "" -- ToDo
+--    | ZPOEZPrimary zPrimary :: ZPrimary
+
+sem ZPostfixExpression
+    | Cons
+        lhs.scalaExpression = @hd.scalaExpression ++ @tl.scalaExpression
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = @hd.scalaSpecialCaseIsSimpleIncrementDecrement || @tl.scalaSpecialCaseIsSimpleIncrementDecrement
+    | Nil
+        lhs.scalaExpression = ""
+        lhs.scalaSpecialCaseIsSimpleIncrementDecrement = False
+
+sem ZPostfixExp
+    | PostIncrement
+            lhs.scalaExpression = " += 1"
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = True
+    | PostDecrement
+            lhs.scalaExpression = " -= 1"
+            lhs.scalaSpecialCaseIsSimpleIncrementDecrement = True
+
+sem AssignmentOperator
+    | AssignmentOp {- = -}
+            lhs.scalaExpression = "="
+    | AssignmentPlus {- *= -}
+            lhs.scalaExpression = "*="
+    | AssignmentDiv {- /= -}
+            lhs.scalaExpression = "/="
+    | AssignmentMod {- %= -}
+            lhs.scalaExpression = "%="
+    | AssignmentAdd {- += -}
+            lhs.scalaExpression = "+="
+    | AssignmentMin {- -= -}
+            lhs.scalaExpression = "-="
+    | AssignmentMinShifShift  {- <<= -}
+            lhs.scalaExpression = "<<="
+    | AssignmentMayShitfShift {- >>= -}
+            lhs.scalaExpression = ">>="
+    | AssignmentMayShiftShiftShift {- >>>= -}
+            lhs.scalaExpression = ">>>="
+    | AssignmentAndSingle {- &= -}
+            lhs.scalaExpression = "&="
+    | AssignmentCincun {- ^= -}
+            lhs.scalaExpression = "^="
+    | AssignmentOrSingle {- |= -}
+            lhs.scalaExpression = "|="
+
+sem PrimNNAClassOrInterfaceType
+--    | PrimNNAClassOrInterfaceType  identifier :: Identifier ToDO
+--                                   typeArguments :: TypeArguments
+--                                   primNNAClassOrInterfaceType :: PrimNNAClassOrInterfaceType
+--    | NilPrimNNAClassOrInterfaceType
+    | TypeZPrimNNAClassOrInterfaceType typeZ.scalaArrayType = ""
+
+
+-- ------------------------------------------------
+-- Has For each
+-- ------------------------------------------------
+{
+hasForEach :: Bool -> String -> String
+hasForEach True importCode = if T.isInfixOf (T.pack("JavaConversions")) (T.pack(importCode))
+                                then importCode
+                                else "import scala.collection.JavaConversions._\n" ++ importCode
+
+hasForEach _ importCode = importCode
+}
+
+
+-- ------------------------------------------------
+-- J2S scala code
+-- ------------------------------------------------
+attr J2s
+     syn scalaCode :: String
+
+sem J2s
+    | J2s lhs.scalaCode = @packageDeclaration.scalaPackageDeclaration ++
+                          (hasForEach @typeDeclarations.scalaHasForEach @importDeclarations.scalaImportDeclaration) ++
+                          @typeDeclarations.scalaTypeDeclaration
+          typeDeclarations.scalaNTab = ""

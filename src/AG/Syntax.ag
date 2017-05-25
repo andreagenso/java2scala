@@ -1,5 +1,5 @@
 -- | Defines the data types
-module {AG.Sintax}
+module {AG.Syntax}
 {} -- Exports of this module, empty for none
 {
 -- Imports
@@ -287,7 +287,7 @@ data PrimitiveType
 
 deriving PrimitiveType : Show
 
--- 34 -
+-- 34 - ToDO OJO CHECK 34 and 35
 data ReferenceType
     | ReferenceTypeClassOrInterfaceType identifier :: Identifier
                                         typeArguments :: TypeArguments
@@ -312,9 +312,9 @@ deriving ZCOITTypeDeclSpecifier : Show
 
 data TypeArguments
     | TypeArgumentsC1 actualTypeArgumentList :: ActualTypeArgumentList
-    | TypeArgumentsC2 actualTypeArgumentList :: ActualTypeArgumentList
+    {-| TypeArgumentsC2 actualTypeArgumentList :: ActualTypeArgumentList
     | TypeArgumentsC3 actualTypeArgumentList :: ActualTypeArgumentList
-    | TypeArgumentsC0 actualTypeArgumentList :: ActualTypeArgumentList
+    | TypeArgumentsC0 actualTypeArgumentList :: ActualTypeArgumentList-}
     | NilTypeArguments
 
 deriving TypeArguments : Show
@@ -343,8 +343,13 @@ data Expression
     | ExpressionAssignment          conditionalOrExpression :: ConditionalOrExpression
                                     assignmentOperator :: AssignmentOperator
                                     expression :: Expression
-
 deriving Expression : Show
+
+data ExpressionAssignment | ExpressionAssignment1 unaryExpression :: UnaryExpression
+                          | ExpressionAssignment2 unaryExpression :: UnaryExpression expression :: Expression conditionalExpression :: ConditionalExpression
+                          | ExpressionAssignment3 unaryExpression :: UnaryExpression assignmentOperator :: AssignmentOperator expression :: Expression
+
+deriving ExpressionAssignment : Show
 
 data AssignmentOperator
     | AssignmentOp {- = -}
@@ -427,7 +432,9 @@ type ElementValues = [ElementValue]
 
 type PackageName = [Identifier]
 
-type Identifier  = [Char]
+{
+type Identifier  = String
+}
 
 -- *****************************************
 -- FIN Los siguientes dataTypes representan la estructutra de Conditional expresion
@@ -706,24 +713,24 @@ deriving BlockStatement : Show
 
 data Statement
     | StatementLabeled identifier :: Identifier
-                       statement :: Statement  {- LabeledStatement -}
+                       statement :: StatementNested  {- LabeledStatement -}
     | StatementIf expression :: Expression
-                  statement :: Statement {- IfThenStatement -}
+                  statement :: StatementNested {- IfThenStatement -}
     | StatementIfElse expression :: Expression
-                      statement1 :: Statement
-                      statement2 :: Statement {- IfThenElseStatement -}
+                      statement1 :: StatementNested
+                      statement2 :: StatementNested {- IfThenElseStatement -}
     | StatementWhile expression :: Expression
-                     statement :: Statement   {- WhileStatement -}
+                     statement :: StatementNested   {- WhileStatement -}
     | StatementFor  forStatement :: ForStatement
     | SWTSBlock blockStatement :: BlockStatements
     | SWTSEmptyStatement
-    | SWTSExpressionStatement expression :: Expression
+    | SWTSExpressionStatement expressionAssignment :: ExpressionAssignment -- expression :: Expression
     | SWTSAssertStatementCond  expression :: Expression
     | SWTSAssertStatementCondEx  expression :: Expression
                                  conditionalExpression :: ConditionalExpression
     | SWTSSwitchStatement expression :: Expression
                           switchBlock :: SwitchBlock
-    | SWTSDoStatement statement :: Statement
+    | SWTSDoStatement statement :: StatementNested
                       expression :: Expression
     | SWTSBreakStatement
     | SWTSBreakStatementId identifier :: Identifier
@@ -740,8 +747,33 @@ data Statement
                              catches :: Catches
                              blockStatements2 :: BlockStatements {-- el ultimo Block es FinallyBlock -}
 
-
 deriving Statement : Show
+
+data StatementNested
+ | StatementLabeledNested identifier :: Identifier statementNested :: StatementNested  -- LabeledStatement
+ | StatementIfNested expression :: Expression statementNested :: StatementNested -- IfThenStatement
+ | StatementIfElseNested expression :: Expression statementNested1 :: StatementNested statementNested2 :: StatementNested -- IfThenElseStatement
+ | StatementWhileNested expression :: Expression statementNested :: StatementNested   -- WhileStatement
+ | StatementForNested forStatement :: ForStatement
+ | SWTSBlockNested blockStatements :: BlockStatements
+ | SWTSEmptyStatementNested
+ | SWTSExpressionStatementNested expression :: Expression
+ | SWTSAssertStatementCondNested  expression :: Expression
+ | SWTSAssertStatementCondExNested  expression :: Expression conditionalExpression :: ConditionalExpression
+ | SWTSSwitchStatementNested expression :: Expression switchBlock :: SwitchBlock
+ | SWTSDoStatementNested statementNested :: StatementNested expression :: Expression
+ | SWTSBreakStatementNested
+ | SWTSBreakStatementIdNested identifier :: Identifier
+ | SWTSNilContinueStatementNested
+ | SWTSContinueStatementNested identifier :: Identifier
+ | SWTSReturnStatementNested expression :: Expression
+ | SWTSNilReturnStatementNested
+ | SWTSynchronizedStatementNested expression ::  Expression  blockStatements :: BlockStatements
+ | SWTTrhowStatementNested expression :: Expression
+ | SWTTryStatementNested blockStatements :: BlockStatements catches :: Catches
+ | SWTTryStatementFinallyNested  blockStatements1 :: BlockStatements catches :: Catches blockStatements2 :: BlockStatements -- el ultimo Block es FinallyBlock
+
+deriving StatementNested : Show
 
 data SwitchBlock
     | SwitchBlockAll switchBlockStatementGrooups :: SwitchBlockStatementGroups
@@ -915,11 +947,6 @@ data EnumBodyDeclarations
     | NilEnumBodyDeclarations
 
 deriving EnumBodyDeclarations : Show
-
-data StaticInitializer
-    | StaticInitializer blockStatements :: BlockStatements
-
-deriving StaticInitializer : Show
 
 data ConstructorBody
     | ConstructorBody explicitConstructorInvocation :: ExplicitConstructorInvocation

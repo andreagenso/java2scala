@@ -2,9 +2,7 @@ module J2s.Scanner.Token where
 
 import J2s.Scanner.Position
 import UU.Scanner.Position
--- import Text.ParserCombinators.UU.Core
--- import Text.ParserCombinators.UU.BasicInstances
-            
+
 {- Data types -}
 data Token = Token J2sSc SimCode Pos
 
@@ -24,20 +22,9 @@ data J2sSc = Identifier
            | DecimalFloatingPointLiteral
            | HexadecimalFloatingPointLiteral
            | NullLiteral
-           | TokMayor
            | Error
            deriving (Eq,Ord)
 
-{-         
-data IntLiteral = DecimalIntegerLiteral
-              | HexIntegerLiteral
-              | OctalIntegerLiteral
-              deriving (Eq,Ord)
-
-data FloatLiteral = DecimalFloatingPointLiteral
-               | HexadecimalFloatingPointLiteral
-              deriving (Eq,Ord)
- -}            
 {- Sinonimous Type -}
 type Tokens        = [Token]
 type KeyWord       = String

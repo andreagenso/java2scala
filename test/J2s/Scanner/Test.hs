@@ -17,7 +17,7 @@ import Debug.Trace ( trace )
 import System.Environment ( getArgs )
 import System.IO.Unsafe ( unsafeInterleaveIO )
 
-path = "/media/andrea/a43a31dd-6316-49c2-8627-897fc0adfbd6/andrea/"
+path = "/home/andrea/"
 
 testSingleScanner = scanner (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/src/share/classes/com/sun/demo/jvmti/hprof/Tracker.java")
 
@@ -43,7 +43,7 @@ testScannerWithError1 = scanner (path ++ "workspaceclipse_haskell/java2scala/tes
 testScannerWithError2  = scanner (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/com/sun/crypto/provider/Cipher/DES/PerformanceTest.java")
 testScannerWithError  = scanner (path ++ "workspaceclipse_haskell/java2scala/test/J2s/java/openjdk-6-src-b27/jdk/test/java/lang/StrictMath/Log1pTests.java")
 
--- todo check sintax
+-- todo check syntax
 tss0 = scanner (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/0compilationUnit.java")
 tss1 = scanner (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/1compilationUnitSimple.java")
 tss2 = scanner (path ++ "workspaceclipse_haskell/java2scala/test/J2s/Parser/2packageDeclarationMarkerAnnotation.java")
