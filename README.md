@@ -8,6 +8,7 @@ cabal build
 cabal install --enable-profiling --ghc-options="-DEXTERNAL_UUAGC -fprof-auto -rtsopts"
 
 ./test +RTS -p
+-- ObjectHandler.java
 
 -- UUAGC
 cabal clean

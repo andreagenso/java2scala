@@ -5,10 +5,7 @@ import J2s.Scanner.Token
 -- Reserved Simbols of language        
 keyWord :: [KeyWord]
 
-keyWord = ["delete","update","insertion","view",
-           "facadeGen","controllerGen","persistGen",
-           "facade","persist","project",
-           "abstract","continue","for","new","switch",
+keyWord = ["abstract","continue","for","new","switch",
            "assert","default","if","package","synchronized",
            "boolean","do","goto","private","this",
            "break","double","implements","protected","throw",

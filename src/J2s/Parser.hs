@@ -33,9 +33,15 @@ evps  = pElementValuePairs  <* pSpecialSimbol ")"
 ev =  pElementValue <* pSpecialSimbol ")"
 
 -- 6 OK
---pTypeName = AGS.sem_TypeName_TypeName <$> pIdentifier <*> pTypeName'
---pTypeName' = pSucceed AGS.sem_TypeName_NilTypeName
---                  <|> AGS.sem_TypeName_TypeName <$ pSpecialSimbol "." <*> pIdentifier <*> pTypeName'
+{-
+pTypeName = AGS.sem_TypeName_TypeName <$> pIdentifier <*> pTypeName'
+pTypeName' = pSucceed AGS.sem_TypeName_NilTypeName
+                  <|> AGS.sem_TypeName_TypeName <$ pSpecialSimbol "." <*> pIdentifier <*> pTypeName'
+-}
+pTypeNameImport = AGS.sem_TypeName_TypeName <$> pIdentifier <*> pTypeNameImport'
+pTypeNameImport' = pSucceed AGS.sem_TypeName_NilTypeName
+                  <|> AGS.sem_TypeName_TypeName <$ pSpecialSimbol "." <*> pIdentifier <*> pTypeNameImport'
+
 pTypeName = pFoldr1Sep(AGS.sem_TypeName_TypeName, AGS.sem_TypeName_NilTypeName) (pSpecialSimbol ".") pIdentifier
 
 -- 7
@@ -193,8 +199,11 @@ pParExprOrCastExpression = (\e f -> f e)  <$>  pExpression <* pSpecialSimbol ")"
 pParExprOrCastExpression' =  pSucceed (\e -> AGS.sem_PrimaryNNA_PrimNNAParExp e)
                                              <|> (\u e ->  AGS.sem_PrimaryNNA_UnNotPlusCastExpression e u)  <$>  pUnaryExpression -- AQUI CONTROLAR CONDICIONES DE CONTEXTO PARA CAST
 
+{-
 pPrimaryNNA' =   (\t i -> AGS.sem_PrimaryNNA_PrimNNATypeClassReferenceTypeTypeVariable i t)  <$>  pTypeZ   <* pSpecialSimbol "." <* pKeyWord "class"
                    <|>   (\a p i -> AGS.sem_PrimaryNNA_PrimNNATypeClassReferenceTypeClassIOT i a p ) <$>  pTypeArguments <*> pPrimNNAClassOrInterfaceType  -- .class esta a continuacion
+-}
+pPrimaryNNA' =   (\a p i -> AGS.sem_PrimaryNNA_PrimNNATypeClassReferenceTypeClassIOT i a p ) <$>  pTypeArguments <*> pPrimNNAClassOrInterfaceType  -- .class esta a continuacion
 
 -- pPrimaryNNA'' = (\f -> f)                                   <$ pKeyWord "super" <* pSpecialSimbol "." <*> pPrimaryNNA'''
 --                   <|> (\i -> sem_PrimaryNNA_PrimNNAClassName i )  <$ pKeyWord "this"
@@ -217,7 +226,7 @@ pPrimaryNNAv' = (\nwt i al tn -> AGS.sem_PrimaryNNA_PrimNNAMethodInvocationTypeN
 --               <|> (\ zpe ids -> AGS.sem_PrimaryNNA_PostExpNamePostfixZ ids zpe) <$> pZPostfixExpression -- AQUI APLICAR COND CONTEXTO
 
 pPrimNNAClassOrInterfaceType  = (\f -> f) <$ pSpecialSimbol "." <*> pPrimNNAClassOrInterfaceType'
-                                <|> AGS.sem_PrimNNAClassOrInterfaceType_TypeZPrimNNAClassOrInterfaceType        <$> pTypeZ <* pSpecialSimbol "." <* pKeyWord "class"
+                                <|> AGS.sem_PrimNNAClassOrInterfaceType_TypeZPrimNNAClassOrInterfaceType        <$> pTypeZ1 <* pSpecialSimbol "." <* pKeyWord "class"
 pPrimNNAClassOrInterfaceType'  = (\i ta co ->  AGS.sem_PrimNNAClassOrInterfaceType_PrimNNAClassOrInterfaceType i ta co ) <$> pIdentifier <*> pTypeArguments <*> pPrimNNAClassOrInterfaceType
                                         <|> (AGS.sem_PrimNNAClassOrInterfaceType_NilPrimNNAClassOrInterfaceType)           <$ pKeyWord "class"
 
@@ -238,6 +247,7 @@ pPrimitiveOrRefereceType =  AGS.sem_PrimitiveOrReferenceType_TypePrimitivePrimit
                           <|> AGS.sem_PrimitiveOrReferenceType_TypePrimitiveNumericType_TypeFloating_Double <$ pKeyWord "double"
                           <|> AGS.sem_PrimitiveOrReferenceType_TypeReference <$> pReferenceType
 
+pTypeZ1 = pFoldr1 (AGS.sem_TypeZ_Cons, AGS.sem_TypeZ_Nil) pArrayType
 pTypeZ = pFoldr (AGS.sem_TypeZ_Cons, AGS.sem_TypeZ_Nil) pArrayType
 pArrayType = AGS.sem_ArrayType_ArrayType <$ pSpecialSimbol "[" <* pSpecialSimbol "]"
 
@@ -380,9 +390,9 @@ pImportDeclarations =   AGS.sem_ImportDeclarations_ImportDeclarations <$ pKeyWor
                                    <|> pSucceed AGS.sem_ImportDeclarations_NilImportDeclarations
 
 -- 78
-pImportDeclaration = AGS.sem_ImportDeclaration_SingleTypeImportDeclaration <$> pTypeName <* pSpecialSimbol ";"
+pImportDeclaration = AGS.sem_ImportDeclaration_SingleTypeImportDeclaration <$> pTypeNameImport <* pSpecialSimbol ";"
                                   <|> AGS.sem_ImportDeclaration_TypeImportOnDemandDeclaration <$> pPackageOrTypeName <* pSpecialSimbol "." <* pOperator "*" <* pSpecialSimbol ";"
-                                  <|> pKeyWord "static" *> pTypeName <**> (( (\tn ss -> AGS.sem_ImportDeclaration_SingleStaticImportDeclaration tn) <$$> pSpecialSimbol ";" ) <|> ( (\tn ss -> AGS.sem_ImportDeclaration_StaticImportOnDemandDeclaration tn ) <$$> pSpecialSimbol "." <* pOperator "*" <* pSpecialSimbol ";" ) )
+                                  <|> pKeyWord "static" *> pTypeNameImport <**> (( (\tn ss -> AGS.sem_ImportDeclaration_SingleStaticImportDeclaration tn) <$$> pSpecialSimbol ";" ) <|> ( (\tn ss -> AGS.sem_ImportDeclaration_StaticImportOnDemandDeclaration tn ) <$$> pSpecialSimbol "." <* pOperator "*" <* pSpecialSimbol ";" ) )
 
 -- 81
 pPackageOrTypeName = AGS.sem_PackageOrTypeName_PackageOrTypeName <$> pIdentifier <*> pPackageOrTypeName'
@@ -472,7 +482,7 @@ pClassMemberDeclarationConstructorOrMethod = (\rt md t mb tp m ->  AGS.sem_Class
                                                                                   <|> (\i f -> f i) <$> pIdentifier <* pSpecialSimbol "(" <*> pZConstructorDeclarator
 
 pZConstructorDeclarator =  (\   t cb  i tp m -> AGS.sem_ClassBodyDeclaration_ClassBodyConstructorDeclarationNoFormalParList m tp i t cb) <$ pSpecialSimbol ")" <*> pThrows <*> pConstructorBody
-                                           <|> (\fp t cb  i tp m -> AGS.sem_ClassBodyDeclaration_ClassBodyConstructorDeclaration m tp i fp t cb )            <$> pFormalParameterList <* pSpecialSimbol ")" <*> pThrows <*> pConstructorBody
+                                           <|> (\fp t cb  i tp m -> AGS.sem_ClassBodyDeclaration_ClassBodyConstructorDeclaration m tp i fp t cb )            <$> pFormalParameterListOne <* pSpecialSimbol ")" <*> pThrows <*> pConstructorBody
 
 pVariableDeclarators = pFoldr1Sep (AGS.sem_VariableDeclarators_Cons, AGS.sem_VariableDeclarators_Nil) (pSpecialSimbol ",") pVariableDeclarator
 
@@ -490,6 +500,8 @@ pResultType = AGS.sem_ResultType_ResultTypeVoid <$ pKeyWord "void"
                    <|> AGS.sem_ResultType_ResultTypeType <$> pType
 
 pMethodDeclarator  =  AGS.sem_MethodDeclarator_MethodDeclaratorFormalPL <$> pIdentifier <* pSpecialSimbol "(" <*> pFormalParameterList <* pSpecialSimbol ")"
+
+pFormalParameterListOne = (\vm t f -> f vm t ) <$> pVariableModifiers <*> pType <*> pFormalParameterList'
 
 pFormalParameterList = (\vm t f -> f vm t ) <$> pVariableModifiers <*> pType <*> pFormalParameterList'
                                         <|> pSucceed AGS.sem_FormalParameterList_FormalParameterListNil
