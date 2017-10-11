@@ -1,21 +1,28 @@
-package code.java
+package java.awt
 
-object Switch {
-  @throws[Exception]
-  private def generate_hmac_sha1_40 {
-    System.out.println("Generating ")
-    val doc: Nothing = dbf.newDocumentBuilder.newDocument
-    val sig: Nothing = new Nothing(doc, null, XMLSignature.ALGO_ID_MAC_HMAC_SHA1, 40, Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS)
-    try {
-      sig.sign(getSecretKey("secret".getBytes("ASCII")))
-      System.out.println("FAILED")
-      atLeastOneFailed = true
-    }
-    catch {
-      case xse: Nothing => {
-        System.out.println(xse.getMessage)
-        System.out.println("PASSED")
-      }
-    }
-  }
+import java.awt.image.ColorModel
+import java.awt.image.Raster
+class ColorPaintContext(color: Int, cm: ColorModel) with PaintContext  { 
+
+	{
+			this???=color
+	}
+
+	var color: Int = 0
+	var savedTile: WritableRaster = null
+	def getRaster(x: Int, y: Int, w: Int, h: Int): Raster = {
+		var t: WritableRaster = savedTile
+		if (t == null || w > t.getWidth() || h > t.getHeight()) {							
+				t=getColorModel()
+				var icr: IntegerComponentRaster = 
+				Arrays.fill(icr.getDataStorage(),color)
+				icr.markDirty()
+				if (w <= 64 && h <= 64) {											
+						savedTile=t
+				}
+		}
+		t
+	}
 }
+
+

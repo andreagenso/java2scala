@@ -70,9 +70,7 @@ public class Panel extends Container implements Accessible {
      * name is null.
      */
     String constructComponentName() {
-        synchronized (Panel.class) {
-            return base + nameCounter++;
-        }
+        return base + nameCounter;
     }
 
     /**
