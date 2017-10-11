@@ -4,6 +4,7 @@ out*
 project*
 target*
 doc/papers*
+*.class
 =3.2.0
 *GenerationTests_orig.java
 
