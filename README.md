@@ -1,5 +1,7 @@
 # java2scala
-Convert Java code to Scala
+Project developed in Haskell + AG : Convert Java code to Scala
+
+AG Basic commands:
 
 -- PROF
 cabal clean
