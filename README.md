@@ -1,5 +1,22 @@
 # java2scala
-Project developed in Haskell + AG : Convert Java code to Scala
+
+Java2Scala is a project which convert Java files to Scala. It receives Java 7 Specification languages and transform them to Scala 10.
+Structures involved:
+* primitives
+* variables
+* modifiers
+* static values
+* static methods
+* static classes
+* collections
+* iterations transformed to high order functions and `for-yield`
+* classes
+* interfaces
+* imports
+* packages
+
+# How to use:
+core code is developed in Haskell and AG:
 
 AG Basic commands:
 
@@ -21,4 +38,6 @@ cabal install --ghc-options="-DEXTERNAL_UUAGC"
 -- "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/TmpImport.java"
 
 ./dist/build/java2scala/java2scala "/home/andrea/workspaceclipse_haskell/java2scala/test/J2s/Parser/1compilationUnitSimple.java"
+
+
 
